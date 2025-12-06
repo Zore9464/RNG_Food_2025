@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食地圖 - RNG</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRSqBMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    
+    <style>
+        /* 基礎設定 */
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif; background-color: #f4f7f6; }
+        
+        /* 導覽列樣式 (與主頁一致) */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; box-sizing: border-box; z-index: 1000;
+        }
+        .nav-logo {
+            font-size: 1.8rem; font-weight: 800;
+            background: linear-gradient(45deg, #ff6b6b, #ff9f43);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-btn {
+            text-decoration: none; color: #555; font-weight: 600; padding: 8px 16px;
+            border-radius: 12px; display: flex; align-items: center; gap: 6px; transition: all 0.3s ease;
+        }
+        .nav-btn:hover { background-color: rgba(255, 107, 107, 0.08); color: #ff6b6b; transform: translateY(-2px); }
+        .nav-side { display: flex; gap: 15px; flex: 1; align-items: center; }
+        .nav-right { justify-content: flex-end; }
+
+        /* 地圖專用容器 */
+        #map {
+            width: 100%;
+            /* 扣掉導覽列高度 (70px) */
+            height: calc(100vh - 70px);
+            margin-top: 70px;
+            z-index: 1;
+        }
+
+        /* 定位按鈕 */
+        .locate-btn {
+            position: absolute; bottom: 30px; right: 30px;
+            background: white; padding: 15px; border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer; z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .locate-btn:active { transform: scale(0.9); }
+        .locate-btn span { color: #555; font-size: 24px; }
+        
+        @media (max-width: 600px) {
+            .nav-btn span:not(.material-symbols-rounded) { display: none; }
+            .navbar { padding: 0 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-side nav-left">
+            <a href="index.html" class="nav-btn"> <span class="material-symbols-rounded">arrow_back</span>
+                返回首頁
+            </a>
+        </div>
+        <a href="#" class="nav-logo">美食地圖</a>
+        <div class="nav-side nav-right">
+            <div class="nav-btn" style="cursor: default;">
+                <span class="material-symbols-rounded">my_location</span>
+                <span id="status-text">定位中...</span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="map"></div>
+
+    <div class="locate-btn" onclick="locateUser()" title="回到我的位置">
+        <span class="material-symbols-rounded">near_me</span>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // 初始化地圖，預設中心點 (台北車站)
+        var map = L.map('map').setView([25.0478, 121.5170], 15);
+
+        // 載入 OpenStreetMap 圖資
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // 定義自訂圖示 (紅色：餐廳，藍色：人)
+        var userIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background-color:#4285F4; width:15px; height:15px; border-radius:50%; border:3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);'></div>",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        // 模擬的餐廳資料 (隨機分布在台北車站附近)
+        const restaurants = [
+            { name: "老王牛肉麵", lat: 25.0488, lng: 121.5180, desc: "湯頭濃郁，老字號" },
+            { name: "巷口炸雞", lat: 25.0465, lng: 121.5160, desc: "外酥內嫩" },
+            { name: "文青咖啡館", lat: 25.0470, lng: 121.5190, desc: "適合下午茶" },
+            { name: "日式拉麵", lat: 25.0490, lng: 121.5155, desc: "叉燒超大塊" }
+        ];
+
+        // 將餐廳標記到地圖上
+        restaurants.forEach(shop => {
+            L.marker([shop.lat, shop.lng])
+             .bindPopup(`<b>${shop.name}</b><br>${shop.desc}`)
+             .addTo(map);
+        });
+
+        var userMarker = null;
+
+        // 獲取使用者位置功能
+        function locateUser() {
+            if (!navigator.geolocation) {
+                alert("您的瀏覽器不支援地理位置功能");
+                return;
+            }
+
+            document.getElementById('status-text').textContent = "定位中...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // 1. 如果已經有標記，就移除舊的
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+
+                    // 2. 新增使用者位置標記
+                    userMarker = L.marker([lat, lng], {icon: userIcon}).addTo(map)
+                        .bindPopup("您現在的位置").openPopup();
+
+                    // 3. 畫一個圓圈表示誤差範圍
+                    L.circle([lat, lng], { radius: accuracy, opacity: 0.1 }).addTo(map);
+
+                    // 4. 移動視角
+                    map.flyTo([lat, lng], 16);
+                    
+                    document.getElementById('status-text').textContent = "定位完成";
+                },
+                (error) => {
+                    console.error(error);
+                    document.getElementById('status-text').textContent = "定位失敗";
+                    alert("無法獲取您的位置，請確認是否允許權限。");
+                },
+                { enableHighAccuracy: true } // 開啟高精準度模式
+            );
+        }
+
+        // 網頁載入後自動定位
+        window.onload = locateUser;
+
+    </script>
+</body>
+</html>
