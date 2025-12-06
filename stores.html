@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店家資訊 - RNG美食</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        /* ========================================
+           全局變數 (必須與首頁一致以支援主題切換)
+           ======================================== */
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --text-sub: #bdbdbd;
+            --accent-color: #ffffff;
+            --surface: rgba(255, 255, 255, 0.08);
+            --surface-light: rgba(255, 255, 255, 0.12);
+            --border-light: rgba(255, 255, 255, 0.15);
+            --border-medium: rgba(255, 255, 255, 0.25);
+            --option-bg: rgba(0, 0, 0, 0.3);
+            --card-hover: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        /* 導覽列 */
+        .navbar {
+            position: fixed; top: 0; width: 100%; height: 70px;
+            background-color: var(--surface);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; padding: 0 30px; z-index: 100;
+        }
+
+        .back-btn {
+            text-decoration: none; color: var(--text-color);
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 500; padding: 8px 16px; border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover { background-color: var(--surface-light); }
+
+        /* 內容容器 */
+        .container {
+            max-width: 1000px; margin: 100px auto 60px; padding: 0 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 2.5rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 10px; }
+        .subtitle { color: var(--text-sub); font-size: 1rem; font-weight: 300; }
+
+        /* 店家卡片網格 */
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* 單張卡片樣式 */
+        .store-card {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+        }
+
+        .store-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-medium);
+            background-color: var(--surface);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .store-name { font-size: 1.4rem; font-weight: 400; letter-spacing: 1px; }
+        
+        .store-price { 
+            font-size: 0.9rem; color: var(--accent-color); 
+            background: var(--option-bg); padding: 4px 10px; border-radius: 20px;
+            border: 1px solid var(--border-light);
+        }
+
+        .stars { color: var(--text-color); margin-bottom: 15px; letter-spacing: 2px; font-size: 0.9rem; }
+
+        .store-desc {
+            color: var(--text-sub); font-size: 0.95rem; margin-bottom: 20px;
+            flex-grow: 1; line-height: 1.6;
+        }
+
+        .card-footer {
+            border-top: 1px solid var(--border-light);
+            padding-top: 15px; margin-top: auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .location {
+            display: flex; align-items: center; gap: 5px;
+            color: var(--text-sub); font-size: 0.85rem;
+        }
+
+        .location .material-symbols-rounded { font-size: 1rem; }
+
+        /* 標籤樣式 */
+        .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .tag {
+            font-size: 0.75rem; padding: 4px 8px; border-radius: 4px;
+            background-color: var(--option-bg); color: var(--text-sub);
+            border: 1px solid var(--border-light);
+        }
+
+        /* 裝飾線條 */
+        .bg-lines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none;
+        }
+        .line { position: absolute; background-color: var(--text-color); }
+        .v-line { width: 1px; height: 100%; left: 25%; }
+        .v-line:nth-child(2) { left: 75%; }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-lines">
+        <div class="line v-line"></div>
+        <div class="line v-line"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="./13test.html" class="back-btn">
+            <span class="material-symbols-rounded">arrow_back</span>
+            <span>返回首頁</span>
+        </a>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>所有店家資訊</h1>
+            <div class="subtitle">探索收錄在資料庫中的美味名單</div>
+        </header>
+
+        <div class="store-grid" id="storeGrid"></div>
+
+        <div style="text-align: center; margin-top: 60px; color: var(--text-sub); font-size: 0.9rem;">
+            &copy; 2025 RNG Project. All foods reserved.
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. 資料庫 (與首頁一致)
+        // ==========================================
+        const foods = [
+            { name: "燒餅油條配豆漿", rating: "傳統滋味，酥脆口感，豆香濃郁", description: "燒餅、油條、冰豆漿", location: "豆漿大王", price: "NT$ 45", stars: 4, category: "light", time: ["breakfast"] },
+            { name: "起司蛋餅", rating: "餅皮酥脆，起司牽絲，喚醒早晨", description: "手工蛋餅皮、切達起司、雞蛋", location: "巷口早餐店", price: "NT$ 40", stars: 5, category: "light", time: ["breakfast", "lunch"] },
+            { name: "牛肉麵", rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈", description: "半筋半肉牛肉、手工麵條、青菜、蔥花", location: "台北市大安區忠孝東路四段", price: "NT$ 150", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
+            { name: "滷肉飯", rating: "滷汁香濃，米飯飽滿，肥瘦適中", description: "滷肉、米飯、滷蛋、黃瓜片", location: "台北市中正區羅斯福路一段", price: "NT$ 50", stars: 5, category: "rice", time: ["lunch", "dinner"] },
+            { name: "日式拉麵", rating: "湯頭醇厚，叉燒入口即化", description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾", location: "台北市信義區松壽路", price: "NT$ 220", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
+            { name: "義大利麵", rating: "醬汁濃郁，麵條彈牙，配料豐富", description: "義大利麵、番茄肉醬、起司、羅勒", location: "台北市中山區南京東路", price: "NT$ 180", stars: 4, category: "western", time: ["lunch", "dinner"] },
+            { name: "健康沙拉", rating: "新鮮蔬菜，營養均衡，輕食首選", description: "生菜、番茄、雞胸肉、堅果、油醋醬", location: "台北市大安區仁愛路四段", price: "NT$ 120", stars: 3, category: "light", time: ["breakfast", "lunch"] },
+            { name: "港式燒臘", rating: "肉質鮮美，皮脆肉嫩，醬汁獨特", description: "燒鴨、叉燒、油雞、青菜、白飯", location: "台北市萬華區西門町", price: "NT$ 110", stars: 4, category: "rice", time: ["lunch", "dinner"] },
+            { name: "韓式拌飯", rating: "辣醬夠味，配料豐富，口感層次多", description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬", location: "台北市松山區市民大道", price: "NT$ 160", stars: 4, category: "rice", time: ["lunch", "dinner"] },
+            { name: "素食餐盒", rating: "清爽不油膩，營養均衡，素食者首選", description: "五穀飯、時蔬、豆腐、菇類、堅果", location: "台北市文山區興隆路", price: "NT$ 90", stars: 3, category: "light", time: ["lunch", "dinner"] }
+        ];
+
+        // 類別與時間的中文對照 (用於顯示標籤)
+        const categoryMap = {
+            'light': '輕食', 'noodle': '麵食', 'rice': '米飯', 'western': '西式', 'all': '全部'
+        };
+        const timeMap = {
+            'breakfast': '早餐', 'lunch': '午餐', 'dinner': '晚餐'
+        };
+
+        // ==========================================
+        // 2. 主題邏輯 (確保顏色一致)
+        // ==========================================
+        const themes = {
+            default: { // 經典黑白
+                '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd',
+                '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)',
+                '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)',
+                '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)'
+            },
+            light: { // 極簡亮白
+                '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366',
+                '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)',
+                '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)',
+                '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)'
+            },
+            midnight: { // 午夜深藍
+                '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8',
+                '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)',
+                '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)',
+                '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)'
+            },
+            forest: { // 森林墨綠
+                '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7',
+                '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)',
+                '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)',
+                '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)'
+            },
+            latte: { // 暖色拿鐵
+                '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4',
+                '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)',
+                '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)',
+                '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)'
+            }
+        };
+
+        // ==========================================
+        // 3. 頁面初始化與渲染
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // A. 應用主題
+            const savedTheme = localStorage.getItem('rng_theme') || 'default';
+            const theme = themes[savedTheme];
+            if (theme) {
+                const root = document.documentElement;
+                for (const [property, value] of Object.entries(theme)) {
+                    root.style.setProperty(property, value);
+                }
+            }
+
+            // B. 渲染卡片
+            const storeGrid = document.getElementById('storeGrid');
+            
+            foods.forEach(food => {
+                // 生成星星字串
+                let starStr = '';
+                for(let i=0; i<5; i++) {
+                    starStr += i < food.stars ? '★' : '☆';
+                }
+
+                // 生成標籤 HTML
+                let tagsHtml = `<span class="tag">${categoryMap[food.category]}</span>`;
+                food.time.forEach(t => {
+                    tagsHtml += `<span class="tag">${timeMap[t]}</span>`;
+                });
+
+                const card = document.createElement('div');
+                card.className = 'store-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3 class="store-name">${food.location}</h3>
+                        <span class="store-price">${food.price}</span>
+                    </div>
+                    
+                    <div class="stars">${starStr}</div>
+                    
+                    <div class="tags">${tagsHtml}</div>
+                    
+                    <p style="margin-bottom: 5px; font-weight: 500;">${food.name}</p>
+                    <p class="store-desc">${food.description}</p>
+                    
+                    <div class="card-footer">
+                        <div class="location">
+                            <span class="material-symbols-rounded">location_on</span>
+                            <span>${food.location}</span>
+                        </div>
+                        <div class="location">
+                            <span class="material-symbols-rounded">rate_review</span>
+                        </div>
+                    </div>
+                `;
+                storeGrid.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>
