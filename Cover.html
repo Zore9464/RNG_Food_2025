@@ -9,197 +9,154 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft JhengHei', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
         }
         
         body {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
+            background-color: #000000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            animation: gradientBG 15s ease infinite;
+            color: #ffffff;
+            position: relative;
             overflow: hidden;
         }
         
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-        
-        /* 添加浮動圓形裝飾 */
-        .floating-shapes {
+        /* 極簡背景圖案 */
+        .background-pattern {
             position: absolute;
             width: 100%;
             height: 100%;
             z-index: 0;
-        }
-        
-        .shape {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-        
-        .shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            top: 60%;
-            left: 85%;
-            animation-delay: -2s;
-        }
-        
-        .shape:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            top: 80%;
-            left: 20%;
-            animation-delay: -4s;
-        }
-        
-        .shape:nth-child(4) {
-            width: 100px;
-            height: 100px;
-            top: 10%;
-            left: 80%;
-            animation-delay: -1s;
-        }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
+            opacity: 0.03;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 20%),
+                linear-gradient(90deg, transparent 98%, rgba(255, 255, 255, 0.05) 100%),
+                linear-gradient(0deg, transparent 98%, rgba(255, 255, 255, 0.05) 100%);
+            background-size: 200px 200px, 200px 200px, 50px 50px, 50px 50px;
         }
         
         .container {
             text-align: center;
-            padding: 50px 30px;
-            max-width: 450px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            z-index: 1;
+            padding: 60px 40px;
+            max-width: 500px;
+            width: 90%;
             position: relative;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            animation: fadeInUp 0.8s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            z-index: 1;
         }
         
         h1 {
-            font-size: 4.5rem;
-            font-weight: 800;
-            margin-bottom: 60px;
-            color: #333;
-            letter-spacing: 3px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(45deg, #e73c7e, #23a6d5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: textGlow 3s ease-in-out infinite alternate;
+            font-size: 5rem;
+            font-weight: 300;
+            margin-bottom: 80px;
+            color: #ffffff;
+            letter-spacing: 8px;
+            position: relative;
+            display: inline-block;
         }
         
-        @keyframes textGlow {
-            0% {
-                filter: drop-shadow(0 0 5px rgba(231, 60, 126, 0.5));
-            }
-            100% {
-                filter: drop-shadow(0 0 15px rgba(35, 166, 213, 0.7));
-            }
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
         }
         
         .button-container {
             margin: 50px 0;
-            transform-style: preserve-3d;
-            perspective: 1000px;
+            position: relative;
         }
         
         button {
-            background: linear-gradient(45deg, #e73c7e, #23a6d5);
-            color: white;
-            border: none;
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
             padding: 20px 60px;
-            font-size: 1.6rem;
-            border-radius: 50px;
+            font-size: 1.3rem;
+            border-radius: 0;
             cursor: pointer;
-            font-weight: bold;
-            letter-spacing: 1px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            font-weight: 300;
+            letter-spacing: 3px;
+            transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
-            z-index: 1;
-            transform: translateZ(20px);
-        }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.7s ease;
-            z-index: -1;
+            background: linear-gradient(to right, transparent 50%, rgba(255, 255, 255, 0.05) 50%);
+            background-size: 200% 100%;
+            background-position: right bottom;
         }
         
         button:hover {
-            transform: translateZ(20px) scale(1.1);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            letter-spacing: 2px;
-            background: linear-gradient(45deg, #23a6d5, #e73c7e);
+            background-position: left bottom;
+            letter-spacing: 5px;
+            border-color: #cccccc;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
         
-        button:hover::before {
-            left: 100%;
+        button::before, button::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            background-color: #ffffff;
+            transition: all 0.4s ease;
         }
         
-        button:active {
-            transform: translateZ(20px) scale(0.95);
-            transition: transform 0.1s;
+        button::before {
+            top: 0;
+            left: 0;
+        }
+        
+        button::after {
+            bottom: 0;
+            right: 0;
+        }
+        
+        button:hover::before, button:hover::after {
+            width: 100%;
+        }
+        
+        .button-border-top, .button-border-bottom {
+            position: absolute;
+            height: 1px;
+            background-color: #ffffff;
+            transition: all 0.4s ease;
+            opacity: 0.5;
+        }
+        
+        .button-border-top {
+            top: 0;
+            left: 0;
+            width: 0;
+        }
+        
+        .button-border-bottom {
+            bottom: 0;
+            right: 0;
+            width: 0;
+        }
+        
+        .button-container:hover .button-border-top {
+            width: 100%;
+        }
+        
+        .button-container:hover .button-border-bottom {
+            width: 100%;
         }
         
         .bottom-text {
-            font-size: 1.3rem;
-            color: #666;
-            margin-top: 70px;
-            font-weight: 600;
+            font-size: 1.1rem;
+            color: #aaaaaa;
+            margin-top: 80px;
+            font-weight: 300;
             letter-spacing: 1px;
             position: relative;
             padding-top: 20px;
-            animation: fadeInDelay 1.2s ease-out;
         }
         
         .bottom-text::before {
@@ -208,92 +165,178 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: linear-gradient(90deg, #e73c7e, #23a6d5);
-            border-radius: 3px;
+            width: 40px;
+            height: 1px;
+            background-color: #666666;
         }
         
-        @keyframes fadeInDelay {
-            0% {
-                opacity: 0;
-            }
-            70% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-        
-        /* 添加背景粒子效果 */
-        .particles {
+        /* 極簡動畫線條 */
+        .minimal-lines {
             position: absolute;
             width: 100%;
             height: 100%;
             z-index: 0;
+            pointer-events: none;
         }
         
-        .particle {
+        .line {
             position: absolute;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            animation: particleMove 15s linear infinite;
+            background-color: rgba(255, 255, 255, 0.03);
+            animation: lineMove 20s linear infinite;
         }
         
-        @keyframes particleMove {
+        .line-1 {
+            top: 10%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            animation-delay: 0s;
+        }
+        
+        .line-2 {
+            top: 30%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            animation-delay: -5s;
+        }
+        
+        .line-3 {
+            top: 70%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            animation-delay: -10s;
+        }
+        
+        .line-4 {
+            top: 90%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            animation-delay: -15s;
+        }
+        
+        @keyframes lineMove {
             0% {
-                transform: translateY(100vh) translateX(0) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
+                transform: translateX(-100%);
             }
             100% {
-                transform: translateY(-100px) translateX(100px) rotate(360deg);
-                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        /* 頁面加載動畫 */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .loader-line {
+            width: 200px;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .loader-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background-color: #ffffff;
+            animation: loading 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                left: -40%;
+            }
+            50% {
+                left: 100%;
+            }
+            100% {
+                left: 100%;
             }
         }
         
         /* 響應式調整 */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .container {
-                max-width: 90%;
                 padding: 40px 20px;
             }
             
             h1 {
                 font-size: 3.5rem;
+                letter-spacing: 5px;
+                margin-bottom: 60px;
             }
             
             button {
                 padding: 18px 40px;
-                font-size: 1.4rem;
+                font-size: 1.1rem;
+            }
+            
+            .bottom-text {
+                margin-top: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.8rem;
+                letter-spacing: 3px;
+            }
+            
+            button {
+                padding: 15px 30px;
+                font-size: 1rem;
+                letter-spacing: 2px;
+            }
+            
+            button:hover {
+                letter-spacing: 3px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- 浮動形狀裝飾 -->
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
+    <!-- 背景圖案 -->
+    <div class="background-pattern"></div>
+    
+    <!-- 動畫線條 -->
+    <div class="minimal-lines">
+        <div class="line line-1"></div>
+        <div class="line line-2"></div>
+        <div class="line line-3"></div>
+        <div class="line line-4"></div>
     </div>
     
-    <!-- 粒子效果 -->
-    <div class="particles" id="particles"></div>
+    <!-- 頁面加載動畫 -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-line"></div>
+    </div>
     
     <!-- 主要內容 -->
     <div class="container">
         <h1>RNG</h1>
         
         <div class="button-container">
-            <button onclick="location.href='./13.html'">點我進入</button>
+            <div class="button-border-top"></div>
+            <button onclick="navigateToLunchPage()">點我進入</button>
+            <div class="button-border-bottom"></div>
         </div>
         
         <div class="bottom-text">
@@ -302,87 +345,57 @@
     </div>
 
     <script>
-        // 生成背景粒子
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // 隨機大小 (1-5px)
-                const size = Math.random() * 4 + 1;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                
-                // 隨機起始位置
-                particle.style.left = `${Math.random() * 100}vw`;
-                
-                // 隨機動畫延遲和持續時間
-                const delay = Math.random() * 15;
-                const duration = 10 + Math.random() * 20;
-                particle.style.animationDelay = `${delay}s`;
-                particle.style.animationDuration = `${duration}s`;
-                
-                // 隨機顏色
-                const colors = [
-                    'rgba(255, 255, 255, 0.5)',
-                    'rgba(231, 60, 126, 0.3)',
-                    'rgba(35, 166, 213, 0.3)',
-                    'rgba(35, 213, 171, 0.3)'
-                ];
-                const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.backgroundColor = randomColor;
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        // 頁面加載時創建粒子
-        window.addEventListener('load', createParticles);
-        
-        // 為按鈕添加點擊漣漪效果
-        document.querySelector('button').addEventListener('click', function(e) {
-            // 創建漣漪元素
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.7);
-                transform: scale(0);
-                animation: ripple-animation 0.6s linear;
-                width: ${size}px;
-                height: ${size}px;
-                top: ${y}px;
-                left: ${x}px;
-                z-index: 0;
-            `;
-            
-            this.appendChild(ripple);
-            
-            // 動畫結束後移除漣漪元素
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
+        // 頁面加載動畫
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const pageLoader = document.getElementById('pageLoader');
+                pageLoader.style.opacity = '0';
+                pageLoader.style.visibility = 'hidden';
+            }, 800);
         });
         
-        // 添加漣漪動畫的CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes ripple-animation {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
+        // 導航到午餐頁面
+        function navigateToLunchPage() {
+            // 添加點擊動畫
+            const button = document.querySelector('button');
+            button.style.transform = 'scale(0.95)';
+            button.style.opacity = '0.8';
+            
+            // 顯示過渡效果
+            document.body.style.transition = 'opacity 0.5s ease';
+            document.body.style.opacity = '0.8';
+            
+            // 延遲導航以顯示動畫
+            setTimeout(function() {
+                window.location.href = './13.html';
+            }, 300);
+        }
+        
+        // 為按鈕添加鍵盤快捷鍵支持
+        document.addEventListener('keydown', function(event) {
+            // 按空格鍵或回車鍵觸發按鈕點擊
+            if (event.code === 'Space' || event.code === 'Enter') {
+                event.preventDefault();
+                navigateToLunchPage();
             }
-        `;
-        document.head.appendChild(style);
+        });
+        
+        // 為按鈕添加觸摸反饋
+        const button = document.querySelector('button');
+        button.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+        });
+        
+        button.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+        });
+        
+        // 隨機背景圖案密度
+        window.addEventListener('load', function() {
+            const pattern = document.querySelector('.background-pattern');
+            const density = Math.random() * 0.5 + 0.5; // 0.5 到 1.0 之間
+            pattern.style.opacity = 0.02 * density;
+        });
     </script>
 </body>
 </html>

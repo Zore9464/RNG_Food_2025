@@ -5,182 +5,1156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RNG美食</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="./css/13.css">
     <style>
         /* ========================================
-           精美導覽列設計重點
-           ========================================
-        */
-        body {
+           全局黑白簡約風格設定
+           ======================================== */
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #eeeeee;
+            --gray-300: #e0e0e0;
+            --gray-400: #bdbdbd;
+            --gray-500: #9e9e9e;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+            --surface: rgba(255, 255, 255, 0.08); /* 表面層背景 */
+            --surface-light: rgba(255, 255, 255, 0.12); /* 較亮表面層 */
+            --border-light: rgba(255, 255, 255, 0.15); /* 淺邊框 */
+            --border-medium: rgba(255, 255, 255, 0.25); /* 中等邊框 */
+        }
+        
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9; /* 確保背景色存在，對比毛玻璃效果 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
         }
-
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+        
+        /* ========================================
+           加載畫面 - 黑白簡約風格
+           ======================================== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        /* 加載動畫容器 */
+        .loading-animation {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin-bottom: 40px;
+        }
+        
+        /* 外圈旋轉動畫 */
+        .loading-circle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            box-sizing: border-box;
+        }
+        
+        .loading-circle::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background-color: var(--white);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .loading-circle:nth-child(1) {
+            animation: rotateCircle 3s linear infinite;
+        }
+        
+        .loading-circle:nth-child(2) {
+            border-width: 1px;
+            width: 160px;
+            height: 160px;
+            top: 10px;
+            left: 10px;
+            animation: rotateCircle 2.5s linear infinite reverse;
+        }
+        
+        .loading-circle:nth-child(3) {
+            border-width: 1px;
+            width: 140px;
+            height: 140px;
+            top: 20px;
+            left: 20px;
+            animation: rotateCircle 2s linear infinite;
+        }
+        
+        @keyframes rotateCircle {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* 中心文字 */
+        .loading-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            color: var(--white);
+            text-align: center;
+        }
+        
+        /* 加載進度條 */
+        .loading-progress {
+            width: 200px;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .loading-progress::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background-color: var(--white);
+            animation: progressMove 2s ease-in-out infinite;
+        }
+        
+        @keyframes progressMove {
+            0% {
+                left: -40%;
+                width: 40%;
+            }
+            50% {
+                width: 60%;
+            }
+            100% {
+                left: 100%;
+                width: 40%;
+            }
+        }
+        
+        /* 加載提示文字 */
+        .loading-message {
+            margin-top: 30px;
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--gray-400);
+            letter-spacing: 1px;
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.5;
+        }
+        
+        /* 加載完成動畫 */
+        .loading-complete {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 2rem;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .loading-complete.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        /* ========================================
+           極簡毛玻璃導覽列
+           ======================================== */
         .navbar {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 70px; /* 稍微增高一點，讓空間更舒適 */
+            height: 70px;
             
-            /* --- 關鍵：毛玻璃質感設定 --- */
-            background-color: rgba(255, 255, 255, 0.85); /* 半透明白色背景 */
-            backdrop-filter: blur(12px); /* 背景模糊濾鏡 (Safari 需要加 -webkit- 前綴，這裡簡化) */
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* 極細微的邊框增加層次 */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 更柔和、擴散的陰影 */
-            /* --------------------------- */
+            /* 黑白毛玻璃效果 */
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px; /* 增加兩側留白 */
-            box-sizing: border-box;
+            padding: 0 30px;
             z-index: 1000;
             transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-20px);
         }
-
-        /* 兩側按鈕區塊 */
+        
+        .navbar.loaded {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.3s;
+        }
+        
         .nav-side {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             flex: 1;
             align-items: center;
         }
-
+        
         .nav-right {
             justify-content: flex-end;
         }
-
-        /* 導覽列按鈕樣式優化 */
+        
+        /* 導覽列按鈕樣式 */
         .nav-btn {
             text-decoration: none;
-            color: #555; /* 更柔和的深灰色 */
-            font-size: 0.95rem;
-            font-weight: 600;
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 400;
             padding: 8px 16px;
-            border-radius: 12px; /* 更圓潤的邊角 */
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 更滑順的過渡效果 */
+            border-radius: 8px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px; /* 圖示與文字間距 */
+            gap: 6px;
+            border: 1px solid transparent;
         }
-
-        /* 圖示樣式調整 */
+        
         .nav-btn .material-symbols-rounded {
-            font-size: 1.3rem;
-            transition: color 0.3s ease;
+            font-size: 1.2rem;
         }
-
-        /* 按鈕懸停互動效果 */
+        
+        /* 按鈕懸停效果 */
         .nav-btn:hover {
-            background-color: rgba(255, 107, 107, 0.1); /* 淡淡的品牌色背景 */
-            color: #ff6b6b; /* 文字變色 */
-            transform: translateY(-2px); /* 輕微上浮 */
-            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.15); /* 懸停時的輕微光暈 */
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        /* 中間 LOGO 優化 */
+        
+        /* 中間 LOGO */
         .nav-logo {
             font-size: 1.8rem;
-            font-weight: 800;
-            /* 使用漸層文字 (可選，增加質感) */
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            
+            font-weight: 300;
+            color: var(--white);
             text-decoration: none;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             position: relative;
         }
-
-
-        /* --- 原有樣式調整 --- */
+        
+        .nav-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 1px;
+            background-color: var(--white);
+        }
+        
+        /* ========================================
+           返回Cover頁面的小框
+           ======================================== */
+        .cover-return-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .cover-return-container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.6s;
+        }
+        
+        .cover-return-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            width: 160px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cover-return-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+        
+        .cover-return-box:hover {
+            transform: translateY(-5px);
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cover-return-box:active {
+            transform: translateY(-2px);
+            transition: transform 0.1s ease;
+        }
+        
+        .cover-return-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--white);
+            text-decoration: none;
+        }
+        
+        .cover-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .cover-return-box:hover .cover-icon {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+        }
+        
+        .cover-icon .material-symbols-rounded {
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+        
+        .cover-text {
+            flex: 1;
+        }
+        
+        .cover-text h3 {
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+            color: var(--white);
+        }
+        
+        .cover-text p {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: var(--gray-400);
+            line-height: 1.4;
+        }
+        
+        /* 返回箭頭動畫 */
+        .cover-return-box:hover .cover-arrow {
+            transform: translateX(3px);
+        }
+        
+        .cover-arrow {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+            color: var(--gray-400);
+        }
+        
+        /* 小框收合/展開功能 */
+        .cover-minimize-btn {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .cover-minimize-btn:hover {
+            opacity: 1;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .cover-minimize-btn .material-symbols-rounded {
+            font-size: 1.2rem;
+            color: var(--white);
+            transition: transform 0.3s ease;
+        }
+        
+        .cover-minimized .cover-minimize-btn .material-symbols-rounded {
+            transform: rotate(180deg);
+        }
+        
+        .cover-minimized .cover-return-box {
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* 主要內容容器 */
         .container {
-            margin-top: 100px; /* 配合新的導覽列高度調整間距 */
-            max-width: 600px;
+            margin-top: 100px;
+            max-width: 700px;
             margin-left: auto;
             margin-right: auto;
-            padding: 30px; /* 增加內部留白 */
+            padding: 0 20px 40px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.4s;
+        }
+        
+        /* 背景裝飾線條 */
+        .background-lines {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.05;
+        }
+        
+        .line {
+            position: absolute;
+            background-color: var(--white);
+        }
+        
+        .line-vertical {
+            width: 1px;
+            height: 100%;
+            left: 20%;
+        }
+        
+        .line-vertical:nth-child(2) {
+            left: 40%;
+        }
+        
+        .line-vertical:nth-child(3) {
+            left: 60%;
+        }
+        
+        .line-vertical:nth-child(4) {
+            left: 80%;
+        }
+        
+        .line-horizontal {
+            width: 100%;
+            height: 1px;
+            top: 20%;
+        }
+        
+        .line-horizontal:nth-child(6) {
+            top: 40%;
+        }
+        
+        .line-horizontal:nth-child(7) {
+            top: 60%;
+        }
+        
+        .line-horizontal:nth-child(8) {
+            top: 80%;
+        }
+        
+        /* 頁面標頭 */
+        header {
             text-align: center;
-            background: white;
-            border-radius: 20px; /* 更圓潤 */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); /* 更更有層次感的陰影 */
+            margin-bottom: 40px;
+            padding-top: 20px;
         }
-
-        /* 選項區塊樣式 */
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: var(--white);
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: var(--gray-400);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        /* ========================================
+           選項區塊 - 重點優化部分
+           ======================================== */
         .options-container {
-            margin-bottom: 25px;
-            text-align: left;
-            background: #fcfcfc;
-            padding: 20px;
-            border-radius: 15px;
-            border: 1px solid #edf2f7;
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: var(--surface-light);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
         }
-        /* ... (其餘樣式保持不變或微調) ... */
-        .option-group { margin-bottom: 15px; }
-        .option-group label { font-weight: 700; margin-right: 10px; color: #4a5568; }
-        .radio-group { display: inline-block; }
-        .radio-group input { margin-left: 10px; accent-color: #ff6b6b; /* 修改單選框顏色 */ }
-        .radio-group label { margin-right: 12px; cursor: pointer; font-weight: 500; color: #666;}
-        select { padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.95rem; outline: none; cursor: pointer;}
-        select:focus { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2); }
-        header { margin-bottom: 25px; }
-        h1 { margin: 0 0 10px 0; color: #2d3748; }
-        .subtitle { margin: 0; color: #718096; }
+        
+        /* 選項容器裝飾元素 */
+        .options-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--white), transparent);
+            opacity: 0.1;
+        }
+        
+        .options-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--white), transparent);
+            opacity: 0.1;
+        }
+        
+        .option-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .option-group:hover {
+            border-color: var(--border-medium);
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .option-group label {
+            display: block;
+            font-weight: 400;
+            margin-bottom: 12px;
+            color: var(--white);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-left: 10px;
+        }
+        
+        .option-group label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 16px;
+            background-color: var(--white);
+            border-radius: 2px;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .radio-group label {
+            position: relative;
+            cursor: pointer;
+            font-weight: 300;
+            color: var(--gray-300);
+            transition: color 0.3s ease;
+            padding-left: 30px; /* 為單選按鈕留出空間 */
+            margin-bottom: 0;
+        }
+        
+        .radio-group label::before {
+            display: none; /* 覆蓋掉 .option-group label::before */
+        }
+        
+        .radio-group input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-500);
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: transparent;
+        }
+        
+        .radio-group input[type="radio"]:checked {
+            border-color: var(--white);
+            background-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+        
+        .radio-group input[type="radio"]:checked + span {
+            color: var(--white);
+            font-weight: 400;
+        }
+        
+        .radio-group label:hover input[type="radio"] {
+            border-color: var(--white);
+        }
+        
+        .radio-group label:hover {
+            color: var(--white);
+        }
+        
+        /* 下拉選單樣式 */
+        .option-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-medium);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: var(--white);
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .option-group select:hover {
+            border-color: var(--white);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .option-group select:focus {
+            border-color: var(--white);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 下拉選單選項樣式 */
+        .option-group select option {
+            background-color: var(--gray-900);
+            color: var(--white);
+            padding: 10px;
+        }
+        
+        /* 選項組標題增強 */
+        .option-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .option-title .material-symbols-rounded {
+            font-size: 1.2rem;
+            color: var(--white);
+        }
+        
+        /* ========================================
+           主要按鈕
+           ======================================== */
+        .button-container {
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .random-btn {
+            background-color: transparent;
+            color: var(--white);
+            border: 1px solid var(--white);
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .random-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.7s ease;
+        }
+        
+        .random-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            letter-spacing: 2px;
+            padding: 18px 45px;
+        }
+        
+        .random-btn:hover::before {
+            left: 100%;
+        }
+        
+        .random-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* ========================================
+           結果顯示區域
+           ======================================== */
+        .result-container {
+            margin-top: 30px;
+            padding: 30px;
+            background-color: var(--surface-light);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .result-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .food-name {
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        /* 評分星星 */
+        .rating {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+        }
+        
+        .star {
+            color: var(--gray-400);
+        }
+        
+        .star:not(:empty) {
+            color: var(--white);
+        }
+        
+        /* 食物詳細資訊 */
+        .food-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .detail-box {
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+        
+        .detail-title {
+            font-size: 0.9rem;
+            color: var(--gray-400);
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .detail-content {
+            font-size: 1.1rem;
+            color: var(--white);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+        
+        /* ========================================
+           頁尾
+           ======================================== */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--gray-500);
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+        
+        /* ========================================
+           響應式設計
+           ======================================== */
+        @media (max-width: 768px) {
+            .navbar {
+                height: 60px;
+                padding: 0 20px;
+            }
+            
+            .nav-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            
+            .nav-btn span {
+                font-size: 1rem;
+            }
+            
+            .nav-logo {
+                font-size: 1.4rem;
+            }
+            
+            .container {
+                margin-top: 80px;
+                padding: 0 15px 30px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .options-container {
+                padding: 20px;
+            }
+            
+            .option-group {
+                padding: 12px;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .food-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .random-btn {
+                min-width: 200px;
+                padding: 16px 30px;
+                font-size: 1rem;
+            }
+            
+            /* 調整返回小框的位置和大小 */
+            .cover-return-container {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .cover-return-box {
+                width: 150px;
+                padding: 14px 16px;
+            }
+            
+            .cover-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .cover-text h3 {
+                font-size: 0.95rem;
+            }
+            
+            .cover-text p {
+                font-size: 0.75rem;
+            }
+            
+            /* 加載畫面調整 */
+            .loading-animation {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .loading-circle:nth-child(2) {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .loading-circle:nth-child(3) {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .loading-text {
+                font-size: 1.4rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-btn span {
+                display: none;
+            }
+            
+            .nav-btn {
+                padding: 8px;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                justify-content: center;
+            }
+            
+            .nav-logo {
+                font-size: 1.2rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .food-name {
+                font-size: 1.8rem;
+            }
+            
+            .option-group label {
+                font-size: 1rem;
+            }
+            
+            /* 在非常小的螢幕上，返回小框只顯示圖標 */
+            .cover-return-box {
+                width: auto;
+                padding: 12px;
+            }
+            
+            .cover-text, .cover-arrow {
+                display: none;
+            }
+            
+            .cover-icon {
+                width: 40px;
+                height: 40px;
+                margin: 0;
+            }
+            
+            .cover-return-content {
+                justify-content: center;
+            }
+            
+            /* 加載畫面調整 */
+            .loading-animation {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .loading-circle:nth-child(2) {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .loading-circle:nth-child(3) {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .loading-text {
+                font-size: 1.2rem;
+            }
+            
+            .loading-message {
+                font-size: 0.9rem;
+                max-width: 250px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 加載畫面 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-animation">
+            <div class="loading-circle"></div>
+            <div class="loading-circle"></div>
+            <div class="loading-circle"></div>
+            <div class="loading-text">RNG</div>
+            <div class="loading-complete" id="loadingComplete">
+                <span class="material-symbols-rounded">check_circle</span>
+            </div>
+        </div>
+        <div class="loading-progress"></div>
+        <div class="loading-message">正在載入美食資料，請稍候...</div>
+    </div>
 
-    <nav class="navbar">
+    <!-- 背景裝飾線條 -->
+    <div class="background-lines">
+        <div class="line line-vertical"></div>
+        <div class="line line-vertical"></div>
+        <div class="line line-vertical"></div>
+        <div class="line line-vertical"></div>
+        <div class="line line-horizontal"></div>
+        <div class="line line-horizontal"></div>
+        <div class="line line-horizontal"></div>
+        <div class="line line-horizontal"></div>
+    </div>
+
+    <!-- 導覽列 -->
+    <nav class="navbar" id="navbar">
         <div class="nav-side nav-left">
             <a href="map.html" class="nav-btn">
                 <span class="material-symbols-rounded">map</span>
-                美食地圖
+                <span>美食地圖</span>
             </a>
             <a href="#" class="nav-btn">
                 <span class="material-symbols-rounded">history</span>
-                歷史紀錄
+                <span>歷史紀錄</span>
             </a>
         </div>
 
-        <a href="#" class="nav-logo">RNG 美食</a>
+        <a href="#" class="nav-logo">RNG</a>
 
         <div class="nav-side nav-right">
             <a href="#" class="nav-btn">
                 <span class="material-symbols-rounded">favorite</span>
-                收藏清單
+                <span>收藏清單</span>
             </a>
             <a href="#" class="nav-btn">
                 <span class="material-symbols-rounded">settings</span>
-                設定
+                <span>設定</span>
             </a>
         </div>
     </nav>
 
-    <div class="container">
+    <!-- 返回Cover頁面的小框 -->
+    <div class="cover-return-container" id="coverReturnContainer">
+        <div class="cover-return-box" id="coverReturnBox">
+            <a href="./Cover.html" class="cover-return-content">
+                <div class="cover-icon">
+                    <span class="material-symbols-rounded">arrow_back</span>
+                </div>
+                <div class="cover-text">
+                    <h3>返回首頁</h3>
+                    <p>回到封面頁面</p>
+                </div>
+                <div class="cover-arrow">
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </div>
+            </a>
+        </div>
+        <div class="cover-minimize-btn" id="coverMinimizeBtn">
+            <span class="material-symbols-rounded">expand_less</span>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="container" id="mainContainer">
         <header>
             <h1>今天吃什麼？</h1>
-            <p class="subtitle">解決你的選擇困難症！</p>
+            <p class="subtitle">解決你的選擇困難症</p>
         </header>
         
         <div class="content">
+            <!-- 選項區塊 -->
             <div class="options-container">
                 <div class="option-group">
-                    <label>時段選擇：</label>
+                    <div class="option-title">
+                        <span class="material-symbols-rounded">schedule</span>
+                        <label>時段選擇</label>
+                    </div>
                     <div class="radio-group">
-                        <label><input type="radio" name="mealTime" value="all" checked> 不限</label>
-                        <label><input type="radio" name="mealTime" value="breakfast"> 早餐</label>
-                        <label><input type="radio" name="mealTime" value="lunch"> 午餐</label>
-                        <label><input type="radio" name="mealTime" value="dinner"> 晚餐</label>
+                        <label><input type="radio" name="mealTime" value="all" checked> <span>不限時段</span></label>
+                        <label><input type="radio" name="mealTime" value="breakfast"> <span>早餐</span></label>
+                        <label><input type="radio" name="mealTime" value="lunch"> <span>午餐</span></label>
+                        <label><input type="radio" name="mealTime" value="dinner"> <span>晚餐</span></label>
                     </div>
                 </div>
                 <div class="option-group">
-                    <label>食物種類：</label>
+                    <div class="option-title">
+                        <span class="material-symbols-rounded">category</span>
+                        <label>食物種類</label>
+                    </div>
                     <select id="foodCategory">
                         <option value="all">全部顯示</option>
                         <option value="noodle">麵食愛好</option>
@@ -191,13 +1165,15 @@
                 </div>
             </div>
 
+            <!-- 主要按鈕 -->
             <div class="button-container">
                 <button class="random-btn" onclick="randomFood()">
-                    <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 5px;">casino</span>
+                    <span class="material-symbols-rounded">casino</span>
                     開始隨機抽選
                 </button>
             </div>
             
+            <!-- 結果顯示區 -->
             <div class="result-container" id="resultContainer">
                 <h2 class="food-name" id="foodName"></h2>
                 
@@ -227,13 +1203,14 @@
             </div>
         </div>
         
+        <!-- 頁尾 -->
         <footer>
-            <p>RNG 美食隨機選擇器 &copy; 2025 - 用質感點亮你的用餐時光</p>
+            <p>RNG 美食隨機選擇器 &copy; 2025</p>
         </footer>
     </div>
 
     <script>
-        // 食物資料陣列 (維持原本設定)
+        // 食物資料陣列
         const foods = [
             {
                 name: "燒餅油條配豆漿",
@@ -337,30 +1314,82 @@
             }
         ];
         
+        // 頁面加載處理
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingComplete = document.getElementById('loadingComplete');
+            const navbar = document.getElementById('navbar');
+            const mainContainer = document.getElementById('mainContainer');
+            const coverReturnContainer = document.getElementById('coverReturnContainer');
+            
+            // 模擬加載過程
+            setTimeout(function() {
+                // 顯示加載完成動畫
+                loadingComplete.classList.add('show');
+                
+                // 隨機選擇一個食物
+                randomFood();
+                
+                // 延遲後隱藏加載畫面
+                setTimeout(function() {
+                    loadingScreen.classList.add('hidden');
+                    
+                    // 顯示頁面內容
+                    navbar.classList.add('loaded');
+                    mainContainer.classList.add('loaded');
+                    coverReturnContainer.classList.add('loaded');
+                }, 800); // 加載完成動畫顯示時間
+            }, 1500); // 模擬加載時間（可根據實際需求調整）
+        });
+        
+        // 隨機選擇食物函數
         function randomFood() {
             const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
             const selectedCategory = document.getElementById('foodCategory').value;
 
+            // 過濾食物
             const filteredFoods = foods.filter(food => {
                 const isTimeMatch = selectedTime === 'all' || food.time.includes(selectedTime);
                 const isCategoryMatch = selectedCategory === 'all' || food.category === selectedCategory;
                 return isTimeMatch && isCategoryMatch;
             });
 
+            // 如果沒有符合條件的食物
             if (filteredFoods.length === 0) {
-                alert("找不到符合條件的食物，請嘗試放寬篩選條件！");
+                // 顯示錯誤訊息
+                document.getElementById('foodName').textContent = "無符合條件的食物";
+                document.getElementById('foodRating').textContent = "請嘗試放寬篩選條件";
+                document.getElementById('foodDescription').textContent = "-";
+                document.getElementById('foodLocation').textContent = "-";
+                document.getElementById('foodPrice').textContent = "-";
+                
+                // 更新評分星星
+                const starsContainer = document.querySelector('.rating');
+                starsContainer.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star';
+                    star.textContent = '☆';
+                    starsContainer.appendChild(star);
+                }
+                
+                // 顯示結果容器
+                document.getElementById('resultContainer').classList.add('show');
                 return;
             }
 
+            // 隨機選擇食物
             const randomIndex = Math.floor(Math.random() * filteredFoods.length);
             const selectedFood = filteredFoods[randomIndex];
             
+            // 更新頁面內容
             document.getElementById('foodName').textContent = selectedFood.name;
             document.getElementById('foodRating').textContent = selectedFood.rating;
             document.getElementById('foodDescription').textContent = selectedFood.description;
             document.getElementById('foodLocation').textContent = selectedFood.location;
             document.getElementById('foodPrice').textContent = selectedFood.price;
             
+            // 更新評分星星
             const starsContainer = document.querySelector('.rating');
             starsContainer.innerHTML = '';
             for (let i = 0; i < 5; i++) {
@@ -370,10 +1399,96 @@
                 starsContainer.appendChild(star);
             }
             
+            // 顯示結果容器
             document.getElementById('resultContainer').classList.add('show');
         }
         
-        window.onload = randomFood;
+        // 為選項組添加視覺反饋
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionGroups = document.querySelectorAll('.option-group');
+            
+            optionGroups.forEach(group => {
+                // 為每個選項組添加點擊反饋
+                group.addEventListener('click', function() {
+                    this.style.borderColor = 'var(--border-medium)';
+                    this.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+                    
+                    // 重置其他選項組的樣式
+                    optionGroups.forEach(otherGroup => {
+                        if (otherGroup !== group) {
+                            otherGroup.style.borderColor = 'var(--border-light)';
+                            otherGroup.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+                        }
+                    });
+                });
+            });
+            
+            // 為單選按鈕添加變更事件
+            const radioInputs = document.querySelectorAll('input[type="radio"]');
+            radioInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    // 找到所屬的選項組並高亮顯示
+                    const parentGroup = this.closest('.option-group');
+                    if (parentGroup) {
+                        parentGroup.style.borderColor = 'var(--white)';
+                        parentGroup.style.boxShadow = '0 0 0 1px rgba(255, 255, 255, 0.2)';
+                    }
+                });
+            });
+            
+            // 為下拉選單添加變更事件
+            const selectElement = document.getElementById('foodCategory');
+            selectElement.addEventListener('change', function() {
+                const parentGroup = this.closest('.option-group');
+                if (parentGroup) {
+                    parentGroup.style.borderColor = 'var(--white)';
+                    parentGroup.style.boxShadow = '0 0 0 1px rgba(255, 255, 255, 0.2)';
+                    
+                    // 2秒後恢復正常樣式
+                    setTimeout(() => {
+                        parentGroup.style.borderColor = 'var(--border-light)';
+                        parentGroup.style.boxShadow = 'none';
+                    }, 2000);
+                }
+            });
+            
+            // 返回Cover小框功能
+            const coverReturnContainer = document.getElementById('coverReturnContainer');
+            const coverMinimizeBtn = document.getElementById('coverMinimizeBtn');
+            
+            // 收合/展開小框功能
+            coverMinimizeBtn.addEventListener('click', function() {
+                coverReturnContainer.classList.toggle('cover-minimized');
+            });
+            
+            // 點擊小框時有反饋效果
+            const coverReturnBox = document.getElementById('coverReturnBox');
+            coverReturnBox.addEventListener('click', function() {
+                this.style.transform = 'translateY(-5px) scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-5px) scale(1)';
+                }, 150);
+            });
+            
+            // 自動隱藏功能（可選）
+            let hideTimeout;
+            coverReturnContainer.addEventListener('mouseenter', function() {
+                clearTimeout(hideTimeout);
+                this.classList.remove('cover-minimized');
+            });
+            
+            // 如果滑鼠離開一段時間，自動收合小框
+            coverReturnContainer.addEventListener('mouseleave', function() {
+                hideTimeout = setTimeout(() => {
+                    this.classList.add('cover-minimized');
+                }, 3000); // 3秒後自動收合
+            });
+            
+            // 初始狀態：延遲後自動收合小框
+            setTimeout(() => {
+                coverReturnContainer.classList.add('cover-minimized');
+            }, 8000); // 頁面載入8秒後自動收合
+        });
     </script>
 </body>
 </html>
