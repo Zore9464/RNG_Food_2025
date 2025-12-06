@@ -3,110 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RNG午餐</title>
+    <title>RNG美食</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="./style.css">
     <style>
-        /* 新增：選項區塊的簡易樣式，保持與原有設計風格一致 */
+        /* ========================================
+           精美導覽列設計重點
+           ========================================
+        */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9; /* 確保背景色存在，對比毛玻璃效果 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px; /* 稍微增高一點，讓空間更舒適 */
+            
+            /* --- 關鍵：毛玻璃質感設定 --- */
+            background-color: rgba(255, 255, 255, 0.85); /* 半透明白色背景 */
+            backdrop-filter: blur(12px); /* 背景模糊濾鏡 (Safari 需要加 -webkit- 前綴，這裡簡化) */
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* 極細微的邊框增加層次 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* 更柔和、擴散的陰影 */
+            /* --------------------------- */
+            
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px; /* 增加兩側留白 */
+            box-sizing: border-box;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        /* 兩側按鈕區塊 */
+        .nav-side {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .nav-right {
+            justify-content: flex-end;
+        }
+
+        /* 導覽列按鈕樣式優化 */
+        .nav-btn {
+            text-decoration: none;
+            color: #555; /* 更柔和的深灰色 */
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px; /* 更圓潤的邊角 */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* 更滑順的過渡效果 */
+            display: flex;
+            align-items: center;
+            gap: 8px; /* 圖示與文字間距 */
+        }
+
+        /* 圖示樣式調整 */
+        .nav-btn .material-symbols-rounded {
+            font-size: 1.3rem;
+            transition: color 0.3s ease;
+        }
+
+        /* 按鈕懸停互動效果 */
+        .nav-btn:hover {
+            background-color: rgba(255, 107, 107, 0.1); /* 淡淡的品牌色背景 */
+            color: #ff6b6b; /* 文字變色 */
+            transform: translateY(-2px); /* 輕微上浮 */
+            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.15); /* 懸停時的輕微光暈 */
+        }
+
+        /* 中間 LOGO 優化 */
+        .nav-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            /* 使用漸層文字 (可選，增加質感) */
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            
+            text-decoration: none;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+
+        /* --- 原有樣式調整 --- */
+        .container {
+            margin-top: 100px; /* 配合新的導覽列高度調整間距 */
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 30px; /* 增加內部留白 */
+            text-align: center;
+            background: white;
+            border-radius: 20px; /* 更圓潤 */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); /* 更更有層次感的陰影 */
+        }
+
+        /* 選項區塊樣式 */
         .options-container {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: left;
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #eee;
+            background: #fcfcfc;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #edf2f7;
         }
-        .option-group {
-            margin-bottom: 10px;
-        }
-        .option-group label {
-            font-weight: bold;
-            margin-right: 10px;
-            color: #555;
-        }
-        .radio-group {
-            display: inline-block;
-        }
-        .radio-group input {
-            margin-left: 10px;
-        }
-        select {
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+        /* ... (其餘樣式保持不變或微調) ... */
+        .option-group { margin-bottom: 15px; }
+        .option-group label { font-weight: 700; margin-right: 10px; color: #4a5568; }
+        .radio-group { display: inline-block; }
+        .radio-group input { margin-left: 10px; accent-color: #ff6b6b; /* 修改單選框顏色 */ }
+        .radio-group label { margin-right: 12px; cursor: pointer; font-weight: 500; color: #666;}
+        select { padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.95rem; outline: none; cursor: pointer;}
+        select:focus { border-color: #ff6b6b; box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2); }
+        header { margin-bottom: 25px; }
+        h1 { margin: 0 0 10px 0; color: #2d3748; }
+        .subtitle { margin: 0; color: #718096; }
     </style>
 </head>
 <body>
+
+    <nav class="navbar">
+        <div class="nav-side nav-left">
+            <a href="#" class="nav-btn">
+                <span class="material-symbols-rounded">map</span>
+                美食地圖
+            </a>
+            <a href="#" class="nav-btn">
+                <span class="material-symbols-rounded">history</span>
+                歷史紀錄
+            </a>
+        </div>
+
+        <a href="#" class="nav-logo">RNG 美食</a>
+
+        <div class="nav-side nav-right">
+            <a href="#" class="nav-btn">
+                <span class="material-symbols-rounded">favorite</span>
+                收藏清單
+            </a>
+            <a href="#" class="nav-btn">
+                <span class="material-symbols-rounded">settings</span>
+                設定
+            </a>
+        </div>
+    </nav>
+
     <div class="container">
         <header>
-            <h1>RNG午餐</h1>
-            <p class="subtitle">解決你的午餐選擇困難症！</p>
+            <h1>今天吃什麼？</h1>
+            <p class="subtitle">解決你的選擇困難症！</p>
         </header>
         
         <div class="content">
             <div class="options-container">
                 <div class="option-group">
-                    <label>時段：</label>
+                    <label>時段選擇：</label>
                     <div class="radio-group">
                         <label><input type="radio" name="mealTime" value="all" checked> 不限</label>
+                        <label><input type="radio" name="mealTime" value="breakfast"> 早餐</label>
                         <label><input type="radio" name="mealTime" value="lunch"> 午餐</label>
                         <label><input type="radio" name="mealTime" value="dinner"> 晚餐</label>
                     </div>
                 </div>
                 <div class="option-group">
-                    <label>種類：</label>
+                    <label>食物種類：</label>
                     <select id="foodCategory">
-                        <option value="all">全部</option>
-                        <option value="noodle">麵食</option>
-                        <option value="rice">飯類</option>
+                        <option value="all">全部顯示</option>
+                        <option value="noodle">麵食愛好</option>
+                        <option value="rice">米飯主義</option>
                         <option value="western">西式/異國</option>
-                        <option value="light">輕食/素食</option>
+                        <option value="light">輕食/早點</option>
                     </select>
                 </div>
             </div>
 
             <div class="button-container">
-                <button class="random-btn" onclick="randomFood()">今天吃什麼？</button>
+                <button class="random-btn" onclick="randomFood()">
+                    <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 5px;">casino</span>
+                    開始隨機抽選
+                </button>
             </div>
             
             <div class="result-container" id="resultContainer">
-                <h2 class="food-name" id="foodName">牛肉麵</h2>
+                <h2 class="food-name" id="foodName"></h2>
                 
-                <div class="rating">
-                    </div>
+                <div class="rating"></div>
                 
                 <div class="food-details">
                     <div class="detail-box">
                         <div class="detail-title">評價</div>
-                        <div class="detail-content" id="foodRating">湯頭濃郁，牛肉軟嫩，麵條Q彈</div>
+                        <div class="detail-content" id="foodRating"></div>
                     </div>
                     
                     <div class="detail-box">
                         <div class="detail-title">內容</div>
-                        <div class="detail-content" id="foodDescription">半筋半肉牛肉、手工麵條、青菜、蔥花</div>
+                        <div class="detail-content" id="foodDescription"></div>
                     </div>
                     
                     <div class="detail-box">
                         <div class="detail-title">地點</div>
-                        <div class="detail-content" id="foodLocation">台北市大安區忠孝東路四段</div>
+                        <div class="detail-content" id="foodLocation"></div>
                     </div>
                     
                     <div class="detail-box">
                         <div class="detail-title">價格</div>
-                        <div class="detail-content" id="foodPrice">NT$ 150</div>
+                        <div class="detail-content" id="foodPrice"></div>
                     </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>午餐隨機選擇器 &copy; 2025 - 不再為午餐煩惱！</p>
+            <p>RNG 美食隨機選擇器 &copy; 2025 - 用質感點亮你的用餐時光</p>
         </footer>
     </div>
 
     <script>
-        // 食物資料陣列 (已新增 category 和 time 屬性以配合篩選)
+        // 食物資料陣列 (維持原本設定)
         const foods = [
+            {
+                name: "燒餅油條配豆漿",
+                rating: "傳統滋味，酥脆口感，豆香濃郁",
+                description: "燒餅、油條、冰豆漿",
+                location: "豆漿大王",
+                price: "NT$ 45",
+                stars: 4,
+                category: "light",
+                time: ["breakfast"] 
+            },
+            {
+                name: "起司蛋餅",
+                rating: "餅皮酥脆，起司牽絲，喚醒早晨",
+                description: "手工蛋餅皮、切達起司、雞蛋",
+                location: "巷口早餐店",
+                price: "NT$ 40",
+                stars: 5,
+                category: "light",
+                time: ["breakfast", "lunch"]
+            },
             {
                 name: "牛肉麵",
                 rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈",
@@ -155,7 +303,7 @@
                 price: "NT$ 120",
                 stars: 3,
                 category: "light",
-                time: ["lunch"] // 假設只適合午餐
+                time: ["breakfast", "lunch"]
             },
             {
                 name: "港式燒臘",
@@ -189,38 +337,30 @@
             }
         ];
         
-        // 隨機選擇食物函數 (加入篩選邏輯)
         function randomFood() {
-            // 1. 獲取使用者選擇
             const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
             const selectedCategory = document.getElementById('foodCategory').value;
 
-            // 2. 篩選資料
-            // 這裡未來可以替換成 API 請求 (Fetch) 傳送參數給資料庫
             const filteredFoods = foods.filter(food => {
                 const isTimeMatch = selectedTime === 'all' || food.time.includes(selectedTime);
                 const isCategoryMatch = selectedCategory === 'all' || food.category === selectedCategory;
                 return isTimeMatch && isCategoryMatch;
             });
 
-            // 3. 檢查是否有符合的結果
             if (filteredFoods.length === 0) {
                 alert("找不到符合條件的食物，請嘗試放寬篩選條件！");
                 return;
             }
 
-            // 4. 隨機抽選
             const randomIndex = Math.floor(Math.random() * filteredFoods.length);
             const selectedFood = filteredFoods[randomIndex];
             
-            // 5. 更新頁面內容
             document.getElementById('foodName').textContent = selectedFood.name;
             document.getElementById('foodRating').textContent = selectedFood.rating;
             document.getElementById('foodDescription').textContent = selectedFood.description;
             document.getElementById('foodLocation').textContent = selectedFood.location;
             document.getElementById('foodPrice').textContent = selectedFood.price;
             
-            // 更新評分星星
             const starsContainer = document.querySelector('.rating');
             starsContainer.innerHTML = '';
             for (let i = 0; i < 5; i++) {
@@ -230,11 +370,9 @@
                 starsContainer.appendChild(star);
             }
             
-            // 顯示結果容器
             document.getElementById('resultContainer').classList.add('show');
         }
         
-        // 頁面加載時先執行一次 (預設不限)
         window.onload = randomFood;
     </script>
 </body>
