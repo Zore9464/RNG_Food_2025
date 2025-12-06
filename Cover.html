@@ -9,72 +9,380 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', Arial, sans-serif;
         }
         
         body {
-            background-color: #f5f5f5;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            animation: gradientBG 15s ease infinite;
+            overflow: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* 添加浮動圓形裝飾 */
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            left: 85%;
+            animation-delay: -2s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 80%;
+            left: 20%;
+            animation-delay: -4s;
+        }
+        
+        .shape:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            top: 10%;
+            left: 80%;
+            animation-delay: -1s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
         }
         
         .container {
             text-align: center;
-            padding: 40px 20px;
-            max-width: 400px;
+            padding: 50px 30px;
+            max-width: 450px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         h1 {
-            font-size: 4rem;
-            font-weight: bold;
+            font-size: 4.5rem;
+            font-weight: 800;
             margin-bottom: 60px;
             color: #333;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(45deg, #e73c7e, #23a6d5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes textGlow {
+            0% {
+                filter: drop-shadow(0 0 5px rgba(231, 60, 126, 0.5));
+            }
+            100% {
+                filter: drop-shadow(0 0 15px rgba(35, 166, 213, 0.7));
+            }
         }
         
         .button-container {
-            margin: 40px 0;
+            margin: 50px 0;
+            transform-style: preserve-3d;
+            perspective: 1000px;
         }
         
         button {
-            background-color: #333;
+            background: linear-gradient(45deg, #e73c7e, #23a6d5);
             color: white;
             border: none;
-            padding: 18px 50px;
-            font-size: 1.5rem;
-            border-radius: 8px;
+            padding: 20px 60px;
+            font-size: 1.6rem;
+            border-radius: 50px;
             cursor: pointer;
-            transition: background-color 0.3s;
             font-weight: bold;
             letter-spacing: 1px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transform: translateZ(20px);
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.7s ease;
+            z-index: -1;
         }
         
         button:hover {
-            background-color: #555;
+            transform: translateZ(20px) scale(1.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #23a6d5, #e73c7e);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:active {
+            transform: translateZ(20px) scale(0.95);
+            transition: transform 0.1s;
         }
         
         .bottom-text {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #666;
-            margin-top: 60px;
-            font-weight: 500;
+            margin-top: 70px;
+            font-weight: 600;
             letter-spacing: 1px;
+            position: relative;
+            padding-top: 20px;
+            animation: fadeInDelay 1.2s ease-out;
+        }
+        
+        .bottom-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #e73c7e, #23a6d5);
+            border-radius: 3px;
+        }
+        
+        @keyframes fadeInDelay {
+            0% {
+                opacity: 0;
+            }
+            70% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        /* 添加背景粒子效果 */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: particleMove 15s linear infinite;
+        }
+        
+        @keyframes particleMove {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* 響應式調整 */
+        @media (max-width: 600px) {
+            .container {
+                max-width: 90%;
+                padding: 40px 20px;
+            }
+            
+            h1 {
+                font-size: 3.5rem;
+            }
+            
+            button {
+                padding: 18px 40px;
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 浮動形狀裝飾 -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <!-- 粒子效果 -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- 主要內容 -->
     <div class="container">
         <h1>RNG</h1>
         
         <div class="button-container">
-            <button>Button</button>
+            <button onclick="location.href='./13.html'">點我進入</button>
         </div>
         
         <div class="bottom-text">
             不再為吃甚麼煩惱！
         </div>
     </div>
+
+    <script>
+        // 生成背景粒子
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 隨機大小 (1-5px)
+                const size = Math.random() * 4 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // 隨機起始位置
+                particle.style.left = `${Math.random() * 100}vw`;
+                
+                // 隨機動畫延遲和持續時間
+                const delay = Math.random() * 15;
+                const duration = 10 + Math.random() * 20;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // 隨機顏色
+                const colors = [
+                    'rgba(255, 255, 255, 0.5)',
+                    'rgba(231, 60, 126, 0.3)',
+                    'rgba(35, 166, 213, 0.3)',
+                    'rgba(35, 213, 171, 0.3)'
+                ];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = randomColor;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // 頁面加載時創建粒子
+        window.addEventListener('load', createParticles);
+        
+        // 為按鈕添加點擊漣漪效果
+        document.querySelector('button').addEventListener('click', function(e) {
+            // 創建漣漪元素
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.7);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                width: ${size}px;
+                height: ${size}px;
+                top: ${y}px;
+                left: ${x}px;
+                z-index: 0;
+            `;
+            
+            this.appendChild(ripple);
+            
+            // 動畫結束後移除漣漪元素
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+        
+        // 添加漣漪動畫的CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
