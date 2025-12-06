@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RNG午餐</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RNG午餐</h1>
+            <p class="subtitle">解決你的午餐選擇困難症！</p>
+        </header>
+        
+        <div class="content">
+            <div class="button-container">
+                <button class="random-btn" onclick="randomFood()">今天吃什麼？</button>
+            </div>
+            
+            <div class="result-container" id="resultContainer">
+                <h2 class="food-name" id="foodName">牛肉麵</h2>
+                
+                <div class="rating">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">☆</span>
+                </div>
+                
+                <div class="food-details">
+                    <div class="detail-box">
+                        <div class="detail-title">評價</div>
+                        <div class="detail-content" id="foodRating">湯頭濃郁，牛肉軟嫩，麵條Q彈</div>
+                    </div>
+                    
+                    <div class="detail-box">
+                        <div class="detail-title">內容</div>
+                        <div class="detail-content" id="foodDescription">半筋半肉牛肉、手工麵條、青菜、蔥花</div>
+                    </div>
+                    
+                    <div class="detail-box">
+                        <div class="detail-title">地點</div>
+                        <div class="detail-content" id="foodLocation">台北市大安區忠孝東路四段</div>
+                    </div>
+                    
+                    <div class="detail-box">
+                        <div class="detail-title">價格</div>
+                        <div class="detail-content" id="foodPrice">NT$ 150</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>午餐隨機選擇器 &copy; 2025 - 不再為午餐煩惱！</p>
+        </footer>
+    </div>
+
+    <script>
+        // 食物数据数组
+        const foods = [
+            {
+                name: "牛肉麵",
+                rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈",
+                description: "半筋半肉牛肉、手工麵條、青菜、蔥花",
+                location: "台北市大安區忠孝東路四段",
+                price: "NT$ 150",
+                stars: 4
+            },
+            {
+                name: "滷肉飯",
+                rating: "滷汁香濃，米飯飽滿，肥瘦適中",
+                description: "滷肉、米飯、滷蛋、黃瓜片",
+                location: "台北市中正區羅斯福路一段",
+                price: "NT$ 50",
+                stars: 5
+            },
+            {
+                name: "日式拉麵",
+                rating: "湯頭醇厚，叉燒入口即化",
+                description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾",
+                location: "台北市信義區松壽路",
+                price: "NT$ 220",
+                stars: 4
+            },
+            {
+                name: "義大利麵",
+                rating: "醬汁濃郁，麵條彈牙，配料豐富",
+                description: "義大利麵、番茄肉醬、起司、羅勒",
+                location: "台北市中山區南京東路",
+                price: "NT$ 180",
+                stars: 4
+            },
+            {
+                name: "健康沙拉",
+                rating: "新鮮蔬菜，營養均衡，輕食首選",
+                description: "生菜、番茄、雞胸肉、堅果、油醋醬",
+                location: "台北市大安區仁愛路四段",
+                price: "NT$ 120",
+                stars: 3
+            },
+            {
+                name: "港式燒臘",
+                rating: "肉質鮮美，皮脆肉嫩，醬汁獨特",
+                description: "燒鴨、叉燒、油雞、青菜、白飯",
+                location: "台北市萬華區西門町",
+                price: "NT$ 110",
+                stars: 4
+            },
+            {
+                name: "韓式拌飯",
+                rating: "辣醬夠味，配料豐富，口感層次多",
+                description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬",
+                location: "台北市松山區市民大道",
+                price: "NT$ 160",
+                stars: 4
+            },
+            {
+                name: "素食餐盒",
+                rating: "清爽不油膩，營養均衡，素食者首選",
+                description: "五穀飯、時蔬、豆腐、菇類、堅果",
+                location: "台北市文山區興隆路",
+                price: "NT$ 90",
+                stars: 3
+            }
+        ];
+        
+        // 随机选择食物函数
+        function randomFood() {
+            const randomIndex = Math.floor(Math.random() * foods.length);
+            const selectedFood = foods[randomIndex];
+            
+            // 更新页面内容
+            document.getElementById('foodName').textContent = selectedFood.name;
+            document.getElementById('foodRating').textContent = selectedFood.rating;
+            document.getElementById('foodDescription').textContent = selectedFood.description;
+            document.getElementById('foodLocation').textContent = selectedFood.location;
+            document.getElementById('foodPrice').textContent = selectedFood.price;
+            
+            // 更新评分星星
+            const starsContainer = document.querySelector('.rating');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.textContent = i < selectedFood.stars ? '★' : '☆';
+                starsContainer.appendChild(star);
+            }
+            
+            // 显示结果容器
+            document.getElementById('resultContainer').classList.add('show');
+        }
+        
+        // 页面加载时随机选择一个食物
+        window.onload = randomFood;
+    </script>
+</body>
+</html>
