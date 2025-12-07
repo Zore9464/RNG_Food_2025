@@ -1014,6 +1014,8 @@
                     <option value="midnight">午夜深藍 (Midnight)</option>
                     <option value="forest">森林墨綠 (Forest)</option>
                     <option value="latte">暖色拿鐵 (Latte)</option>
+                    <option value="lavender">薰衣草紫 (Lavender)</option>
+                    <option value="sakura">櫻花淺粉 (Sakura)</option>
                 </select>
             </div>
 
@@ -1064,15 +1066,15 @@
 
         <div class="nav-side nav-right">
             <div class="nav-side nav-right">
-    <a href="stores.html" class="nav-btn">
-        <span class="material-symbols-rounded">store</span>
-        <span>店家資訊</span>
-    </a>
-            <button class="nav-btn" id="settingsBtn" style="background:none; border:none; padding: 8px 16px;">
-                <span class="material-symbols-rounded">settings</span>
-                <span>設定</span>
-            </button>
-        </div>
+                <a href="stores.html" class="nav-btn">
+                    <span class="material-symbols-rounded">store</span>
+                    <span>店家資訊</span>
+                </a>
+                <button class="nav-btn" id="settingsBtn" style="background:none; border:none; padding: 8px 16px;">
+                    <span class="material-symbols-rounded">settings</span>
+                    <span>設定</span>
+                </button>
+            </div>
     </nav>
 
     <div class="cover-return-container" id="coverReturnContainer">
@@ -1177,64 +1179,46 @@
         // ==========================================
         const themes = {
             default: { // 經典黑白
-                '--bg-color': '#000000',
-                '--text-color': '#ffffff',
-                '--text-sub': '#bdbdbd',
-                '--accent-color': '#ffffff',
-                '--surface': 'rgba(255, 255, 255, 0.08)',
-                '--surface-light': 'rgba(255, 255, 255, 0.12)',
-                '--border-light': 'rgba(255, 255, 255, 0.15)',
-                '--border-medium': 'rgba(255, 255, 255, 0.25)',
-                '--option-bg': 'rgba(0, 0, 0, 0.3)',
-                '--option-bg-hover': 'rgba(0, 0, 0, 0.4)'
+                '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd',
+                '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)',
+                '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)',
+                '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)'
             },
-            light: { // 極簡亮白 (反轉色)
-                '--bg-color': '#f2f2f7',
-                '--text-color': '#1c1c1e',
-                '--text-sub': '#636366',
-                '--accent-color': '#000000',
-                '--surface': 'rgba(0, 0, 0, 0.05)',
-                '--surface-light': 'rgba(255, 255, 255, 0.6)',
-                '--border-light': 'rgba(0, 0, 0, 0.1)',
-                '--border-medium': 'rgba(0, 0, 0, 0.2)',
-                '--option-bg': 'rgba(255, 255, 255, 0.5)',
-                '--option-bg-hover': 'rgba(255, 255, 255, 0.8)'
+            light: { // 極簡亮白
+                '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366',
+                '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)',
+                '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)',
+                '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)'
             },
             midnight: { // 午夜深藍
-                '--bg-color': '#0f172a',
-                '--text-color': '#e2e8f0',
-                '--text-sub': '#94a3b8',
-                '--accent-color': '#38bdf8',
-                '--surface': 'rgba(30, 41, 59, 0.7)',
-                '--surface-light': 'rgba(51, 65, 85, 0.6)',
-                '--border-light': 'rgba(148, 163, 184, 0.2)',
-                '--border-medium': 'rgba(148, 163, 184, 0.4)',
-                '--option-bg': 'rgba(15, 23, 42, 0.5)',
-                '--option-bg-hover': 'rgba(30, 41, 59, 0.8)'
+                '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8',
+                '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)',
+                '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)',
+                '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)'
             },
             forest: { // 森林墨綠
-                '--bg-color': '#051910',
-                '--text-color': '#e8f5e9',
-                '--text-sub': '#a5d6a7',
-                '--accent-color': '#66bb6a',
-                '--surface': 'rgba(255, 255, 255, 0.05)',
-                '--surface-light': 'rgba(255, 255, 255, 0.1)',
-                '--border-light': 'rgba(165, 214, 167, 0.2)',
-                '--border-medium': 'rgba(165, 214, 167, 0.3)',
-                '--option-bg': 'rgba(0, 20, 10, 0.4)',
-                '--option-bg-hover': 'rgba(0, 40, 20, 0.5)'
+                '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7',
+                '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)',
+                '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)',
+                '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)'
             },
             latte: { // 暖色拿鐵
-                '--bg-color': '#2c241b',
-                '--text-color': '#ede0d4',
-                '--text-sub': '#bcaaa4',
-                '--accent-color': '#d7ccc8',
-                '--surface': 'rgba(255, 255, 255, 0.06)',
-                '--surface-light': 'rgba(255, 255, 255, 0.1)',
-                '--border-light': 'rgba(215, 204, 200, 0.2)',
-                '--border-medium': 'rgba(215, 204, 200, 0.3)',
-                '--option-bg': 'rgba(62, 39, 35, 0.4)',
-                '--option-bg-hover': 'rgba(78, 52, 46, 0.5)'
+                '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4',
+                '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)',
+                '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)',
+                '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)'
+            },
+            lavender: { // 薰衣草紫 (新增)
+                '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed',
+                '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)',
+                '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)',
+                '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)'
+            },
+            sakura: { // 櫻花淺粉 (新增)
+                '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777',
+                '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)',
+                '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)',
+                '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)'
             }
         };
 
