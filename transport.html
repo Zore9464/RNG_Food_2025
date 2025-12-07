@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交通資訊 - AEUST RNG</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        /* === 全域變數與主題系統 === */
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --text-sub: #bdbdbd;
+            --accent-color: #ffffff;
+            --surface: rgba(255, 255, 255, 0.08);
+            --surface-hover: rgba(255, 255, 255, 0.15);
+            --border-light: rgba(255, 255, 255, 0.15);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --map-filter: grayscale(100%) invert(100%) contrast(90%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+            padding-top: 80px; /* 預留頂部導覽列空間 */
+        }
+
+        /* === 頂部導覽列樣式 (您提供的結構) === */
+        .navbar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background-color: var(--surface);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-side { display: flex; align-items: center; gap: 10px; }
+        .nav-left { flex: 1; justify-content: flex-start; }
+        .nav-right { flex: 1; justify-content: flex-end; }
+
+        .nav-logo {
+            font-size: 1.5rem; font-weight: 700; color: var(--text-color);
+            text-decoration: none; letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* 按鈕通用樣式 */
+        .nav-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 8px;
+            color: var(--text-color); text-decoration: none;
+            background: transparent; border: none;
+            font-size: 0.9rem; font-weight: 500; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover { background-color: var(--surface-hover); transform: translateY(-2px); }
+        .nav-btn span.material-symbols-rounded { font-size: 1.2rem; }
+
+        /* 當前頁面高亮 */
+        .nav-btn.active {
+            background-color: var(--accent-color);
+            color: var(--bg-color); /* 反轉顏色以凸顯 */
+        }
+
+        /* === 內容區域 === */
+        .container {
+            max-width: 900px; margin: 40px auto; padding: 0 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 10px; }
+        .subtitle { color: var(--text-sub); }
+
+        /* 資訊卡片 */
+        .info-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: 16px; padding: 30px; margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-card h2 {
+            font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--border-light); padding-bottom: 10px;
+        }
+        
+        .info-row { display: flex; margin-bottom: 15px; }
+        .info-label { min-width: 80px; color: var(--text-sub); }
+        .info-content { color: var(--text-color); flex: 1; }
+
+        /* 地圖框架 */
+        .map-frame {
+            width: 100%; height: 350px; border-radius: 12px; border: 0;
+            filter: var(--map-filter); transition: filter 0.5s ease;
+        }
+
+        /* === 彈窗 (Modal) 共用樣式 === */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 2000;
+            backdrop-filter: blur(5px); justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal.show { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background-color: var(--bg-color); border: 1px solid var(--border-light);
+            border-radius: 20px; padding: 30px; width: 90%; max-width: 400px;
+            box-shadow: var(--shadow); transform: scale(0.9); transition: transform 0.3s ease;
+            position: relative;
+        }
+        .modal.show .modal-content { transform: scale(1); }
+        
+        .close-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: none; border: none; color: var(--text-sub); cursor: pointer;
+        }
+
+        /* 設定主題按鈕網格 */
+        .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
+        .theme-btn {
+            padding: 12px; border-radius: 10px; border: 1px solid var(--border-light);
+            background: var(--surface); color: var(--text-color); cursor: pointer;
+            transition: 0.2s;
+        }
+        .theme-btn:hover { background: var(--surface-hover); }
+
+        /* RWD 調整 */
+        @media (max-width: 900px) {
+            .navbar { height: auto; flex-direction: column; padding: 10px; }
+            .nav-side { width: 100%; justify-content: center; margin: 5px 0; flex-wrap: wrap; }
+            .nav-logo { order: -1; margin-bottom: 5px; }
+            body { padding-top: 140px; }
+            .nav-btn span:last-child { display: none; } /* 手機版隱藏文字只留圖示 */
+            .nav-btn { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-side nav-left">
+            <button class="nav-btn" id="teamBtn">
+                <span class="material-symbols-rounded">groups</span>
+                <span>關於開發者團隊</span>
+            </button>
+
+            <a href="about.html" class="nav-btn">
+                <span class="material-symbols-rounded">info</span>
+                <span>關於網站</span>
+            </a>
+
+            <a href="map.html" class="nav-btn">
+                <span class="material-symbols-rounded">map</span>
+                <span>美食地圖搜尋</span>
+            </a>
+        </div>
+
+        <a href="./index.html" class="nav-logo">AEUST RNG</a>
+
+        <div class="nav-side nav-right">
+            <a href="stores.html" class="nav-btn">
+                <span class="material-symbols-rounded">store</span>
+                <span>店家總覽</span>
+            </a>
+            <a href="./transport.html" class="nav-btn active">
+                <span class="material-symbols-rounded">commute</span>
+                <span>交通資訊</span>
+            </a>
+            <button class="nav-btn" id="settingsBtn">
+                <span class="material-symbols-rounded">settings</span>
+                <span>背景設定</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <h1>交通資訊</h1>
+            <p class="subtitle">如何抵達 亞東科技大學 的周邊美食圈</p>
+        </header>
+
+        <div class="info-card">
+            <h2><span class="material-symbols-rounded">map</span>地理位置</h2>
+            <iframe class="map-frame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.703649992034!2d121.5121!3d25.0410!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDAyJzI3LjYiTiAxMjHCsDMwJzQzLjYiRQ!5e0!3m2!1szh-TW!2stw!4v1620000000000!5m2!1szh-TW!2stw" loading="lazy"></iframe>
+        </div>
+
+        <div class="info-card">
+            <h2><span class="material-symbols-rounded">directions_bus</span>大眾運輸</h2>
+            <div class="info-row">
+                <span class="info-label">公車</span>
+                <span class="info-content">搭乘 xx, xx, xxx, xxx 等路線至「亞東科技大學站」下車。</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">捷運</span>
+                <span class="info-content">搭乘捷運板南線至<span style="color: #f0ad4e;">【亞東醫院站】</span>，1號出口步行約 5 分鐘。</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ubike</span>
+                <span class="info-content">校門口左側設有 Ubike 2.0 站點。</span>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h2><span class="material-symbols-rounded">local_parking</span>停車資訊</h2>
+            <div class="info-row">
+                <span class="info-label">校內停車</span>
+                <span class="info-content">提供訪客臨停，每小時 30 元 (請由正門進入)。</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">周邊停車</span>
+                <span class="info-content">建國一路停車場、好市多停車場 (需消費折抵)。</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('settings-modal')">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+            <h3 style="margin-bottom: 15px;">背景主題設定</h3>
+            <div class="theme-grid">
+                <button class="theme-btn" onclick="setTheme('default')">極簡黑 (預設)</button>
+                <button class="theme-btn" onclick="setTheme('light')">純淨白</button>
+                <button class="theme-btn" onclick="setTheme('midnight')">午夜藍</button>
+                <button class="theme-btn" onclick="setTheme('forest')">森林綠</button>
+                <button class="theme-btn" onclick="setTheme('latte')">拿鐵棕</button>
+                <button class="theme-btn" onclick="setTheme('sakura')">櫻花粉</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="team-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('team-modal')">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+            <h3 style="margin-bottom: 15px;">開發者團隊</h3>
+            <p>AEUST RNG 專題小組</p>
+            <p style="color: var(--text-sub); font-size: 0.9rem; margin-top: 10px;">
+                致力於解決「今天吃什麼」的世紀難題。<br>
+                版本: v1.0.0
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // === 主題資料 ===
+        const themes = {
+            default: {
+                '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd',
+                '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)',
+                '--surface-hover': 'rgba(255, 255, 255, 0.15)', '--map-filter': 'none'
+            },
+            light: {
+                '--bg-color': '#f5f5f7', '--text-color': '#1d1d1f', '--text-sub': '#86868b',
+                '--accent-color': '#0071e3', '--surface': 'rgba(255, 255, 255, 0.8)',
+                '--surface-hover': 'rgba(0, 0, 0, 0.05)', '--map-filter': 'none'
+            },
+            midnight: {
+                '--bg-color': '#0f172a', '--text-color': '#f8fafc', '--text-sub': '#94a3b8',
+                '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)',
+                '--surface-hover': 'rgba(51, 65, 85, 0.8)', '--map-filter': 'none'
+            },
+            forest: {
+                '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7',
+                '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)',
+                '--surface-hover': 'rgba(255, 255, 255, 0.1)', '--map-filter': 'none'
+            },
+            latte: {
+                '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4',
+                '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)',
+                '--surface-hover': 'rgba(255, 255, 255, 0.1)', '--map-filter': 'none'
+            },
+            sakura: {
+                '--bg-color': '#fff0f5', '--text-color': '#831843', '--text-sub': '#be185d',
+                '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)',
+                '--surface-hover': 'rgba(255, 255, 255, 0.8)', '--map-filter': 'none'
+            }
+        };
+
+        // 套用主題
+        function setTheme(themeName) {
+            const theme = themes[themeName] || themes['default'];
+            const root = document.documentElement;
+            for (const [key, value] of Object.entries(theme)) {
+                root.style.setProperty(key, value);
+            }
+            localStorage.setItem('rng_theme', themeName);
+            closeModal('settings-modal');
+        }
+
+        // Modal 控制
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.add('show');
+        }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.remove('show');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 讀取主題
+            const savedTheme = localStorage.getItem('rng_theme') || 'default';
+            setTheme(savedTheme);
+
+            // 綁定按鈕事件
+            document.getElementById('settingsBtn').addEventListener('click', () => openModal('settings-modal'));
+            document.getElementById('teamBtn').addEventListener('click', () => openModal('team-modal'));
+
+            // 點擊 Modal 外部關閉
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
