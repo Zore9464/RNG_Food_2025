@@ -5,26 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AEUST_RNG</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         /* ========================================
-           全局變數定義
+           全局變數定義 (預設值 - 經典黑白)
            ======================================== */
         :root {
+            /* 這些變數現在會透過 JS 動態修改 */
             --bg-color: #000000;
+            /* 背景色 */
             --text-color: #ffffff;
+            /* 主要文字 */
             --text-sub: #bdbdbd;
+            /* 次要文字 */
             --accent-color: #ffffff;
+            /* 強調色 (邊框/按鈕) */
+
+            /* 玻璃擬態層級 */
             --surface: rgba(255, 255, 255, 0.08);
             --surface-light: rgba(255, 255, 255, 0.12);
             --border-light: rgba(255, 255, 255, 0.15);
             --border-medium: rgba(255, 255, 255, 0.25);
+
+            /* 選項背景 */
             --option-bg: rgba(0, 0, 0, 0.3);
             --option-bg-hover: rgba(0, 0, 0, 0.4);
-            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -33,29 +46,462 @@
             min-height: 100vh;
             line-height: 1.6;
             transition: background-color 0.5s ease, color 0.5s ease;
+            /* 顏色切換過渡動畫 */
             overflow-x: hidden;
-            padding-top: 80px; /* 預留導覽列高度 */
         }
 
         /* ========================================
-           導覽列 (已更新樣式)
+           設定面板 (Modal) - 新增部分
+           ======================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .settings-modal,
+        .team-modal {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-medium);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .settings-modal,
+        .modal-overlay.active .team-modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .close-modal-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        /* 風格化下拉選單 */
+        .theme-select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .theme-select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .theme-select option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* ========================================
+           組員清單模態窗樣式
+           ======================================== */
+        .team-modal {
+            max-width: 500px;
+        }
+
+        .team-members {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--option-bg);
+            /* 使用較深的背景色 */
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover {
+            background-color: var(--surface-light);
+            border-color: var(--border-medium);
+            transform: translateY(-3px);
+        }
+
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--surface-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .member-avatar .material-symbols-rounded {
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .member-id {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .member-role {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            background-color: var(--surface-light);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .member-contact {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .contact-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .contact-btn:hover {
+            background-color: var(--surface-light);
+            transform: scale(1.1);
+        }
+
+        .contact-btn .material-symbols-rounded {
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+
+        .team-intro {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            padding: 0 10px;
+        }
+
+        /* ========================================
+           加載畫面
+           ======================================== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-animation {
+            position: relative;
+            width: 220px;
+            height: 180px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-circle {
+            position: absolute;
+            border: 2px solid var(--surface-light);
+            border-radius: 50%;
+            box-sizing: border-box;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .loading-circle::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background-color: var(--text-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .loading-circle:nth-child(1) {
+            width: 180px;
+            height: 180px;
+            animation: rotateCircle 3s linear infinite;
+            border-color: var(--border-light);
+        }
+
+        .loading-circle:nth-child(2) {
+            width: 160px;
+            height: 160px;
+            border-width: 1px;
+            animation: rotateCircle 2.5s linear infinite reverse;
+        }
+
+        .loading-circle:nth-child(3) {
+            width: 140px;
+            height: 140px;
+            border-width: 1px;
+            animation: rotateCircle 2s linear infinite;
+        }
+
+        @keyframes rotateCircle {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+            color: var(--text-color);
+            z-index: 1;
+            text-align: center;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 1px;
+            background-color: var(--surface-light);
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loading-progress::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 100%;
+            background-color: var(--text-color);
+            animation: progressMove 2s ease-in-out infinite;
+        }
+
+        @keyframes progressMove {
+            0% {
+                left: -40%;
+                width: 40%;
+            }
+
+            50% {
+                width: 60%;
+            }
+
+            100% {
+                left: 100%;
+                width: 40%;
+            }
+        }
+
+        .loading-message {
+            margin-top: 30px;
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--text-sub);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .loading-complete {
+            position: absolute;
+            top: calc(50% + 110px);
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 3rem;
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--text-color);
+            z-index: 2;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .loading-complete.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        /* ========================================
+           極簡毛玻璃導覽列
            ======================================== */
         .navbar {
-            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
             background-color: var(--surface);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--border-light);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; z-index: 1000;
-            transition: all 0.3s ease; opacity: 0; transform: translateY(-20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-20px);
         }
 
-        .navbar.loaded { opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
-        
-        .nav-side { display: flex; gap: 10px; flex: 1; align-items: center; }
-        .nav-left { justify-content: flex-start; }
-        .nav-right { justify-content: flex-end; }
+        .navbar.loaded {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.3s;
+        }
+
+        .nav-side {
+            display: flex;
+            gap: 5px;
+            flex: 1;
+            align-items: center;
+        }
+
+        .nav-right {
+            justify-content: flex-end;
+        }
+
+        .nav-btn {
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            font-weight: 400;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            /* 確保 cursor 為 pointer */
+        }
+
+        .nav-btn .material-symbols-rounded {
+            font-size: 1.2rem;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-medium);
+        }
 
         .nav-logo {
             font-size: 1.8rem;
@@ -72,224 +518,735 @@
             bottom: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 210px;
+            width: 180px;
             height: 1px;
             background-color: var(--text-color);
             opacity: 0.8;
             /* 讓線條稍微透明一點更美觀 */
         }
 
-        .nav-btn {
-            text-decoration: none; color: var(--text-color);
-            font-size: 0.9rem; font-weight: 400; padding: 8px 16px;
-            border-radius: 8px; transition: all 0.3s ease;
-            display: flex; align-items: center; gap: 6px;
-            border: 1px solid transparent; cursor: pointer; background: transparent;
-        }
-
-        .nav-btn:hover { background-color: var(--surface-light); transform: translateY(-2px); }
-        .nav-btn.active { background-color: var(--accent-color); color: var(--bg-color); }
-        .nav-btn .material-symbols-rounded { font-size: 1.2rem; }
-
         /* ========================================
-           彈窗系統 (設定 + 團隊)
+           返回Cover頁面的小框
            ======================================== */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
-            z-index: 2000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        .cover-return-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
 
-        /* 通用彈窗樣式 */
-        .settings-modal, .team-modal {
-            background-color: var(--bg-color); border: 1px solid var(--border-medium);
-            border-radius: 16px; padding: 30px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        .cover-return-container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.6s;
         }
-        .modal-overlay.active .settings-modal, 
-        .modal-overlay.active .team-modal { transform: scale(1); }
 
-        /* 設定彈窗尺寸 */
-        .settings-modal { width: 90%; max-width: 400px; }
-        
-        /* 團隊彈窗尺寸 (寬版) */
-        .team-modal { width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; }
+        .cover-return-box {
+            background-color: var(--surface);
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px 20px;
+            width: 160px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
 
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 25px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px;
+        .cover-return-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-medium), transparent);
         }
-        .modal-title { font-size: 1.4rem; font-weight: 300; letter-spacing: 1px; color: var(--text-color); }
-        .close-modal-btn { background: none; border: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
-        .close-modal-btn:hover { transform: rotate(90deg); }
 
-        /* 設定選單樣式 */
-        .setting-item { margin-bottom: 20px; }
-        .setting-label { display: block; margin-bottom: 10px; color: var(--text-sub); font-size: 0.9rem; }
-        .theme-select {
-            width: 100%; padding: 12px; background-color: var(--surface);
-            border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-color);
-            font-size: 1rem; cursor: pointer; outline: none;
+        .cover-return-box:hover {
+            transform: translateY(-5px);
+            background-color: var(--surface-light);
+            border-color: var(--border-medium);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
         }
-        .theme-select:focus { border-color: var(--accent-color); }
-        .theme-select option { background-color: var(--bg-color); color: var(--text-color); }
 
-        /* 團隊成員卡片樣式 */
-        .team-intro { text-align: center; color: var(--text-sub); margin-bottom: 30px; font-size: 0.95rem; padding: 0 10px; line-height: 1.6; }
-        .team-members { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        
-        .member-card {
-            background-color: var(--surface); border: 1px solid var(--border-light);
-            border-radius: 16px; padding: 25px; display: flex; flex-direction: column; align-items: center;
-            text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;
+        .cover-return-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-color);
+            text-decoration: none;
         }
-        .member-card:hover { transform: translateY(-5px); border-color: var(--accent-color); background-color: var(--surface-light); }
-        
-        .member-avatar {
-            width: 70px; height: 70px; border-radius: 50%; background-color: var(--surface-light);
-            border: 2px solid var(--border-medium); display: flex; align-items: center; justify-content: center;
-            margin-bottom: 15px; color: var(--text-color);
+
+        .cover-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--surface-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
-        .member-name { font-size: 1.2rem; font-weight: 600; color: var(--text-color); margin-bottom: 5px; }
-        .member-role { color: var(--accent-color); font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; }
-        .member-desc { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 15px; flex-grow: 1; }
-        .member-links { display: flex; gap: 15px; margin-top: auto; }
-        .link-btn { color: var(--text-sub); transition: color 0.2s; text-decoration: none; display: flex; align-items: center; }
-        .link-btn:hover { color: var(--accent-color); }
+
+        .cover-return-box:hover .cover-icon {
+            background-color: var(--border-medium);
+            transform: scale(1.1);
+        }
+
+        .cover-icon .material-symbols-rounded {
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .cover-text {
+            flex: 1;
+        }
+
+        .cover-text h3 {
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+            color: var(--text-color);
+        }
+
+        .cover-text p {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .cover-return-box:hover .cover-arrow {
+            transform: translateX(3px);
+        }
+
+        .cover-arrow {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+            color: var(--text-sub);
+        }
+
+        .cover-minimize-btn {
+            width: 40px;
+            height: 40px;
+            background-color: var(--surface);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .cover-minimize-btn:hover {
+            opacity: 1;
+            background-color: var(--surface-light);
+            transform: scale(1.05);
+        }
+
+        .cover-minimize-btn .material-symbols-rounded {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            transition: transform 0.3s ease;
+        }
+
+        .cover-minimized .cover-minimize-btn .material-symbols-rounded {
+            transform: rotate(180deg);
+        }
+
+        .cover-minimized .cover-return-box {
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+        }
 
         /* ========================================
-           主頁內容與卡片 (保留原有樣式)
+           主要內容 & 元件
            ======================================== */
         .container {
-            max-width: 700px; margin: 40px auto; padding: 0 20px;
-            opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
+            margin-top: 100px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 20px 40px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
         }
-        .container.loaded { opacity: 1; transform: translateY(0); transition-delay: 0.4s; }
-        
-        header { text-align: center; margin-bottom: 40px; }
-        h1 { font-size: 3rem; font-weight: 300; margin-bottom: 10px; color: var(--text-color); letter-spacing: 3px; }
-        .subtitle { font-size: 1rem; color: var(--text-sub); font-weight: 300; letter-spacing: 1px; }
-        
+
+        .container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.4s;
+        }
+
+        /* 背景裝飾線條 */
+        .background-lines {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.05;
+        }
+
+        .line {
+            position: absolute;
+            background-color: var(--text-color);
+        }
+
+        .line-vertical {
+            width: 1px;
+            height: 100%;
+            left: 20%;
+        }
+
+        .line-vertical:nth-child(2) {
+            left: 40%;
+        }
+
+        .line-vertical:nth-child(3) {
+            left: 60%;
+        }
+
+        .line-vertical:nth-child(4) {
+            left: 80%;
+        }
+
+        .line-horizontal {
+            width: 100%;
+            height: 1px;
+            top: 20%;
+        }
+
+        .line-horizontal:nth-child(6) {
+            top: 40%;
+        }
+
+        .line-horizontal:nth-child(7) {
+            top: 60%;
+        }
+
+        .line-horizontal:nth-child(8) {
+            top: 80%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-sub);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
         .options-container {
-            margin-bottom: 30px; padding: 25px; background-color: var(--surface-light);
-            border-radius: 12px; border: 1px solid var(--border-light);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: var(--surface-light);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
         }
+
         .option-group {
-            margin-bottom: 25px; padding: 15px; background-color: var(--option-bg);
-            border-radius: 8px; border: 1px solid var(--border-light); transition: all 0.3s ease;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: var(--option-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .option-group:hover { border-color: var(--border-medium); background-color: var(--option-bg-hover); }
-        .option-group label { display: block; font-weight: 400; margin-bottom: 12px; color: var(--text-color); font-size: 1.1rem; padding-left: 10px; position: relative; }
-        .option-group label::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 16px; background-color: var(--text-color); border-radius: 2px; }
 
-        .radio-group { display: flex; flex-wrap: wrap; gap: 15px; }
-        .radio-group label { cursor: pointer; font-weight: 300; color: var(--text-sub); padding-left: 30px; margin-bottom: 0; }
-        .radio-group label::before { display: none; }
-        .radio-group input[type="radio"] { appearance: none; width: 20px; height: 20px; border: 2px solid var(--text-sub); border-radius: 50%; position: absolute; left: 0; top: 50%; transform: translateY(-50%); transition: all 0.3s ease; }
-        .radio-group input[type="radio"]:checked { border-color: var(--text-color); background-color: var(--text-color); box-shadow: 0 0 0 3px var(--surface); }
-        .radio-group input[type="radio"]:checked + span { color: var(--text-color); font-weight: 400; }
-        .radio-group label:hover input[type="radio"] { border-color: var(--text-color); }
-        .radio-group label:hover { color: var(--text-color); }
-        
+        .option-group:hover {
+            border-color: var(--border-medium);
+            background-color: var(--option-bg-hover);
+        }
+
+        .option-group label {
+            display: block;
+            font-weight: 400;
+            margin-bottom: 12px;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .option-group label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 16px;
+            background-color: var(--text-color);
+            border-radius: 2px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .radio-group label {
+            position: relative;
+            cursor: pointer;
+            font-weight: 300;
+            color: var(--text-sub);
+            transition: color 0.3s ease;
+            padding-left: 30px;
+            margin-bottom: 0;
+        }
+
+        .radio-group label::before {
+            display: none;
+        }
+
+        .radio-group input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-sub);
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: transparent;
+        }
+
+        .radio-group input[type="radio"]:checked {
+            border-color: var(--text-color);
+            background-color: var(--text-color);
+            box-shadow: 0 0 0 3px var(--surface);
+        }
+
+        .radio-group input[type="radio"]:checked+span {
+            color: var(--text-color);
+            font-weight: 400;
+        }
+
+        .radio-group label:hover input[type="radio"] {
+            border-color: var(--text-color);
+        }
+
+        .radio-group label:hover {
+            color: var(--text-color);
+        }
+
         .option-group select {
-            width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid var(--border-medium);
-            background-color: var(--option-bg-hover); color: var(--text-color); font-size: 1rem; outline: none;
-            appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='grey' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 16px center; background-size: 18px;
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-medium);
+            background-color: var(--option-bg-hover);
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            /* SVG 圖標顏色隨文字顏色改變需要用 JS 或 mask，這裡簡化使用 base64 白色，若切到淺色主題可能需調整 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='grey' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+            transition: all 0.3s ease;
         }
-        .option-group select option { background-color: var(--bg-color); color: var(--text-color); }
-        .option-title { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-        .option-title .material-symbols-rounded { font-size: 1.2rem; color: var(--text-color); }
 
-        .button-container { margin: 40px 0; text-align: center; }
+        .option-group select:hover {
+            border-color: var(--text-color);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .option-group select option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 10px;
+        }
+
+        .option-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .option-title .material-symbols-rounded {
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .button-container {
+            margin: 40px 0;
+            text-align: center;
+        }
+
         .random-btn {
-            background-color: transparent; color: var(--text-color); border: 1px solid var(--text-color);
-            padding: 18px 40px; font-size: 1.1rem; border-radius: 8px; cursor: pointer; font-weight: 300;
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 250px;
-            transition: all 0.3s ease; position: relative; overflow: hidden;
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 250px;
+            position: relative;
+            overflow: hidden;
         }
-        .random-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--surface-light), transparent); transition: left 0.7s ease; }
-        .random-btn:hover { background-color: var(--surface); letter-spacing: 2px; }
-        .random-btn:hover::before { left: 100%; }
 
-        /* 結果列表樣式 */
-        .results-list {
-            display: none; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; width: 100%;
+        .random-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--surface-light), transparent);
+            transition: left 0.7s ease;
         }
-        .results-list.show { display: grid; animation: fadeIn 0.5s ease; }
-        .result-item {
-            background: var(--surface); border: 1px solid var(--border-light); padding: 20px;
-            border-radius: 16px; cursor: pointer; transition: all 0.3s ease;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-        }
-        .result-item:hover { transform: translateY(-5px); border-color: var(--accent-color); box-shadow: 0 10px 20px rgba(0,0,0,0.2); background: var(--surface-light); }
-        .result-item h3 { margin: 0 0 10px 0; color: var(--text-color); font-size: 1.2rem; }
-        .result-item .mini-tag { font-size: 0.85rem; color: var(--text-sub); background: var(--option-bg); padding: 4px 10px; border-radius: 20px; }
 
-        /* 詳細結果樣式 */
+        .random-btn:hover {
+            background-color: var(--surface);
+            letter-spacing: 2px;
+            padding: 18px 45px;
+        }
+
+        .random-btn:hover::before {
+            left: 100%;
+        }
+
+        .random-btn:active {
+            transform: scale(0.98);
+        }
+
         .result-container {
-            margin-top: 30px; padding: 30px; background-color: var(--surface-light);
-            border-radius: 12px; border: 1px solid var(--border-light);
-            backdrop-filter: blur(10px); display: none; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease;
+            margin-top: 30px;
+            padding: 30px;
+            background-color: var(--surface-light);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        .result-container.show { opacity: 1; transform: translateY(0); }
-        .result-header { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px; width: 100%; }
-        
-        .back-btn { position: absolute; left: 0; background: none; border: none; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        .back-btn:hover { color: var(--text-color); background-color: var(--surface-light); padding: 5px 10px; border-radius: 8px; }
-        
-        .food-name { font-size: 2.2rem; font-weight: 300; margin-bottom: 20px; color: var(--text-color); text-align: center; }
-        .rating { text-align: center; margin-bottom: 25px; font-size: 1.5rem; letter-spacing: 5px; }
-        .star { color: var(--border-medium); }
-        .star:not(:empty) { color: var(--text-color); }
-        .food-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 25px; }
-        .detail-box { padding: 20px; background-color: var(--option-bg); border-radius: 8px; border: 1px solid var(--border-light); }
-        .detail-title { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase; }
-        .detail-content { font-size: 1.1rem; color: var(--text-color); }
 
-        footer { text-align: center; margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border-light); color: var(--text-sub); font-size: 0.9rem; }
+        .result-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-        /* Cover 返回按鈕 */
-        .cover-return-container { position: fixed; bottom: 30px; right: 30px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
-        .cover-return-container.loaded { opacity: 1; transform: translateY(0); transition-delay: 0.6s; }
-        .cover-return-box { background-color: var(--surface); backdrop-filter: blur(15px); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px 20px; width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); transition: all 0.4s ease; cursor: pointer; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-color); }
-        .cover-return-box:hover { transform: translateY(-5px); background-color: var(--surface-light); border-color: var(--border-medium); }
-        .cover-icon { width: 40px; height: 40px; background: var(--surface-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-        .cover-text { flex: 1; }
-        .cover-text h3 { font-size: 1rem; margin-bottom: 4px; }
-        .cover-text p { font-size: 0.8rem; color: var(--text-sub); }
-        .cover-minimize-btn { width: 40px; height: 40px; background-color: var(--surface); border: 1px solid var(--border-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.7; color: var(--text-color); transition: 0.3s; }
-        .cover-minimized .cover-return-box { transform: translateY(100px); opacity: 0; pointer-events: none; }
+        .food-name {
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-align: center;
+            letter-spacing: 1px;
+        }
 
-        /* 加載畫面 */
-        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; transition: opacity 0.8s ease, visibility 0.8s ease; }
-        .loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        .loading-animation { width: 80px; height: 80px; position: relative; }
-        .loading-circle { position: absolute; border: 2px solid var(--surface-light); border-radius: 50%; width: 100%; height: 100%; animation: rotateCircle 2s linear infinite; }
-        .loading-circle:after { content: ''; position: absolute; top: -2px; left: 50%; width: 6px; height: 6px; background: var(--text-color); border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 10px var(--accent-color); }
-        @keyframes rotateCircle { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .rating {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+        }
 
-        /* 背景裝飾 */
-        .background-lines { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: -1; opacity: 0.05; }
-        .line { position: absolute; background-color: var(--text-color); }
-        .line-vertical { width: 1px; height: 100%; left: 20%; }
-        .line-horizontal { width: 100%; height: 1px; top: 20%; }
+        .star {
+            color: var(--border-medium);
+        }
 
-        @media (max-width: 900px) {
-            .navbar { height: auto; flex-direction: column; padding: 10px; }
-            .nav-side { width: 100%; justify-content: center; margin: 5px 0; flex-wrap: wrap; }
-            .nav-logo { order: -1; margin-bottom: 5px; }
-            body { padding-top: 140px; }
-            .nav-btn span:last-child { display: none; }
-            .nav-btn { padding: 8px; }
+        .star:not(:empty) {
+            color: var(--text-color);
+        }
+
+        .food-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .detail-box {
+            padding: 20px;
+            background-color: var(--option-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .detail-title {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .detail-content {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-light);
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* 結果列表容器 */
+        .results-list {
+            display: none;
+            /* 預設隱藏 */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            /* 自動排版 */
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .results-list.show {
+            display: grid;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* 列表單項卡片 */
+        .result-item {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            padding: 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .result-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: var(--surface-light);
+        }
+
+        .result-item h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .result-item .mini-tag {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            background: var(--option-bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* 詳細頁面的頭部與返回按鈕 */
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--surface-light);
+            color: var(--text-color);
+        }
+
+        /* 響應式 */
+        @media (max-width: 768px) {
+            .navbar {
+                height: 60px;
+                padding: 0 20px;
+            }
+
+            .nav-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .nav-btn span {
+                font-size: 1rem;
+            }
+
+            .nav-logo {
+                font-size: 1.4rem;
+            }
+
+            .container {
+                margin-top: 80px;
+                padding: 0 15px 30px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .options-container {
+                padding: 20px;
+            }
+
+            .food-details {
+                grid-template-columns: 1fr;
+            }
+
+            .random-btn {
+                min-width: 200px;
+                padding: 16px 30px;
+                font-size: 1rem;
+            }
+
+            .cover-return-container {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .team-modal {
+                max-width: 90%;
+                padding: 20px;
+            }
+
+            .team-member {
+                padding: 12px;
+            }
+
+            .member-avatar {
+                width: 50px;
+                height: 50px;
+                margin-right: 12px;
+            }
+
+            .member-avatar .material-symbols-rounded {
+                font-size: 1.5rem;
+            }
+
+            .member-name {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-btn span:not(.material-symbols-rounded) {
+                display: none;
+            }
+
+            .nav-btn {
+                padding: 8px;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                justify-content: center;
+            }
+
+            .nav-logo {
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .team-member {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .member-avatar {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .member-contact {
+                justify-content: center;
+            }
         }
     </style>
 </head>
-<body>
 
+<body>
+    <!-- 設定模態窗 -->
     <div class="modal-overlay" id="settingsModalOverlay">
         <div class="settings-modal">
             <div class="modal-header">
@@ -298,6 +1255,7 @@
                     <span class="material-symbols-rounded">close</span>
                 </button>
             </div>
+
             <div class="setting-item">
                 <label class="setting-label">色彩主題風格</label>
                 <select class="theme-select" id="themeSelector">
@@ -310,10 +1268,14 @@
                     <option value="sakura">櫻花淺粉 (Sakura)</option>
                 </select>
             </div>
-            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-sub);">* 設定會自動儲存於您的瀏覽器中。</div>
+
+            <div class="setting-item" style="margin-top: 10px; font-size: 0.8rem; color: var(--text-sub);">
+                * 設定會自動儲存於您的瀏覽器中。
+            </div>
         </div>
     </div>
 
+    <!-- 組員清單模態窗 -->
     <div class="modal-overlay" id="teamModalOverlay">
         <div class="team-modal">
             <div class="modal-header">
@@ -322,25 +1284,38 @@
                     <span class="material-symbols-rounded">close</span>
                 </button>
             </div>
+
             <p class="team-intro">AEUST RNG美食網站由一群熱愛美食與程式設計的高質量人類共同打造，致力於解決您的選擇困難症！</p>
-            <div class="team-members" id="teamMembers"></div>
+
+            <div class="team-members" id="teamMembers">
+                <!-- 組員資料將由 JavaScript 動態生成 -->
+            </div>
         </div>
     </div>
 
     <div class="loading-screen" id="loadingScreen">
-        <div class="loading-animation"><div class="loading-circle"></div></div>
-        <div style="margin-top: 20px; color: var(--text-sub);">載入中...</div>
+        <div class="loading-animation">
+            <div class="loading-circle"></div>
+            <div class="loading-circle"></div>
+            <div class="loading-circle"></div>
+            <div class="loading-text">AEUST RNG</div>
+            <div class="loading-complete" id="loadingComplete">
+                <span class="material-symbols-rounded">check_circle</span>
+            </div>
+        </div>
+        <div class="loading-progress"></div>
+        <div class="loading-message">正在載入美食資料，請稍候...</div>
     </div>
 
     <div class="background-lines">
         <div class="line line-vertical"></div>
-        <div class="line line-vertical" style="left:40%"></div>
-        <div class="line line-vertical" style="left:60%"></div>
-        <div class="line line-vertical" style="left:80%"></div>
+        <div class="line line-vertical"></div>
+        <div class="line line-vertical"></div>
+        <div class="line line-vertical"></div>
         <div class="line line-horizontal"></div>
-        <div class="line line-horizontal" style="top:40%"></div>
-        <div class="line line-horizontal" style="top:60%"></div>
-        <div class="line line-horizontal" style="top:80%"></div>
+        <div class="line line-horizontal"></div>
+        <div class="line line-horizontal"></div>
+        <div class="line line-horizontal"></div>
     </div>
 
     <nav class="navbar" id="navbar">
@@ -349,10 +1324,12 @@
                 <span class="material-symbols-rounded">groups</span>
                 <span>關於開發者團隊</span>
             </button>
+
             <a href="about.html" class="nav-btn">
                 <span class="material-symbols-rounded">info</span>
                 <span>關於網站</span>
             </a>
+
             <a href="map.html" class="nav-btn">
                 <span class="material-symbols-rounded">map</span>
                 <span>美食地圖搜尋</span>
@@ -362,27 +1339,38 @@
         <a href="./index.html" class="nav-logo">AEUST RNG</a>
 
         <div class="nav-side nav-right">
-            <a href="stores.html" class="nav-btn">
-                <span class="material-symbols-rounded">store</span>
-                <span>店家總覽</span>
-            </a>
-            <a href="./transport.html" class="nav-btn">
-                <span class="material-symbols-rounded">commute</span>
-                <span>交通資訊</span>
-            </a>
-            <button class="nav-btn" id="settingsBtn">
-                <span class="material-symbols-rounded">settings</span>
-                <span>背景設定</span>
-            </button>
+            <div class="nav-side nav-right">
+                <a href="stores.html" class="nav-btn">
+                    <span class="material-symbols-rounded">store</span>
+                    <span>店家總覽</span>
+                </a>
+                <a href="./transport.html" class="nav-btn">
+                    <span class="material-symbols-rounded">commute</span>
+                    <span>交通資訊</span>
+                </a>
+                <button class="nav-btn" id="settingsBtn" style="background:none; border:none; padding: 8px 16px;">
+                    <span class="material-symbols-rounded">settings</span>
+                    <span>背景頁面設定</span>
+                </button>
+            </div>
         </div>
     </nav>
 
     <div class="cover-return-container" id="coverReturnContainer">
-        <a href="./Cover.html" class="cover-return-box" id="coverReturnBox">
-            <div class="cover-icon"><span class="material-symbols-rounded">arrow_back</span></div>
-            <div class="cover-text"><h3>返回首頁</h3><p>回到封面頁面</p></div>
-            <span class="material-symbols-rounded" style="color:var(--text-sub);">arrow_forward</span>
-        </a>
+        <div class="cover-return-box" id="coverReturnBox">
+            <a href="./Cover.html" class="cover-return-content">
+                <div class="cover-icon">
+                    <span class="material-symbols-rounded">arrow_back</span>
+                </div>
+                <div class="cover-text">
+                    <h3>返回首頁</h3>
+                    <p>回到封面頁面</p>
+                </div>
+                <div class="cover-arrow">
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </div>
+            </a>
+        </div>
         <div class="cover-minimize-btn" id="coverMinimizeBtn">
             <span class="material-symbols-rounded">expand_less</span>
         </div>
@@ -393,7 +1381,7 @@
             <h1>今天吃什麼？</h1>
             <p class="subtitle">解決你的選擇困難症</p>
         </header>
-        
+
         <div class="content">
             <div class="options-container">
                 <div class="option-group">
@@ -429,229 +1417,495 @@
                     開始隨機抽選
                 </button>
             </div>
-            
+
             <div class="results-list" id="resultsList"></div>
 
-            <div class="result-container" id="resultContainer">
+            <div class="result-container" id="resultContainer" style="display: none;">
                 <div class="result-header">
                     <button class="back-btn" onclick="backToList()">
                         <span class="material-symbols-rounded">arrow_back</span> 返回列表
                     </button>
                     <h2 class="food-name" id="foodName"></h2>
                 </div>
-                
+
                 <div class="rating"></div>
-                
+
                 <div class="food-details">
                     <div class="detail-box">
                         <div class="detail-title">評價</div>
                         <div class="detail-content" id="foodRating"></div>
                     </div>
+
                     <div class="detail-box">
                         <div class="detail-title">內容</div>
                         <div class="detail-content" id="foodDescription"></div>
                     </div>
+
                     <div class="detail-box">
                         <div class="detail-title">地點</div>
                         <div class="detail-content" id="foodLocation"></div>
                     </div>
+
                     <div class="detail-box">
                         <div class="detail-title">價格</div>
                         <div class="detail-content" id="foodPrice"></div>
                     </div>
                 </div>
             </div>
+
+            <footer>
+                <p>AEUST RNG 美食隨機選擇器 &copy; 2025 - 由 <span style="color: var(--text-color); cursor: pointer;"
+                        onclick="openTeamModal()">AEUST RNG 開發團隊</span> 製作</p>
+            </footer>
         </div>
-        
-        <footer>
-            <p>AEUST RNG 美食隨機選擇器 &copy; 2025</p>
-        </footer>
-    </div>
 
-    <script>
-        // === 資料庫 (組員 & 食物) ===
-        const teamMembers = [
-            { id: 1, name: "林品承", studentId: "112111113", role: "前端開發、UI設計師", avatar: "person", email: "11211113@mail.aeust.edu.tw", github: "PINCHENG612", description: "負責UI/UX設計與前端互動功能等" },
-            { id: 2, name: "林劭瑋", studentId: "112111125", role: "前端開發、UI設計師", avatar: "person", email: "aka0903912930@gmail.com", github: "Zore9464", description: "負責UI/UX設計與前端互動功能等" },
-            { id: 3, name: "呂佩衫", studentId: "11211121", role: "後端開發、UI設計師", avatar: "person", email: "peishenlu@gmail.com", github: "peishenlu", description: "負責視覺設計與使用者體驗，負責資料庫設計與API開發" },
-        ];
-
-        const foods = [
-            { id: 1, name: "燒餅油條配豆漿", rating: "傳統滋味，酥脆口感，豆香濃郁", description: "燒餅、油條、冰豆漿", location: "豆漿大王", price: "NT$ 45", stars: 4, category: "light", time: ["breakfast"] },
-            { id: 2, name: "起司蛋餅", rating: "餅皮酥脆，起司牽絲，喚醒早晨", description: "手工蛋餅皮、切達起司、雞蛋", location: "巷口早餐店", price: "NT$ 40", stars: 5, category: "light", time: ["breakfast", "lunch"] },
-            { id: 3, name: "牛肉麵", rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈", description: "半筋半肉牛肉、手工麵條、青菜、蔥花", location: "台北市大安區忠孝東路四段", price: "NT$ 150", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
-            { id: 4, name: "滷肉飯", rating: "滷汁香濃，米飯飽滿，肥瘦適中", description: "滷肉、米飯、滷蛋、黃瓜片", location: "台北市中正區羅斯福路一段", price: "NT$ 50", stars: 5, category: "rice", time: ["lunch", "dinner"] },
-            { id: 5, name: "日式拉麵", rating: "湯頭醇厚，叉燒入口即化", description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾", location: "台北市信義區松壽路", price: "NT$ 220", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
-            { id: 6, name: "義大利麵", rating: "醬汁濃郁，麵條彈牙，配料豐富", description: "義大利麵、番茄肉醬、起司、羅勒", location: "台北市中山區南京東路", price: "NT$ 180", stars: 4, category: "western", time: ["lunch", "dinner"] },
-            { id: 7, name: "健康沙拉", rating: "新鮮蔬菜，營養均衡，輕食首選", description: "生菜、番茄、雞胸肉、堅果、油醋醬", location: "台北市大安區仁愛路四段", price: "NT$ 120", stars: 3, category: "light", time: ["breakfast", "lunch"] },
-            { id: 8, name: "港式燒臘", rating: "肉質鮮美，皮脆肉嫩，醬汁獨特", description: "燒鴨、叉燒、油雞、青菜、白飯", location: "台北市萬華區西門町", price: "NT$ 110", stars: 4, category: "rice", time: ["lunch", "dinner"] },
-            { id: 9, name: "韓式拌飯", rating: "辣醬夠味，配料豐富，口感層次多", description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬", location: "台北市松山區市民大道", price: "NT$ 160", stars: 4, category: "rice", time: ["lunch", "dinner"] },
-            { id: 10, name: "素食餐盒", rating: "清爽不油膩，營養均衡，素食者首選", description: "五穀飯、時蔬、豆腐、菇類、堅果", location: "台北市文山區興隆路", price: "NT$ 90", stars: 3, category: "light", time: ["lunch", "dinner"] }
-        ];
-
-        const themes = {
-            default: { '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd', '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)', '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)', '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)', '--option-bg-hover': 'rgba(0, 0, 0, 0.4)' },
-            light: { '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366', '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)', '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)', '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)', '--option-bg-hover': 'rgba(255, 255, 255, 0.8)' },
-            midnight: { '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8', '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)', '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)', '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)', '--option-bg-hover': 'rgba(30, 41, 59, 0.8)' },
-            forest: { '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7', '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)', '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)', '--option-bg-hover': 'rgba(0, 40, 20, 0.5)' },
-            latte: { '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4', '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)', '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)', '--option-bg-hover': 'rgba(78, 52, 46, 0.5)' },
-            lavender: { '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed', '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)', '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)', '--option-bg-hover': 'rgba(139, 92, 246, 0.2)' },
-            sakura: { '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777', '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)', '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)', '--option-bg-hover': 'rgba(236, 72, 153, 0.2)' }
-        };
-
-        function applyTheme(themeName) {
-            const theme = themes[themeName] || themes['default'];
-            const root = document.documentElement;
-            for (const [key, value] of Object.entries(theme)) {
-                root.style.setProperty(key, value);
-            }
-            localStorage.setItem('rng_theme', themeName);
-        }
-
-        // === 團隊渲染 ===
-        function renderTeam() {
-            const container = document.getElementById('teamMembers');
-            if(!container) return;
-            container.innerHTML = teamMembers.map(member => `
-                <div class="member-card">
-                    <div class="member-avatar"><span class="material-symbols-rounded">${member.avatar}</span></div>
-                    <h3 class="member-name">${member.name}</h3>
-                    <div style="font-size:0.85rem; font-family:monospace; color:var(--text-sub); background:var(--surface-light); padding:2px 8px; border-radius:4px; margin-bottom:10px;">${member.studentId}</div>
-                    <div class="member-role">${member.role}</div>
-                    <p class="member-desc">${member.description}</p>
-                    <div class="member-links">
-                        <a href="mailto:${member.email}" class="link-btn"><span class="material-symbols-rounded">mail</span></a>
-                        <a href="https://github.com/${member.github}" target="_blank" class="link-btn"><span class="material-symbols-rounded">code</span></a>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // === 抽籤邏輯 ===
-        let currentFilteredFoods = [];
-
-        function randomFood() {
-            const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
-            const selectedCategory = document.getElementById('foodCategory').value;
-
-            // 1. 篩選
-            currentFilteredFoods = foods.filter(food => {
-                const isTimeMatch = selectedTime === 'all' || food.time.includes(selectedTime);
-                const isCategoryMatch = selectedCategory === 'all' || food.category === selectedCategory;
-                return isTimeMatch && isCategoryMatch;
-            });
-
-            const listContainer = document.getElementById('resultsList');
-            const detailContainer = document.getElementById('resultContainer');
-            const backBtn = document.querySelector('.back-btn');
-
-            listContainer.innerHTML = '';
-            detailContainer.style.display = 'none';
-
-            // 2. 無結果
-            if (currentFilteredFoods.length === 0) {
-                detailContainer.style.display = 'block';
-                detailContainer.classList.add('show');
-                document.getElementById('foodName').textContent = "無符合條件的店家";
-                document.querySelector('.rating').innerHTML = '';
-                document.getElementById('foodRating').textContent = "請嘗試放寬篩選條件";
-                document.getElementById('foodDescription').textContent = "-";
-                document.getElementById('foodLocation').textContent = "-";
-                document.getElementById('foodPrice').textContent = "-";
-                if(backBtn) backBtn.style.display = 'none';
-                return;
-            }
-
-            // 3. 顯示列表
-            listContainer.style.display = 'grid';
-            listContainer.classList.add('show');
-            currentFilteredFoods.forEach(food => {
-                const card = document.createElement('div');
-                card.className = 'result-item';
-                card.onclick = () => showDetail(food);
-                card.innerHTML = `<h3>${food.name}</h3><span class="mini-tag">${food.rating.split('，')[0]}</span>`;
-                listContainer.appendChild(card);
-            });
-        }
-
-        function showDetail(food) {
-            const listContainer = document.getElementById('resultsList');
-            const detailContainer = document.getElementById('resultContainer');
-            
-            listContainer.style.display = 'none';
-            detailContainer.style.display = 'block';
-            document.querySelector('.back-btn').style.display = 'flex';
-
-            document.getElementById('foodName').textContent = food.name;
-            document.getElementById('foodRating').textContent = food.rating;
-            document.getElementById('foodDescription').textContent = food.description;
-            document.getElementById('foodLocation').textContent = food.location;
-            document.getElementById('foodPrice').textContent = food.price;
-
-            const starsContainer = document.querySelector('.rating');
-            starsContainer.innerHTML = '';
-            for (let i = 0; i < 5; i++) {
-                const star = document.createElement('span');
-                star.className = 'star';
-                star.textContent = i < food.stars ? '★' : '☆';
-                starsContainer.appendChild(star);
-            }
-            
-            detailContainer.classList.remove('show');
-            void detailContainer.offsetWidth; 
-            detailContainer.classList.add('show');
-        }
-
-        function backToList() {
-            document.getElementById('resultContainer').style.display = 'none';
-            document.getElementById('resultsList').style.display = 'grid';
-        }
-
-        // === 初始化 ===
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('rng_theme') || 'default';
-            document.getElementById('themeSelector').value = savedTheme;
-            applyTheme(savedTheme);
-            renderTeam();
-
-            // Cover 返回按鈕
-            const coverReturnContainer = document.getElementById('coverReturnContainer');
-            const coverMinimizeBtn = document.getElementById('coverMinimizeBtn');
-            if(coverMinimizeBtn) {
-                coverMinimizeBtn.addEventListener('click', () => coverReturnContainer.classList.toggle('cover-minimized'));
-                setTimeout(() => coverReturnContainer.classList.add('loaded', 'cover-minimized'), 800);
-            }
-
-            // Modal 控制
-            const setupModal = (btnId, modalId, closeId) => {
-                const btn = document.getElementById(btnId);
-                const modal = document.getElementById(modalId);
-                const close = document.getElementById(closeId);
-                btn.addEventListener('click', () => modal.classList.add('active'));
-                close.addEventListener('click', () => modal.classList.remove('active'));
-                modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('active'); });
+        <script>
+            // ==========================================
+            // 主題色彩定義
+            // ==========================================
+            const themes = {
+                default: { // 經典黑白
+                    '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd',
+                    '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)',
+                    '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)',
+                    '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)'
+                },
+                light: { // 極簡亮白
+                    '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366',
+                    '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)',
+                    '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)',
+                    '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)'
+                },
+                midnight: { // 午夜深藍
+                    '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8',
+                    '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)',
+                    '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)',
+                    '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)'
+                },
+                forest: { // 森林墨綠
+                    '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7',
+                    '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)',
+                    '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)',
+                    '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)'
+                },
+                latte: { // 暖色拿鐵
+                    '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4',
+                    '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)',
+                    '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)',
+                    '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)'
+                },
+                lavender: { // 薰衣草紫 (新增)
+                    '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed',
+                    '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)',
+                    '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)',
+                    '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)'
+                },
+                sakura: { // 櫻花淺粉 (新增)
+                    '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777',
+                    '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)',
+                    '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)',
+                    '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)'
+                }
             };
 
-            setupModal('settingsBtn', 'settingsModalOverlay', 'closeSettingsBtn');
-            setupModal('teamBtn', 'teamModalOverlay', 'closeTeamBtn');
+            // ==========================================
+            // 組員資料定義
+            // ==========================================
+            const teamMembers = [
+                {
+                    id: 1,
+                    name: "林品承",
+                    studentId: "112111113",
+                    role: "前端開發、UI設計師",
+                    avatar: "person",
+                    email: "11211113@mail.aeust.edu.tw",
+                    github: "PINCHENG612",
+                    description: "負責UI/UX設計與前端互動功能等"
+                },
+                {
+                    id: 2,
+                    name: "林劭瑋",
+                    studentId: "112111125",
+                    role: "前端開發、UI設計師",
+                    avatar: "person",
+                    email: "aka0903912930@gmail.com",
+                    github: "Zore9464",
+                    description: "負責UI/UX設計與前端互動功能等"
+                },
+                {
+                    id: 3,
+                    name: "呂佩衫",
+                    studentId: "11211121",
+                    role: "後端開發、UI設計師",
+                    avatar: "person",
+                    email: "peishenlu@gmail.com",
+                    github: "peishenlu",
+                    description: "負責視覺設計與使用者體驗，負責資料庫設計與API開發"
+                },
+            ];
 
-            document.getElementById('themeSelector').addEventListener('change', (e) => applyTheme(e.target.value));
-            
-            // 選項組視覺
-            document.querySelectorAll('.option-group').forEach(g => {
-                g.addEventListener('click', () => {
-                    g.style.borderColor = 'var(--accent-color)';
-                    setTimeout(() => g.style.borderColor = 'var(--border-light)', 500);
+            // 應用主題函數
+            function applyTheme(themeName) {
+                const theme = themes[themeName];
+                if (!theme) return;
+
+                const root = document.documentElement;
+                for (const [property, value] of Object.entries(theme)) {
+                    root.style.setProperty(property, value);
+                }
+
+                // 儲存設定到 LocalStorage
+                localStorage.setItem('rng_theme', themeName);
+            }
+
+            // 食物資料陣列 (保持不變)
+            const foods = [
+                { name: "燒餅油條配豆漿", rating: "傳統滋味，酥脆口感，豆香濃郁", description: "燒餅、油條、冰豆漿", location: "豆漿大王", price: "NT$ 45", stars: 4, category: "light", time: ["breakfast"] },
+                { name: "起司蛋餅", rating: "餅皮酥脆，起司牽絲，喚醒早晨", description: "手工蛋餅皮、切達起司、雞蛋", location: "巷口早餐店", price: "NT$ 40", stars: 5, category: "light", time: ["breakfast", "lunch"] },
+                { name: "牛肉麵", rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈", description: "半筋半肉牛肉、手工麵條、青菜、蔥花", location: "台北市大安區忠孝東路四段", price: "NT$ 150", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
+                { name: "滷肉飯", rating: "滷汁香濃，米飯飽滿，肥瘦適中", description: "滷肉、米飯、滷蛋、黃瓜片", location: "台北市中正區羅斯福路一段", price: "NT$ 50", stars: 5, category: "rice", time: ["lunch", "dinner"] },
+                { name: "日式拉麵", rating: "湯頭醇厚，叉燒入口即化", description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾", location: "台北市信義區松壽路", price: "NT$ 220", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
+                { name: "義大利麵", rating: "醬汁濃郁，麵條彈牙，配料豐富", description: "義大利麵、番茄肉醬、起司、羅勒", location: "台北市中山區南京東路", price: "NT$ 180", stars: 4, category: "western", time: ["lunch", "dinner"] },
+                { name: "健康沙拉", rating: "新鮮蔬菜，營養均衡，輕食首選", description: "生菜、番茄、雞胸肉、堅果、油醋醬", location: "台北市大安區仁愛路四段", price: "NT$ 120", stars: 3, category: "light", time: ["breakfast", "lunch"] },
+                { name: "港式燒臘", rating: "肉質鮮美，皮脆肉嫩，醬汁獨特", description: "燒鴨、叉燒、油雞、青菜、白飯", location: "台北市萬華區西門町", price: "NT$ 110", stars: 4, category: "rice", time: ["lunch", "dinner"] },
+                { name: "韓式拌飯", rating: "辣醬夠味，配料豐富，口感層次多", description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬", location: "台北市松山區市民大道", price: "NT$ 160", stars: 4, category: "rice", time: ["lunch", "dinner"] },
+                { name: "素食餐盒", rating: "清爽不油膩，營養均衡，素食者首選", description: "五穀飯、時蔬、豆腐、菇類、堅果", location: "台北市文山區興隆路", price: "NT$ 90", stars: 3, category: "light", time: ["lunch", "dinner"] }
+            ];
+
+            // 頁面加載處理
+            document.addEventListener('DOMContentLoaded', function () {
+                // 1. 初始化主題
+                const savedTheme = localStorage.getItem('rng_theme') || 'default';
+                document.getElementById('themeSelector').value = savedTheme;
+                applyTheme(savedTheme);
+
+                // 2. 初始化組員清單
+                initTeamMembers();
+
+                const loadingScreen = document.getElementById('loadingScreen');
+                const loadingComplete = document.getElementById('loadingComplete');
+                const navbar = document.getElementById('navbar');
+                const mainContainer = document.getElementById('mainContainer');
+                const coverReturnContainer = document.getElementById('coverReturnContainer');
+
+                // 模擬加載過程
+                setTimeout(function () {
+                    loadingComplete.classList.add('show');
+                    randomFood();
+
+                    setTimeout(function () {
+                        loadingScreen.classList.add('hidden');
+                        navbar.classList.add('loaded');
+                        mainContainer.classList.add('loaded');
+                        coverReturnContainer.classList.add('loaded');
+                    }, 800);
+                }, 1500);
+
+                // ==========================================
+                // 設定面板邏輯
+                // ==========================================
+                const settingsBtn = document.getElementById('settingsBtn');
+                const settingsModalOverlay = document.getElementById('settingsModalOverlay');
+                const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+                const themeSelector = document.getElementById('themeSelector');
+
+                // 打開設定面板
+                settingsBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    settingsModalOverlay.classList.add('active');
+                });
+
+                // 關閉設定面板
+                closeSettingsBtn.addEventListener('click', function () {
+                    settingsModalOverlay.classList.remove('active');
+                });
+
+                // 點擊背景關閉設定面板
+                settingsModalOverlay.addEventListener('click', function (e) {
+                    if (e.target === settingsModalOverlay) {
+                        settingsModalOverlay.classList.remove('active');
+                    }
+                });
+
+                // 切換主題
+                themeSelector.addEventListener('change', function () {
+                    applyTheme(this.value);
+                });
+
+                // ==========================================
+                // 組員清單面板邏輯
+                // ==========================================
+                const teamBtn = document.getElementById('teamBtn');
+                const teamModalOverlay = document.getElementById('teamModalOverlay');
+                const closeTeamBtn = document.getElementById('closeTeamBtn');
+
+                // 打開組員清單面板
+                teamBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    teamModalOverlay.classList.add('active');
+                });
+
+                // 關閉組員清單面板
+                closeTeamBtn.addEventListener('click', function () {
+                    teamModalOverlay.classList.remove('active');
+                });
+
+                // 點擊背景關閉組員清單面板
+                teamModalOverlay.addEventListener('click', function (e) {
+                    if (e.target === teamModalOverlay) {
+                        teamModalOverlay.classList.remove('active');
+                    }
                 });
             });
 
-            // 載入動畫
-            setTimeout(() => {
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('navbar').classList.add('loaded');
-                document.getElementById('mainContainer').classList.add('loaded');
-            }, 800);
-        });
-    </script>
+            // 初始化組員清單
+            function initTeamMembers() {
+                const teamMembersContainer = document.getElementById('teamMembers');
+                teamMembersContainer.innerHTML = '';
+
+                teamMembers.forEach(member => {
+                    const memberElement = document.createElement('div');
+                    memberElement.className = 'team-member';
+                    memberElement.innerHTML = `
+                    <div class="member-avatar">
+                        <span class="material-symbols-rounded">${member.avatar}</span>
+                    </div>
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-id">學號: ${member.studentId}</div>
+                        <div class="member-role">${member.role}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-sub); margin-top: 5px;">${member.description}</div>
+                        <div class="member-contact">
+                            <button class="contact-btn" onclick="sendEmail('${member.email}')" title="發送郵件">
+                                <span class="material-symbols-rounded">mail</span>
+                            </button>
+                            <button class="contact-btn" onclick="openGithub('${member.github}')" title="GitHub 主頁">
+                                <span class="material-symbols-rounded">code</span>
+                            </button>
+                            <button class="contact-btn" onclick="showMemberDetails(${member.id})" title="詳細資訊">
+                                <span class="material-symbols-rounded">info</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                    teamMembersContainer.appendChild(memberElement);
+                });
+            }
+
+            // 組員相關功能
+            function openTeamModal() {
+                document.getElementById('teamModalOverlay').classList.add('active');
+            }
+
+            function sendEmail(email) {
+                window.location.href = `mailto:${email}`;
+            }
+
+            function openGithub(username) {
+                alert(`將導向 ${username} 的 GitHub 主頁\n(此為示範功能，實際開發中可替換為真實連結)`);
+                // 實際應用中可使用: window.open(`https://github.com/${username}`, '_blank');
+            }
+
+            function showMemberDetails(memberId) {
+                const member = teamMembers.find(m => m.id === memberId);
+                if (member) {
+                    alert(`詳細資訊:\n\n姓名: ${member.name}\n學號: ${member.studentId}\n職位: ${member.role}\n\n${member.description}`);
+                }
+            }
+
+            // 全域變數用來儲存篩選後的結果
+            let currentFilteredFoods = [];
+
+            // 修改後的「開始抽選/搜尋」按鈕邏輯
+            function randomFood() {
+                const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
+                const selectedCategory = document.getElementById('foodCategory').value;
+
+                // 1. 篩選資料
+                currentFilteredFoods = foods.filter(food => {
+                    const isTimeMatch = selectedTime === 'all' || food.time.includes(selectedTime);
+                    const isCategoryMatch = selectedCategory === 'all' || food.category === selectedCategory;
+                    return isTimeMatch && isCategoryMatch;
+                });
+
+                const listContainer = document.getElementById('resultsList');
+                const detailContainer = document.getElementById('resultContainer');
+                const foodNameTitle = document.getElementById('foodName'); // 用來借用顯示錯誤訊息
+
+                // 清空舊內容
+                listContainer.innerHTML = '';
+
+                // 隱藏詳細頁，準備顯示列表
+                detailContainer.style.display = 'none';
+
+                // 2. 判斷是否有結果
+                if (currentFilteredFoods.length === 0) {
+                    listContainer.style.display = 'none';
+                    detailContainer.style.display = 'block'; // 借用詳細區塊顯示錯誤
+                    detailContainer.classList.add('show');
+
+                    document.getElementById('foodName').textContent = "無符合條件的店家";
+                    document.querySelector('.rating').innerHTML = '';
+                    document.getElementById('foodRating').textContent = "請嘗試放寬篩選條件";
+                    document.getElementById('foodDescription').textContent = "-";
+                    document.getElementById('foodLocation').textContent = "-";
+                    document.getElementById('foodPrice').textContent = "-";
+                    // 隱藏返回按鈕，因為沒有列表可回
+                    document.querySelector('.back-btn').style.display = 'none';
+                    return;
+                }
+
+                // 3. 產生列表卡片
+                currentFilteredFoods.forEach(food => {
+                    const card = document.createElement('div');
+                    card.className = 'result-item';
+                    // 點擊卡片時觸發 showDetail 函式
+                    card.onclick = () => showDetail(food);
+
+                    const title = document.createElement('h3');
+                    title.textContent = food.name;
+
+                    const tag = document.createElement('span');
+                    tag.className = 'mini-tag';
+                    tag.textContent = food.rating.split('，')[0]; // 取評價的第一句話當簡介
+
+                    card.appendChild(title);
+                    card.appendChild(tag);
+                    listContainer.appendChild(card);
+                });
+
+                // 顯示列表
+                listContainer.style.display = 'grid'; // 或 flex，對應 CSS
+                listContainer.classList.add('show');
+            }
+
+            // 顯示詳細資訊函式
+            function showDetail(food) {
+                const listContainer = document.getElementById('resultsList');
+                const detailContainer = document.getElementById('resultContainer');
+
+                // 隱藏列表，顯示詳細頁
+                listContainer.style.display = 'none';
+                detailContainer.style.display = 'block';
+
+                // 確保返回按鈕顯示
+                document.querySelector('.back-btn').style.display = 'flex';
+
+                // 填入資料
+                document.getElementById('foodName').textContent = food.name;
+                document.getElementById('foodRating').textContent = food.rating;
+                document.getElementById('foodDescription').textContent = food.description;
+                document.getElementById('foodLocation').textContent = food.location;
+                document.getElementById('foodPrice').textContent = food.price;
+
+                // 星星評價
+                const starsContainer = document.querySelector('.rating');
+                starsContainer.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star';
+                    star.textContent = i < food.stars ? '★' : '☆';
+                    starsContainer.appendChild(star);
+                }
+
+                // 添加動畫 class
+                detailContainer.classList.remove('show');
+                void detailContainer.offsetWidth; // 觸發重繪 (Reflow) 以重啟動畫
+                detailContainer.classList.add('show');
+            }
+
+            // 返回列表函式
+            function backToList() {
+                const listContainer = document.getElementById('resultsList');
+                const detailContainer = document.getElementById('resultContainer');
+
+                detailContainer.style.display = 'none';
+                listContainer.style.display = 'grid';
+            }
+            // 選項組視覺反饋
+            document.addEventListener('DOMContentLoaded', function () {
+                const optionGroups = document.querySelectorAll('.option-group');
+
+                optionGroups.forEach(group => {
+                    group.addEventListener('click', function () {
+                        // 這裡改用 CSS 變數來設定動態樣式
+                        // 為了簡化，保持 CSS :hover 效果，這裡只處理 radio 的邏輯
+                    });
+                });
+
+                const radioInputs = document.querySelectorAll('input[type="radio"]');
+                radioInputs.forEach(input => {
+                    input.addEventListener('change', function () {
+                        const parentGroup = this.closest('.option-group');
+                        if (parentGroup) {
+                            // 使用 JS 強制添加高亮 class 比較好，但為了保持單文件簡單，這裡沿用原本邏輯
+                            // 不過因為用了 CSS 變數，原本的 style.borderColor 可能會覆蓋變數
+                            // 建議依靠 CSS 選擇器，或者如下設定
+                            parentGroup.style.borderColor = 'var(--accent-color)';
+                            parentGroup.style.boxShadow = '0 0 0 1px var(--surface-light)';
+
+                            // 重置其他組
+                            document.querySelectorAll('.option-group').forEach(g => {
+                                if (g !== parentGroup) {
+                                    g.style.borderColor = 'var(--border-light)';
+                                    g.style.boxShadow = 'none';
+                                }
+                            });
+                        }
+                    });
+                });
+
+                const selectElement = document.getElementById('foodCategory');
+                selectElement.addEventListener('change', function () {
+                    const parentGroup = this.closest('.option-group');
+                    if (parentGroup) {
+                        parentGroup.style.borderColor = 'var(--accent-color)';
+                        parentGroup.style.boxShadow = '0 0 0 1px var(--surface-light)';
+                        setTimeout(() => {
+                            parentGroup.style.borderColor = 'var(--border-light)';
+                            parentGroup.style.boxShadow = 'none';
+                        }, 2000);
+                    }
+                });
+
+                const coverReturnContainer = document.getElementById('coverReturnContainer');
+                const coverMinimizeBtn = document.getElementById('coverMinimizeBtn');
+
+                if (coverMinimizeBtn) {
+                    coverMinimizeBtn.addEventListener('click', function () {
+                        coverReturnContainer.classList.toggle('cover-minimized');
+                    });
+                }
+
+                const coverReturnBox = document.getElementById('coverReturnBox');
+                if (coverReturnBox) {
+                    coverReturnBox.addEventListener('click', function () {
+                        this.style.transform = 'translateY(-5px) scale(0.98)';
+                        setTimeout(() => {
+                            this.style.transform = 'translateY(-5px) scale(1)';
+                        }, 150);
+                    });
+                }
+
+                let hideTimeout;
+                if (coverReturnContainer) {
+                    coverReturnContainer.addEventListener('mouseenter', function () {
+                        clearTimeout(hideTimeout);
+                        this.classList.remove('cover-minimized');
+                    });
+
+                    coverReturnContainer.addEventListener('mouseleave', function () {
+                        hideTimeout = setTimeout(() => {
+                            this.classList.add('cover-minimized');
+                        }, 3000);
+                    });
+
+                    setTimeout(() => {
+                        coverReturnContainer.classList.add('cover-minimized');
+                    }, 8000);
+                }
+            });
+        </script>
 </body>
+
 </html>
