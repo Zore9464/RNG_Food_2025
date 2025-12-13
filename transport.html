@@ -13,10 +13,12 @@
             --text-sub: #bdbdbd;
             --accent-color: #ffffff;
             --surface: rgba(255, 255, 255, 0.08);
-            --surface-hover: rgba(255, 255, 255, 0.15);
+            --surface-light: rgba(255, 255, 255, 0.12);
             --border-light: rgba(255, 255, 255, 0.15);
+            --border-medium: rgba(255, 255, 255, 0.25);
             --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             --map-filter: grayscale(100%) invert(100%) contrast(90%);
+            --option-bg: rgba(0, 0, 0, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,10 +30,10 @@
             line-height: 1.6;
             transition: background-color 0.5s ease, color 0.5s ease;
             overflow-x: hidden;
-            padding-top: 80px; /* 預留頂部導覽列空間 */
+            padding-top: 80px;
         }
 
-        /* === 頂部導覽列樣式 (您提供的結構) === */
+        /* === 導覽列樣式 === */
         .navbar {
             position: fixed; top: 0; left: 0; width: 100%; height: 70px;
             background-color: var(--surface);
@@ -39,7 +41,6 @@
             border-bottom: 1px solid var(--border-light);
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; z-index: 1000;
-            transition: all 0.3s ease;
         }
 
         .nav-side { display: flex; align-items: center; gap: 10px; }
@@ -47,12 +48,27 @@
         .nav-right { flex: 1; justify-content: flex-end; }
 
         .nav-logo {
-            font-size: 1.5rem; font-weight: 700; color: var(--text-color);
-            text-decoration: none; letter-spacing: 1px;
-            text-transform: uppercase;
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-color);
+            text-decoration: none;
+            letter-spacing: 15px;
+            position: relative;
         }
 
-        /* 按鈕通用樣式 */
+        .nav-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 1px;
+            background-color: var(--text-color);
+            opacity: 0.8;
+            /* 讓線條稍微透明一點更美觀 */
+        }
+
         .nav-btn {
             display: flex; align-items: center; gap: 6px;
             padding: 8px 16px; border-radius: 8px;
@@ -62,96 +78,156 @@
             transition: all 0.3s ease;
         }
 
-        .nav-btn:hover { background-color: var(--surface-hover); transform: translateY(-2px); }
+        .nav-btn:hover { background-color: var(--surface-light); transform: translateY(-2px); }
+        .nav-btn.active { background-color: var(--accent-color); color: var(--bg-color); }
         .nav-btn span.material-symbols-rounded { font-size: 1.2rem; }
 
-        /* 當前頁面高亮 */
-        .nav-btn.active {
-            background-color: var(--accent-color);
-            color: var(--bg-color); /* 反轉顏色以凸顯 */
+        /* === 彈窗系統 (Modal) === */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            z-index: 2000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
         }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        /* 設定彈窗樣式 */
+        .settings-modal {
+            background-color: var(--bg-color); border: 1px solid var(--border-medium);
+            border-radius: 16px; padding: 30px; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.9); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-overlay.active .settings-modal { transform: scale(1); }
+
+        /* 開發團隊彈窗樣式 (寬度較寬) */
+        .team-modal {
+            background-color: var(--bg-color); border: 1px solid var(--border-medium);
+            border-radius: 20px; padding: 30px; width: 90%; max-width: 900px; /* 較寬以容納卡片 */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.9); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh; overflow-y: auto; /* 內容多時可捲動 */
+        }
+        .modal-overlay.active .team-modal { transform: scale(1); }
+
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px;
+        }
+        .modal-title { font-size: 1.4rem; font-weight: 300; letter-spacing: 1px; color: var(--text-color); }
+        .close-modal-btn { background: none; border: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
+        .close-modal-btn:hover { transform: rotate(90deg); }
+
+        /* 團隊成員卡片樣式 */
+        .team-intro { text-align: center; color: var(--text-sub); margin-bottom: 30px; font-size: 0.95rem; line-height: 1.6; }
+        
+        .team-members {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .member-card {
+            background-color: var(--surface); border: 1px solid var(--border-light);
+            border-radius: 16px; padding: 25px; display: flex; flex-direction: column; align-items: center;
+            text-align: center; transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .member-card:hover { transform: translateY(-5px); border-color: var(--accent-color); background-color: var(--surface-light); }
+
+        .member-avatar {
+            width: 70px; height: 70px; border-radius: 50%; background-color: var(--surface-light);
+            border: 2px solid var(--border-medium); display: flex; align-items: center; justify-content: center;
+            margin-bottom: 15px; color: var(--text-color);
+        }
+        .member-avatar span { font-size: 36px; }
+
+        .member-name { font-size: 1.2rem; font-weight: 600; color: var(--text-color); margin-bottom: 5px; }
+        .member-id { font-size: 0.85rem; font-family: monospace; color: var(--text-sub); background: var(--surface-light); padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; }
+        .member-role { color: var(--accent-color); font-size: 0.9rem; font-weight: 500; margin-bottom: 15px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; width: 100%; }
+        .member-desc { font-size: 0.9rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
+        
+        .member-links { display: flex; gap: 15px; margin-top: auto; }
+        .link-btn { color: var(--text-sub); transition: color 0.2s; text-decoration: none; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; }
+        .link-btn:hover { color: var(--accent-color); }
+
+        /* 設定下拉選單樣式 */
+        .theme-select {
+            width: 100%; padding: 12px; background-color: var(--surface);
+            border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-color);
+            font-size: 1rem; cursor: pointer; outline: none;
+        }
+        .theme-select option { background-color: var(--bg-color); color: var(--text-color); }
 
         /* === 內容區域 === */
-        .container {
-            max-width: 900px; margin: 40px auto; padding: 0 20px;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         header { text-align: center; margin-bottom: 40px; }
         h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 10px; }
         .subtitle { color: var(--text-sub); }
 
-        /* 資訊卡片 */
         .info-card {
-            background-color: var(--surface);
-            border: 1px solid var(--border-light);
-            border-radius: 16px; padding: 30px; margin-bottom: 25px;
-            backdrop-filter: blur(10px);
+            background-color: var(--surface); border: 1px solid var(--border-light);
+            border-radius: 16px; padding: 30px; margin-bottom: 25px; backdrop-filter: blur(10px);
         }
-        
         .info-card h2 {
             font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
-            border-bottom: 1px solid var(--border-light); padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light); padding-bottom: 10px; color: var(--text-color);
         }
-        
+        .info-card .icon { color: var(--accent-color); }
         .info-row { display: flex; margin-bottom: 15px; }
         .info-label { min-width: 80px; color: var(--text-sub); }
         .info-content { color: var(--text-color); flex: 1; }
+        .map-frame { width: 100%; height: 350px; border-radius: 12px; border: 0; filter: var(--map-filter); transition: filter 0.5s ease; }
 
-        /* 地圖框架 */
-        .map-frame {
-            width: 100%; height: 350px; border-radius: 12px; border: 0;
-            filter: var(--map-filter); transition: filter 0.5s ease;
-        }
-
-        /* === 彈窗 (Modal) 共用樣式 === */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); z-index: 2000;
-            backdrop-filter: blur(5px); justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .modal.show { display: flex; opacity: 1; }
-        
-        .modal-content {
-            background-color: var(--bg-color); border: 1px solid var(--border-light);
-            border-radius: 20px; padding: 30px; width: 90%; max-width: 400px;
-            box-shadow: var(--shadow); transform: scale(0.9); transition: transform 0.3s ease;
-            position: relative;
-        }
-        .modal.show .modal-content { transform: scale(1); }
-        
-        .close-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: none; border: none; color: var(--text-sub); cursor: pointer;
-        }
-
-        /* 設定主題按鈕網格 */
-        .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
-        .theme-btn {
-            padding: 12px; border-radius: 10px; border: 1px solid var(--border-light);
-            background: var(--surface); color: var(--text-color); cursor: pointer;
-            transition: 0.2s;
-        }
-        .theme-btn:hover { background: var(--surface-hover); }
-
-        /* RWD 調整 */
         @media (max-width: 900px) {
             .navbar { height: auto; flex-direction: column; padding: 10px; }
             .nav-side { width: 100%; justify-content: center; margin: 5px 0; flex-wrap: wrap; }
             .nav-logo { order: -1; margin-bottom: 5px; }
             body { padding-top: 140px; }
-            .nav-btn span:last-child { display: none; } /* 手機版隱藏文字只留圖示 */
+            .nav-btn span:last-child { display: none; }
             .nav-btn { padding: 8px; }
         }
     </style>
 </head>
 <body>
+
+    <div class="modal-overlay" id="settingsModalOverlay">
+        <div class="settings-modal">
+            <div class="modal-header">
+                <span class="modal-title">網站設定</span>
+                <button class="close-modal-btn" id="closeSettingsBtn">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            <div class="setting-item">
+                <label style="display:block; margin-bottom:10px; color:var(--text-sub);">色彩主題風格</label>
+                <select class="theme-select" id="themeSelector">
+                    <option value="default">經典黑白 (Default)</option>
+                    <option value="light">極簡亮白 (Light)</option>
+                    <option value="midnight">午夜深藍 (Midnight)</option>
+                    <option value="forest">森林墨綠 (Forest)</option>
+                    <option value="latte">暖色拿鐵 (Latte)</option>
+                    <option value="lavender">薰衣草紫 (Lavender)</option>
+                    <option value="sakura">櫻花淺粉 (Sakura)</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-sub);">* 設定會自動儲存於您的瀏覽器中。</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="teamModalOverlay">
+        <div class="team-modal">
+            <div class="modal-header">
+                <span class="modal-title">開發團隊</span>
+                <button class="close-modal-btn" id="closeTeamBtn">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            <p class="team-intro">AEUST RNG美食網站由一群熱愛美食與程式設計的高質量人類共同打造，致力於解決您的選擇困難症！</p>
+            <div class="team-members" id="teamMembers">
+                </div>
+        </div>
+    </div>
 
     <nav class="navbar" id="navbar">
         <div class="nav-side nav-left">
@@ -159,12 +235,10 @@
                 <span class="material-symbols-rounded">groups</span>
                 <span>關於開發者團隊</span>
             </button>
-
             <a href="about.html" class="nav-btn">
                 <span class="material-symbols-rounded">info</span>
                 <span>關於網站</span>
             </a>
-
             <a href="map.html" class="nav-btn">
                 <span class="material-symbols-rounded">map</span>
                 <span>美食地圖搜尋</span>
@@ -192,146 +266,143 @@
     <div class="container">
         <header>
             <h1>交通資訊</h1>
-            <p class="subtitle">如何抵達 亞東科技大學 的周邊美食圈</p>
+            <p class="subtitle">如何抵達 AEUST 周邊美食圈</p>
         </header>
 
         <div class="info-card">
-            <h2><span class="material-symbols-rounded">map</span>地理位置</h2>
+            <h2><span class="material-symbols-rounded icon">map</span>地理位置</h2>
+            <p style="color: var(--text-sub); margin-bottom: 15px; font-size: 0.9rem;">位於市中心核心地帶，交通便利。</p>
             <iframe class="map-frame" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.703649992034!2d121.5121!3d25.0410!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjXCsDAyJzI3LjYiTiAxMjHCsDMwJzQzLjYiRQ!5e0!3m2!1szh-TW!2stw!4v1620000000000!5m2!1szh-TW!2stw" loading="lazy"></iframe>
         </div>
 
         <div class="info-card">
-            <h2><span class="material-symbols-rounded">directions_bus</span>大眾運輸</h2>
+            <h2><span class="material-symbols-rounded icon">directions_bus</span>大眾運輸</h2>
             <div class="info-row">
                 <span class="info-label">公車</span>
-                <span class="info-content">搭乘 xx, xx, xxx, xxx 等路線至「亞東科技大學站」下車。</span>
+                <span class="info-content">搭乘 299, 235, 638, 802 等路線至「輔大站」下車。</span>
             </div>
             <div class="info-row">
                 <span class="info-label">捷運</span>
-                <span class="info-content">搭乘捷運板南線至<span style="color: #f0ad4e;">【亞東醫院站】</span>，1號出口步行約 5 分鐘。</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Ubike</span>
-                <span class="info-content">校門口左側設有 Ubike 2.0 站點。</span>
+                <span class="info-content">搭乘捷運中和新蘆線至<span style="color: #f0ad4e;">【輔大站】</span>，1號出口步行約 5 分鐘。</span>
             </div>
         </div>
 
         <div class="info-card">
-            <h2><span class="material-symbols-rounded">local_parking</span>停車資訊</h2>
+            <h2><span class="material-symbols-rounded icon">local_parking</span>停車資訊</h2>
             <div class="info-row">
                 <span class="info-label">校內停車</span>
                 <span class="info-content">提供訪客臨停，每小時 30 元 (請由正門進入)。</span>
             </div>
-            <div class="info-row">
-                <span class="info-label">周邊停車</span>
-                <span class="info-content">建國一路停車場、好市多停車場 (需消費折抵)。</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="settings-modal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('settings-modal')">
-                <span class="material-symbols-rounded">close</span>
-            </button>
-            <h3 style="margin-bottom: 15px;">背景主題設定</h3>
-            <div class="theme-grid">
-                <button class="theme-btn" onclick="setTheme('default')">極簡黑 (預設)</button>
-                <button class="theme-btn" onclick="setTheme('light')">純淨白</button>
-                <button class="theme-btn" onclick="setTheme('midnight')">午夜藍</button>
-                <button class="theme-btn" onclick="setTheme('forest')">森林綠</button>
-                <button class="theme-btn" onclick="setTheme('latte')">拿鐵棕</button>
-                <button class="theme-btn" onclick="setTheme('sakura')">櫻花粉</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="team-modal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('team-modal')">
-                <span class="material-symbols-rounded">close</span>
-            </button>
-            <h3 style="margin-bottom: 15px;">開發者團隊</h3>
-            <p>AEUST RNG 專題小組</p>
-            <p style="color: var(--text-sub); font-size: 0.9rem; margin-top: 10px;">
-                致力於解決「今天吃什麼」的世紀難題。<br>
-                版本: v1.0.0
-            </p>
         </div>
     </div>
 
     <script>
-        // === 主題資料 ===
+        // === 1. 資料庫：開發團隊 ===
+        const teamMembers = [
+            {
+                id: 1, name: "林品承", studentId: "112111113",
+                role: "前端開發、UI設計師", avatar: "person",
+                email: "11211113@mail.aeust.edu.tw", github: "PINCHENG612",
+                description: "負責UI/UX設計與前端互動功能等"
+            },
+            {
+                id: 2, name: "林劭瑋", studentId: "112111125",
+                role: "前端開發、UI設計師", avatar: "person",
+                email: "aka0903912930@gmail.com", github: "Zore9464",
+                description: "負責UI/UX設計與前端互動功能等"
+            },
+            {
+                id: 3, name: "呂佩衫", studentId: "11211121",
+                role: "後端開發、UI設計師", avatar: "person",
+                email: "peishenlu@gmail.com", github: "peishenlu",
+                description: "負責視覺設計與使用者體驗，負責資料庫設計與API開發"
+            },
+        ];
+
+        // === 2. 主題資料庫 ===
         const themes = {
-            default: {
-                '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd',
-                '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)',
-                '--surface-hover': 'rgba(255, 255, 255, 0.15)', '--map-filter': 'none'
-            },
-            light: {
-                '--bg-color': '#f5f5f7', '--text-color': '#1d1d1f', '--text-sub': '#86868b',
-                '--accent-color': '#0071e3', '--surface': 'rgba(255, 255, 255, 0.8)',
-                '--surface-hover': 'rgba(0, 0, 0, 0.05)', '--map-filter': 'none'
-            },
-            midnight: {
-                '--bg-color': '#0f172a', '--text-color': '#f8fafc', '--text-sub': '#94a3b8',
-                '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)',
-                '--surface-hover': 'rgba(51, 65, 85, 0.8)', '--map-filter': 'none'
-            },
-            forest: {
-                '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7',
-                '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)',
-                '--surface-hover': 'rgba(255, 255, 255, 0.1)', '--map-filter': 'none'
-            },
-            latte: {
-                '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4',
-                '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)',
-                '--surface-hover': 'rgba(255, 255, 255, 0.1)', '--map-filter': 'none'
-            },
-            sakura: {
-                '--bg-color': '#fff0f5', '--text-color': '#831843', '--text-sub': '#be185d',
-                '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)',
-                '--surface-hover': 'rgba(255, 255, 255, 0.8)', '--map-filter': 'none'
-            }
+            default: { '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd', '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)', '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)', '--border-medium': 'rgba(255, 255, 255, 0.25)', '--map-filter': 'grayscale(100%) invert(100%) contrast(90%)' },
+            light: { '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366', '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)', '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)', '--border-medium': 'rgba(0, 0, 0, 0.2)', '--map-filter': 'none' },
+            midnight: { '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8', '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)', '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)', '--border-medium': 'rgba(148, 163, 184, 0.4)', '--map-filter': 'grayscale(100%) invert(100%) hue-rotate(180deg) brightness(0.9)' },
+            forest: { '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7', '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)', '--border-medium': 'rgba(165, 214, 167, 0.3)', '--map-filter': 'grayscale(100%) invert(90%) sepia(20%) hue-rotate(100deg)' },
+            latte: { '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4', '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)', '--border-medium': 'rgba(215, 204, 200, 0.3)', '--map-filter': 'sepia(0.8) invert(0.9) grayscale(0.2)' },
+            lavender: { '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed', '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)', '--border-medium': 'rgba(139, 92, 246, 0.3)', '--map-filter': 'none' },
+            sakura: { '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777', '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)', '--border-medium': 'rgba(236, 72, 153, 0.3)', '--map-filter': 'none' }
         };
 
-        // 套用主題
-        function setTheme(themeName) {
+        function applyTheme(themeName) {
             const theme = themes[themeName] || themes['default'];
             const root = document.documentElement;
             for (const [key, value] of Object.entries(theme)) {
                 root.style.setProperty(key, value);
             }
             localStorage.setItem('rng_theme', themeName);
-            closeModal('settings-modal');
         }
 
-        // Modal 控制
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if(modal) modal.classList.add('show');
-        }
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if(modal) modal.classList.remove('show');
+        // === 3. 生成團隊卡片 ===
+        function renderTeam() {
+            const container = document.getElementById('teamMembers');
+            if(!container) return;
+            
+            container.innerHTML = teamMembers.map(member => `
+                <div class="member-card">
+                    <div class="member-avatar">
+                        <span class="material-symbols-rounded">${member.avatar}</span>
+                    </div>
+                    <h3 class="member-name">${member.name}</h3>
+                    <div class="member-id">${member.studentId}</div>
+                    <div class="member-role">${member.role}</div>
+                    <p class="member-desc">${member.description}</p>
+                    <div class="member-links">
+                        <a href="mailto:${member.email}" class="link-btn" title="Email">
+                            <span class="material-symbols-rounded">mail</span>
+                        </a>
+                        <a href="https://github.com/${member.github}" target="_blank" class="link-btn" title="GitHub">
+                            <span class="material-symbols-rounded">code</span>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // 初始化
+        // === 4. 初始化 ===
         document.addEventListener('DOMContentLoaded', () => {
-            // 讀取主題
+            // A. 讀取主題
             const savedTheme = localStorage.getItem('rng_theme') || 'default';
-            setTheme(savedTheme);
+            document.getElementById('themeSelector').value = savedTheme;
+            applyTheme(savedTheme);
 
-            // 綁定按鈕事件
-            document.getElementById('settingsBtn').addEventListener('click', () => openModal('settings-modal'));
-            document.getElementById('teamBtn').addEventListener('click', () => openModal('team-modal'));
+            // B. 渲染團隊
+            renderTeam();
 
-            // 點擊 Modal 外部關閉
-            window.onclick = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.classList.remove('show');
-                }
-            }
+            // C. 綁定按鈕事件
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsModal = document.getElementById('settingsModalOverlay');
+            const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+            const themeSelector = document.getElementById('themeSelector');
+
+            const teamBtn = document.getElementById('teamBtn');
+            const teamModal = document.getElementById('teamModalOverlay');
+            const closeTeamBtn = document.getElementById('closeTeamBtn');
+
+            // 設定 Modal
+            settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
+            closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('active'));
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) settingsModal.classList.remove('active');
+            });
+
+            // 團隊 Modal
+            teamBtn.addEventListener('click', () => teamModal.classList.add('active'));
+            closeTeamBtn.addEventListener('click', () => teamModal.classList.remove('active'));
+            teamModal.addEventListener('click', (e) => {
+                if (e.target === teamModal) teamModal.classList.remove('active');
+            });
+
+            // 下拉選單變更
+            themeSelector.addEventListener('change', function() {
+                applyTheme(this.value);
+            });
         });
     </script>
 </body>
