@@ -22,6 +22,9 @@
             --border-medium: rgba(255, 255, 255, 0.25);
             --option-bg: rgba(0, 0, 0, 0.3);
             --option-bg-hover: rgba(0, 0, 0, 0.4);
+            --tag-color: #4a9eff;
+            --tag-bg: rgba(74, 158, 255, 0.1);
+            --history-bg: rgba(255, 255, 255, 0.05);
         }
 
         * {
@@ -286,7 +289,7 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
         }
 
         .loading-screen.hidden {
@@ -678,7 +681,7 @@
            ======================================== */
         .container {
             margin-top: 100px;
-            max-width: 700px;
+            max-width: 1000px; /* 增加寬度以容納並排內容 */
             margin-left: auto;
             margin-right: auto;
             padding: 0 20px 40px;
@@ -768,8 +771,16 @@
             letter-spacing: 1px;
         }
 
-        .options-container {
+        /* 篩選選項和歷史記錄並排容器 */
+        .side-by-side-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 兩欄等寬 */
+            gap: 30px; /* 欄間距 */
             margin-bottom: 30px;
+        }
+
+        /* 篩選選項容器 */
+        .options-container {
             padding: 25px;
             background-color: var(--surface-light);
             border-radius: 12px;
@@ -778,6 +789,22 @@
             -webkit-backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
+            height: fit-content;
+        }
+
+        /* 歷史記錄容器 */
+        .history-container {
+            padding: 25px;
+            background-color: var(--surface-light);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .option-group {
@@ -917,6 +944,80 @@
             color: var(--text-color);
         }
 
+        /* 標籤系統樣式 */
+        .tag-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tag-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background-color: var(--tag-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            color: var(--text-color);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .tag-label:hover {
+            background-color: rgba(74, 158, 255, 0.2);
+            border-color: var(--tag-color);
+            transform: translateY(-2px);
+        }
+
+        .tag-label input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--text-sub);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tag-label input[type="checkbox"]:checked {
+            background-color: var(--tag-color);
+            border-color: var(--tag-color);
+        }
+
+        .tag-label input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .food-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .food-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: var(--tag-bg);
+            color: var(--tag-color);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(74, 158, 255, 0.3);
+        }
+
         .button-container {
             margin: 40px 0;
             text-align: center;
@@ -967,6 +1068,41 @@
             transform: scale(0.98);
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-medium);
+            background-color: var(--surface);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: var(--surface-light);
+            border-color: var(--text-color);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.secondary {
+            background-color: transparent;
+            border-color: var(--border-light);
+        }
+
         .result-container {
             margin-top: 30px;
             padding: 30px;
@@ -978,6 +1114,7 @@
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.5s ease, transform 0.5s ease;
+            display: none; /* 預設隱藏 */
         }
 
         .result-container.show {
@@ -1039,6 +1176,126 @@
             line-height: 1.5;
         }
 
+        /* 搜尋歷史樣式 */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .history-title {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--text-color);
+        }
+
+        .clear-history-btn {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-history-btn:hover {
+            border-color: var(--text-color);
+            color: var(--text-color);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            max-height: 300px; /* 限制歷史記錄最大高度 */
+            padding-right: 5px;
+            flex-grow: 1;
+        }
+
+        /* 自訂滾動條樣式 */
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: var(--surface);
+            border-radius: 3px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 3px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: var(--border-medium);
+        }
+
+        .history-item {
+            padding: 15px;
+            background-color: var(--history-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .history-item:hover {
+            background-color: var(--surface);
+            border-color: var(--border-medium);
+            transform: translateX(5px);
+        }
+
+        .history-food-name {
+            font-weight: 400;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .history-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .history-category {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .history-time {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .history-price {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            font-weight: 400;
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-sub);
+            font-style: italic;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         footer {
             text-align: center;
             margin-top: 50px;
@@ -1053,9 +1310,7 @@
         /* 結果列表容器 */
         .results-list {
             display: none;
-            /* 預設隱藏 */
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            /* 自動排版 */
             gap: 15px;
             margin-top: 20px;
             width: 100%;
@@ -1132,6 +1387,11 @@
             color: var(--text-color);
         }
 
+        /* 平滑捲動效果 */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* 響應式 */
         @media (max-width: 768px) {
             .navbar {
@@ -1155,13 +1415,21 @@
             .container {
                 margin-top: 80px;
                 padding: 0 15px 30px;
+                max-width: 100%;
             }
 
             h1 {
                 font-size: 2.2rem;
             }
 
-            .options-container {
+            /* 手機端將並排改為堆疊 */
+            .side-by-side-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .options-container,
+            .history-container {
                 padding: 20px;
             }
 
@@ -1194,6 +1462,27 @@
                 width: 60px;
                 height: 60px;
             }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .history-info {
+                width: 100%;
+                justify-content: space-between;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1215,6 +1504,15 @@
 
             h1 {
                 font-size: 1.8rem;
+            }
+
+            .tag-group {
+                gap: 6px;
+            }
+
+            .tag-label {
+                padding: 6px 10px;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -1336,11 +1634,9 @@
                 </div>
                 <div class="cover-text">
                     <h3>返回首頁</h3>
-                    <p>回到封面頁面</p>
+                    <p>廖冠登好帥</p>
                 </div>
-                <div class="cover-arrow">
-                    <span class="material-symbols-rounded">arrow_forward</span>
-                </div>
+                
             </a>
         </div>
         <div class="cover-minimize-btn" id="coverMinimizeBtn">
@@ -1355,52 +1651,104 @@
         </header>
 
         <div class="content">
-            <div class="options-container">
-                <div class="option-group">
-                    <div class="option-title">
-                        <span class="material-symbols-rounded">schedule</span>
-                        <label>時段選擇</label>
+            <!-- 篩選選項和歷史記錄並排容器 -->
+            <div class="side-by-side-container">
+                <!-- 左側：篩選選項 -->
+                <div class="options-container">
+                    <div class="option-group">
+                        <div class="option-title">
+                            <span class="material-symbols-rounded">schedule</span>
+                            <label>時段選擇</label>
+                        </div>
+                        <div class="radio-group">
+                            <label><input type="radio" name="mealTime" value="all" checked> <span>不限時段</span></label>
+                            <label><input type="radio" name="mealTime" value="breakfast"> <span>早餐</span></label>
+                            <label><input type="radio" name="mealTime" value="lunch"> <span>午餐</span></label>
+                            <label><input type="radio" name="mealTime" value="dinner"> <span>晚餐</span></label>
+                        </div>
                     </div>
-                    <div class="radio-group">
-                        <label><input type="radio" name="mealTime" value="all" checked> <span>不限時段</span></label>
-                        <label><input type="radio" name="mealTime" value="breakfast"> <span>早餐</span></label>
-                        <label><input type="radio" name="mealTime" value="lunch"> <span>午餐</span></label>
-                        <label><input type="radio" name="mealTime" value="dinner"> <span>晚餐</span></label>
+                    <div class="option-group">
+                        <div class="option-title">
+                            <span class="material-symbols-rounded">category</span>
+                            <label>食物種類</label>
+                        </div>
+                        <select id="foodCategory">
+                            <option value="all">全部顯示</option>
+                            <option value="noodle">麵食愛好</option>
+                            <option value="rice">米飯主義</option>
+                            <option value="western">西式/異國</option>
+                            <option value="light">輕食/早點</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 標籤系統 -->
+                    <div class="option-group">
+                        <div class="option-title">
+                            <span class="material-symbols-rounded">sell</span>
+                            <label>特色標籤 (可多選)</label>
+                        </div>
+                        <div class="tag-group" id="tagGroup">
+                            <label class="tag-label">
+                                <input type="checkbox" name="foodTags" value="spicy">
+                                <span>辣味</span>
+                            </label>
+                            <label class="tag-label">
+                                <input type="checkbox" name="foodTags" value="vegetarian">
+                                <span>素食</span>
+                            </label>
+                            <label class="tag-label">
+                                <input type="checkbox" name="foodTags" value="quick">
+                                <span>快速</span>
+                            </label>
+                            <label class="tag-label">
+                                <input type="checkbox" name="foodTags" value="budget">
+                                <span>平價</span>
+                            </label>
+                            <label class="tag-label">
+                                <input type="checkbox" name="foodTags" value="popular">
+                                <span>熱門</span>
+                            </label>
+                            <label class="tag-label">
+                                <input type="checkbox" name="foodTags" value="healthy">
+                                <span>健康</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="option-group">
-                    <div class="option-title">
-                        <span class="material-symbols-rounded">category</span>
-                        <label>食物種類</label>
+
+                <!-- 右側：歷史記錄 -->
+                <div class="history-container">
+                    <div class="history-header">
+                        <h3 class="history-title">搜尋歷史記錄</h3>
+                        <button class="clear-history-btn" id="clearHistoryBtn">
+                            清除記錄
+                        </button>
                     </div>
-                    <select id="foodCategory">
-                        <option value="all">全部顯示</option>
-                        <option value="noodle">麵食愛好</option>
-                        <option value="rice">米飯主義</option>
-                        <option value="western">西式/異國</option>
-                        <option value="light">輕食/早點</option>
-                    </select>
+                    <div class="history-list" id="historyList">
+                        <!-- 歷史記錄將動態插入 -->
+                    </div>
                 </div>
             </div>
 
             <div class="button-container">
-                <button class="random-btn" onclick="randomFood()">
+                <button class="random-btn" id="randomFoodBtn">
                     <span class="material-symbols-rounded">casino</span>
                     開始隨機抽選
                 </button>
             </div>
 
-            <div class="results-list" id="resultsList"></div>
-
-            <div class="result-container" id="resultContainer" style="display: none;">
+            <div class="result-container" id="resultContainer">
                 <div class="result-header">
-                    <button class="back-btn" onclick="backToList()">
-                        <span class="material-symbols-rounded">arrow_back</span> 返回列表
+                    <button class="back-btn" onclick="showFilterOptions()">
+                        <span class="material-symbols-rounded">arrow_back</span> 返回篩選
                     </button>
                     <h2 class="food-name" id="foodName"></h2>
                 </div>
 
-                <div class="rating"></div>
+                <div class="rating" id="foodStars"></div>
+                
+                <!-- 標籤顯示區域 -->
+                <div class="food-tags" id="foodTagsContainer"></div>
 
                 <div class="food-details">
                     <div class="detail-box">
@@ -1423,7 +1771,21 @@
                         <div class="detail-content" id="foodPrice"></div>
                     </div>
                 </div>
+                
+                <!-- 操作按鈕 -->
+                <div class="action-buttons">
+                    <button class="action-btn" id="rerollBtn">
+                        <span class="material-symbols-rounded">refresh</span>
+                        再抽一次
+                    </button>
+                    <button class="action-btn secondary" id="viewAllBtn">
+                        <span class="material-symbols-rounded">list</span>
+                        查看所有選項
+                    </button>
+                </div>
             </div>
+
+            <div class="results-list" id="resultsList"></div>
 
             <footer>
                 <p>AEUST RNG 美食隨機選擇器 &copy; 2025 - 由 <span style="color: var(--text-color); cursor: pointer;"
@@ -1440,43 +1802,57 @@
                     '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd',
                     '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)',
                     '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)',
-                    '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)'
+                    '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)',
+                    '--tag-color': '#4a9eff', '--tag-bg': 'rgba(74, 158, 255, 0.1)',
+                    '--history-bg': 'rgba(255, 255, 255, 0.05)'
                 },
                 light: { // 極簡亮白
                     '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366',
                     '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)',
                     '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)',
-                    '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)'
+                    '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)',
+                    '--tag-color': '#007aff', '--tag-bg': 'rgba(0, 122, 255, 0.1)',
+                    '--history-bg': 'rgba(0, 0, 0, 0.05)'
                 },
                 midnight: { // 午夜深藍
                     '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8',
                     '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)',
                     '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)',
-                    '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)'
+                    '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)',
+                    '--tag-color': '#60a5fa', '--tag-bg': 'rgba(96, 165, 250, 0.1)',
+                    '--history-bg': 'rgba(255, 255, 255, 0.05)'
                 },
                 forest: { // 森林墨綠
                     '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7',
                     '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)',
                     '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)',
-                    '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)'
+                    '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)',
+                    '--tag-color': '#4ade80', '--tag-bg': 'rgba(74, 222, 128, 0.1)',
+                    '--history-bg': 'rgba(255, 255, 255, 0.05)'
                 },
                 latte: { // 暖色拿鐵
                     '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4',
                     '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)',
                     '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)',
-                    '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)'
+                    '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)',
+                    '--tag-color': '#d4a574', '--tag-bg': 'rgba(212, 165, 116, 0.1)',
+                    '--history-bg': 'rgba(255, 255, 255, 0.05)'
                 },
                 lavender: { // 薰衣草紫 (新增)
                     '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed',
                     '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)',
                     '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)',
-                    '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)'
+                    '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)',
+                    '--tag-color': '#a855f7', '--tag-bg': 'rgba(168, 85, 247, 0.1)',
+                    '--history-bg': 'rgba(168, 85, 247, 0.05)'
                 },
                 sakura: { // 櫻花淺粉 (新增)
                     '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777',
                     '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)',
                     '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)',
-                    '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)'
+                    '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)',
+                    '--tag-color': '#ec4899', '--tag-bg': 'rgba(236, 72, 153, 0.1)',
+                    '--history-bg': 'rgba(236, 72, 153, 0.05)'
                 }
             };
 
@@ -1516,35 +1892,132 @@
                 },
             ];
 
-            // 應用主題函數
-            function applyTheme(themeName) {
-                const theme = themes[themeName];
-                if (!theme) return;
-
-                const root = document.documentElement;
-                for (const [property, value] of Object.entries(theme)) {
-                    root.style.setProperty(property, value);
-                }
-
-                // 儲存設定到 LocalStorage
-                localStorage.setItem('rng_theme', themeName);
-            }
-
-            // 食物資料陣列 (保持不變)
+            // ==========================================
+            // 擴充食物資料陣列 (新增標籤)
+            // ==========================================
             const foods = [
-                { name: "燒餅油條配豆漿", rating: "傳統滋味，酥脆口感，豆香濃郁", description: "燒餅、油條、冰豆漿", location: "豆漿大王", price: "NT$ 45", stars: 4, category: "light", time: ["breakfast"] },
-                { name: "起司蛋餅", rating: "餅皮酥脆，起司牽絲，喚醒早晨", description: "手工蛋餅皮、切達起司、雞蛋", location: "巷口早餐店", price: "NT$ 40", stars: 5, category: "light", time: ["breakfast", "lunch"] },
-                { name: "牛肉麵", rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈", description: "半筋半肉牛肉、手工麵條、青菜、蔥花", location: "台北市大安區忠孝東路四段", price: "NT$ 150", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
-                { name: "滷肉飯", rating: "滷汁香濃，米飯飽滿，肥瘦適中", description: "滷肉、米飯、滷蛋、黃瓜片", location: "台北市中正區羅斯福路一段", price: "NT$ 50", stars: 5, category: "rice", time: ["lunch", "dinner"] },
-                { name: "日式拉麵", rating: "湯頭醇厚，叉燒入口即化", description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾", location: "台北市信義區松壽路", price: "NT$ 220", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
-                { name: "義大利麵", rating: "醬汁濃郁，麵條彈牙，配料豐富", description: "義大利麵、番茄肉醬、起司、羅勒", location: "台北市中山區南京東路", price: "NT$ 180", stars: 4, category: "western", time: ["lunch", "dinner"] },
-                { name: "健康沙拉", rating: "新鮮蔬菜，營養均衡，輕食首選", description: "生菜、番茄、雞胸肉、堅果、油醋醬", location: "台北市大安區仁愛路四段", price: "NT$ 120", stars: 3, category: "light", time: ["breakfast", "lunch"] },
-                { name: "港式燒臘", rating: "肉質鮮美，皮脆肉嫩，醬汁獨特", description: "燒鴨、叉燒、油雞、青菜、白飯", location: "台北市萬華區西門町", price: "NT$ 110", stars: 4, category: "rice", time: ["lunch", "dinner"] },
-                { name: "韓式拌飯", rating: "辣醬夠味，配料豐富，口感層次多", description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬", location: "台北市松山區市民大道", price: "NT$ 160", stars: 4, category: "rice", time: ["lunch", "dinner"] },
-                { name: "素食餐盒", rating: "清爽不油膩，營養均衡，素食者首選", description: "五穀飯、時蔬、豆腐、菇類、堅果", location: "台北市文山區興隆路", price: "NT$ 90", stars: 3, category: "light", time: ["lunch", "dinner"] }
+                { 
+                    name: "燒餅油條配豆漿", 
+                    rating: "傳統滋味，酥脆口感，豆香濃郁", 
+                    description: "燒餅、油條、冰豆漿", 
+                    location: "豆漿大王", 
+                    price: "NT$ 45", 
+                    stars: 4, 
+                    category: "light", 
+                    time: ["breakfast"],
+                    tags: ["budget", "traditional"]
+                },
+                { 
+                    name: "起司蛋餅", 
+                    rating: "餅皮酥脆，起司牽絲，喚醒早晨", 
+                    description: "手工蛋餅皮、切達起司、雞蛋", 
+                    location: "巷口早餐店", 
+                    price: "NT$ 40", 
+                    stars: 5, 
+                    category: "light", 
+                    time: ["breakfast", "lunch"],
+                    tags: ["budget", "quick", "popular"]
+                },
+                { 
+                    name: "牛肉麵", 
+                    rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈", 
+                    description: "半筋半肉牛肉、手工麵條、青菜、蔥花", 
+                    location: "台北市大安區忠孝東路四段", 
+                    price: "NT$ 150", 
+                    stars: 4, 
+                    category: "noodle", 
+                    time: ["lunch", "dinner"],
+                    tags: ["spicy", "popular"]
+                },
+                { 
+                    name: "滷肉飯", 
+                    rating: "滷汁香濃，米飯飽滿，肥瘦適中", 
+                    description: "滷肉、米飯、滷蛋、黃瓜片", 
+                    location: "台北市中正區羅斯福路一段", 
+                    price: "NT$ 50", 
+                    stars: 5, 
+                    category: "rice", 
+                    time: ["lunch", "dinner"],
+                    tags: ["budget", "quick", "popular"]
+                },
+                { 
+                    name: "日式拉麵", 
+                    rating: "湯頭醇厚，叉燒入口即化", 
+                    description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾", 
+                    location: "台北市信義區松壽路", 
+                    price: "NT$ 220", 
+                    stars: 4, 
+                    category: "noodle", 
+                    time: ["lunch", "dinner"],
+                    tags: ["popular"]
+                },
+                { 
+                    name: "義大利麵", 
+                    rating: "醬汁濃鬱，麵條彈牙，配料豐富", 
+                    description: "義大利麵、番茄肉醬、起司、羅勒", 
+                    location: "台北市中山區南京東路", 
+                    price: "NT$ 180", 
+                    stars: 4, 
+                    category: "western", 
+                    time: ["lunch", "dinner"],
+                    tags: ["popular"]
+                },
+                { 
+                    name: "健康沙拉", 
+                    rating: "新鮮蔬菜，營養均衡，輕食首選", 
+                    description: "生菜、番茄、雞胸肉、堅果、油醋醬", 
+                    location: "台北市大安區仁愛路四段", 
+                    price: "NT$ 120", 
+                    stars: 3, 
+                    category: "light", 
+                    time: ["breakfast", "lunch"],
+                    tags: ["healthy", "vegetarian"]
+                },
+                { 
+                    name: "港式燒臘", 
+                    rating: "肉質鮮美，皮脆肉嫩，醬汁獨特", 
+                    description: "燒鴨、叉燒、油雞、青菜、白飯", 
+                    location: "台北市萬華區西門町", 
+                    price: "NT$ 110", 
+                    stars: 4, 
+                    category: "rice", 
+                    time: ["lunch", "dinner"],
+                    tags: ["popular", "budget"]
+                },
+                { 
+                    name: "韓式拌飯", 
+                    rating: "辣醬夠味，配料豐富，口感層次多", 
+                    description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬", 
+                    location: "台北市松山區市民大道", 
+                    price: "NT$ 160", 
+                    stars: 4, 
+                    category: "rice", 
+                    time: ["lunch", "dinner"],
+                    tags: ["spicy", "popular"]
+                },
+                { 
+                    name: "素食餐盒", 
+                    rating: "清爽不油膩，營養均衡，素食者首選", 
+                    description: "五穀飯、時蔬、豆腐、菇類、堅果", 
+                    location: "台北市文山區興隆路", 
+                    price: "NT$ 90", 
+                    stars: 3, 
+                    category: "light", 
+                    time: ["lunch", "dinner"],
+                    tags: ["vegetarian", "healthy", "budget"]
+                }
             ];
 
-            // 頁面加載處理
+            // ==========================================
+            // 全局變數
+            // ==========================================
+            let currentFilteredFoods = [];
+            let currentSelectedFood = null;
+            let searchHistory = [];
+
+            // ==========================================
+            // 初始化函數
+            // ==========================================
             document.addEventListener('DOMContentLoaded', function () {
                 // 1. 初始化主題
                 const savedTheme = localStorage.getItem('rng_theme') || 'default';
@@ -1554,293 +2027,99 @@
                 // 2. 初始化組員清單
                 initTeamMembers();
 
+                // 3. 載入搜尋歷史
+                loadSearchHistory();
+                
+                // 4. 初始化事件監聽器
+                initEventListeners();
+
+                // 5. 模擬加載過程
                 const loadingScreen = document.getElementById('loadingScreen');
                 const loadingComplete = document.getElementById('loadingComplete');
                 const navbar = document.getElementById('navbar');
                 const mainContainer = document.getElementById('mainContainer');
                 const coverReturnContainer = document.getElementById('coverReturnContainer');
 
-                // 模擬加載過程
                 setTimeout(function () {
                     loadingComplete.classList.add('show');
-                    randomFood();
 
                     setTimeout(function () {
                         loadingScreen.classList.add('hidden');
                         navbar.classList.add('loaded');
                         mainContainer.classList.add('loaded');
                         coverReturnContainer.classList.add('loaded');
+                        
+                        // 初始顯示篩選頁面，隱藏結果
+                        showFilterOptions();
                     }, 800);
                 }, 1500);
+            });
 
-                // ==========================================
+            // ==========================================
+            // 初始化事件監聽器
+            // ==========================================
+            function initEventListeners() {
                 // 設定面板邏輯
-                // ==========================================
                 const settingsBtn = document.getElementById('settingsBtn');
                 const settingsModalOverlay = document.getElementById('settingsModalOverlay');
                 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
                 const themeSelector = document.getElementById('themeSelector');
 
-                // 打開設定面板
                 settingsBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     settingsModalOverlay.classList.add('active');
                 });
 
-                // 關閉設定面板
                 closeSettingsBtn.addEventListener('click', function () {
                     settingsModalOverlay.classList.remove('active');
                 });
 
-                // 點擊背景關閉設定面板
                 settingsModalOverlay.addEventListener('click', function (e) {
                     if (e.target === settingsModalOverlay) {
                         settingsModalOverlay.classList.remove('active');
                     }
                 });
 
-                // 切換主題
                 themeSelector.addEventListener('change', function () {
                     applyTheme(this.value);
                 });
 
-                // ==========================================
                 // 組員清單面板邏輯
-                // ==========================================
                 const teamBtn = document.getElementById('teamBtn');
                 const teamModalOverlay = document.getElementById('teamModalOverlay');
                 const closeTeamBtn = document.getElementById('closeTeamBtn');
 
-                // 打開組員清單面板
                 teamBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     teamModalOverlay.classList.add('active');
                 });
 
-                // 關閉組員清單面板
                 closeTeamBtn.addEventListener('click', function () {
                     teamModalOverlay.classList.remove('active');
                 });
 
-                // 點擊背景關閉組員清單面板
                 teamModalOverlay.addEventListener('click', function (e) {
                     if (e.target === teamModalOverlay) {
                         teamModalOverlay.classList.remove('active');
                     }
                 });
-            });
 
-            // 初始化組員清單 (這裡已經更新為生成卡片樣式)
-            function initTeamMembers() {
-                const teamMembersContainer = document.getElementById('teamMembers');
-                teamMembersContainer.innerHTML = '';
-
-                teamMembers.forEach(member => {
-                    const memberElement = document.createElement('div');
-                    // 這裡改用 member-card 樣式
-                    memberElement.className = 'member-card';
-                    memberElement.innerHTML = `
-                    <div class="member-avatar">
-                        <span class="material-symbols-rounded">${member.avatar}</span>
-                    </div>
-                    <h3 class="member-name">${member.name}</h3>
-                    <div class="member-id">${member.studentId}</div>
-                    <div class="member-role">${member.role}</div>
-                    <p class="member-desc">${member.description}</p>
-                    <div class="member-links">
-                        <a href="mailto:${member.email}" class="link-btn" title="Email">
-                            <span class="material-symbols-rounded">mail</span>
-                        </a>
-                        <a href="https://github.com/${member.github}" target="_blank" class="link-btn" title="GitHub">
-                            <span class="material-symbols-rounded">code</span>
-                        </a>
-                        <button class="link-btn" onclick="showMemberDetails(${member.id})" title="詳細資訊" style="border:none; background:none; cursor:pointer;">
-                            <span class="material-symbols-rounded">info</span>
-                        </button>
-                    </div>
-                `;
-                    teamMembersContainer.appendChild(memberElement);
-                });
-            }
-
-            // 組員相關功能
-            function openTeamModal() {
-                document.getElementById('teamModalOverlay').classList.add('active');
-            }
-
-            function sendEmail(email) {
-                window.location.href = `mailto:${email}`;
-            }
-
-            function openGithub(username) {
-                alert(`將導向 ${username} 的 GitHub 主頁\n(此為示範功能，實際開發中可替換為真實連結)`);
-                // 實際應用中可使用: window.open(`https://github.com/${username}`, '_blank');
-            }
-
-            function showMemberDetails(memberId) {
-                const member = teamMembers.find(m => m.id === memberId);
-                if (member) {
-                    alert(`詳細資訊:\n\n姓名: ${member.name}\n學號: ${member.studentId}\n職位: ${member.role}\n\n${member.description}`);
-                }
-            }
-
-            // 全域變數用來儲存篩選後的結果
-            let currentFilteredFoods = [];
-
-            // 修改後的「開始抽選/搜尋」按鈕邏輯
-            function randomFood() {
-                const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
-                const selectedCategory = document.getElementById('foodCategory').value;
-
-                // 1. 篩選資料
-                currentFilteredFoods = foods.filter(food => {
-                    const isTimeMatch = selectedTime === 'all' || food.time.includes(selectedTime);
-                    const isCategoryMatch = selectedCategory === 'all' || food.category === selectedCategory;
-                    return isTimeMatch && isCategoryMatch;
-                });
-
-                const listContainer = document.getElementById('resultsList');
-                const detailContainer = document.getElementById('resultContainer');
-                const foodNameTitle = document.getElementById('foodName'); // 用來借用顯示錯誤訊息
-
-                // 清空舊內容
-                listContainer.innerHTML = '';
-
-                // 隱藏詳細頁，準備顯示列表
-                detailContainer.style.display = 'none';
-
-                // 2. 判斷是否有結果
-                if (currentFilteredFoods.length === 0) {
-                    listContainer.style.display = 'none';
-                    detailContainer.style.display = 'block'; // 借用詳細區塊顯示錯誤
-                    detailContainer.classList.add('show');
-
-                    document.getElementById('foodName').textContent = "無符合條件的店家";
-                    document.querySelector('.rating').innerHTML = '';
-                    document.getElementById('foodRating').textContent = "請嘗試放寬篩選條件";
-                    document.getElementById('foodDescription').textContent = "-";
-                    document.getElementById('foodLocation').textContent = "-";
-                    document.getElementById('foodPrice').textContent = "-";
-                    // 隱藏返回按鈕，因為沒有列表可回
-                    document.querySelector('.back-btn').style.display = 'none';
-                    return;
-                }
-
-                // 3. 產生列表卡片
-                currentFilteredFoods.forEach(food => {
-                    const card = document.createElement('div');
-                    card.className = 'result-item';
-                    // 點擊卡片時觸發 showDetail 函式
-                    card.onclick = () => showDetail(food);
-
-                    const title = document.createElement('h3');
-                    title.textContent = food.name;
-
-                    const tag = document.createElement('span');
-                    tag.className = 'mini-tag';
-                    tag.textContent = food.rating.split('，')[0]; // 取評價的第一句話當簡介
-
-                    card.appendChild(title);
-                    card.appendChild(tag);
-                    listContainer.appendChild(card);
-                });
-
-                // 顯示列表
-                listContainer.style.display = 'grid'; // 或 flex，對應 CSS
-                listContainer.classList.add('show');
-            }
-
-            // 顯示詳細資訊函式
-            function showDetail(food) {
-                const listContainer = document.getElementById('resultsList');
-                const detailContainer = document.getElementById('resultContainer');
-
-                // 隱藏列表，顯示詳細頁
-                listContainer.style.display = 'none';
-                detailContainer.style.display = 'block';
-
-                // 確保返回按鈕顯示
-                document.querySelector('.back-btn').style.display = 'flex';
-
-                // 填入資料
-                document.getElementById('foodName').textContent = food.name;
-                document.getElementById('foodRating').textContent = food.rating;
-                document.getElementById('foodDescription').textContent = food.description;
-                document.getElementById('foodLocation').textContent = food.location;
-                document.getElementById('foodPrice').textContent = food.price;
-
-                // 星星評價
-                const starsContainer = document.querySelector('.rating');
-                starsContainer.innerHTML = '';
-                for (let i = 0; i < 5; i++) {
-                    const star = document.createElement('span');
-                    star.className = 'star';
-                    star.textContent = i < food.stars ? '★' : '☆';
-                    starsContainer.appendChild(star);
-                }
-
-                // 添加動畫 class
-                detailContainer.classList.remove('show');
-                void detailContainer.offsetWidth; // 觸發重繪 (Reflow) 以重啟動畫
-                detailContainer.classList.add('show');
-            }
-
-            // 返回列表函式
-            function backToList() {
-                const listContainer = document.getElementById('resultsList');
-                const detailContainer = document.getElementById('resultContainer');
-
-                detailContainer.style.display = 'none';
-                listContainer.style.display = 'grid';
-            }
-            // 選項組視覺反饋
-            document.addEventListener('DOMContentLoaded', function () {
-                const optionGroups = document.querySelectorAll('.option-group');
-
-                optionGroups.forEach(group => {
-                    group.addEventListener('click', function () {
-                        // 這裡改用 CSS 變數來設定動態樣式
-                        // 為了簡化，保持 CSS :hover 效果，這裡只處理 radio 的邏輯
-                    });
-                });
-
-                const radioInputs = document.querySelectorAll('input[type="radio"]');
-                radioInputs.forEach(input => {
-                    input.addEventListener('change', function () {
-                        const parentGroup = this.closest('.option-group');
-                        if (parentGroup) {
-                            // 使用 JS 強制添加高亮 class 比較好，但為了保持單文件簡單，這裡沿用原本邏輯
-                            // 不過因為用了 CSS 變數，原本的 style.borderColor 可能會覆蓋變數
-                            // 建議依靠 CSS 選擇器，或者如下設定
-                            parentGroup.style.borderColor = 'var(--accent-color)';
-                            parentGroup.style.boxShadow = '0 0 0 1px var(--surface-light)';
-
-                            // 重置其他組
-                            document.querySelectorAll('.option-group').forEach(g => {
-                                if (g !== parentGroup) {
-                                    g.style.borderColor = 'var(--border-light)';
-                                    g.style.boxShadow = 'none';
-                                }
-                            });
-                        }
-                    });
-                });
-
-                const selectElement = document.getElementById('foodCategory');
-                selectElement.addEventListener('change', function () {
-                    const parentGroup = this.closest('.option-group');
-                    if (parentGroup) {
-                        parentGroup.style.borderColor = 'var(--accent-color)';
-                        parentGroup.style.boxShadow = '0 0 0 1px var(--surface-light)';
-                        setTimeout(() => {
-                            parentGroup.style.borderColor = 'var(--border-light)';
-                            parentGroup.style.boxShadow = 'none';
-                        }, 2000);
-                    }
-                });
-
+                // 隨機抽選按鈕
+                document.getElementById('randomFoodBtn').addEventListener('click', randomFood);
+                
+                // 再抽一次按鈕
+                document.getElementById('rerollBtn').addEventListener('click', rerollFood);
+                
+                // 查看所有選項按鈕
+                document.getElementById('viewAllBtn').addEventListener('click', showAllOptions);
+                
+                // 清除歷史記錄按鈕
+                document.getElementById('clearHistoryBtn').addEventListener('click', clearSearchHistory);
+                
+                // 返回小框控制
                 const coverReturnContainer = document.getElementById('coverReturnContainer');
                 const coverMinimizeBtn = document.getElementById('coverMinimizeBtn');
+                const coverReturnBox = document.getElementById('coverReturnBox');
 
                 if (coverMinimizeBtn) {
                     coverMinimizeBtn.addEventListener('click', function () {
@@ -1848,7 +2127,6 @@
                     });
                 }
 
-                const coverReturnBox = document.getElementById('coverReturnBox');
                 if (coverReturnBox) {
                     coverReturnBox.addEventListener('click', function () {
                         this.style.transform = 'translateY(-5px) scale(0.98)';
@@ -1875,7 +2153,402 @@
                         coverReturnContainer.classList.add('cover-minimized');
                     }, 8000);
                 }
-            });
+            }
+
+            // ==========================================
+            // 應用主題函數
+            // ==========================================
+            function applyTheme(themeName) {
+                const theme = themes[themeName];
+                if (!theme) return;
+
+                const root = document.documentElement;
+                for (const [property, value] of Object.entries(theme)) {
+                    root.style.setProperty(property, value);
+                }
+
+                // 儲存設定到 LocalStorage
+                localStorage.setItem('rng_theme', themeName);
+            }
+
+            // ==========================================
+            // 初始化組員清單
+            // ==========================================
+            function initTeamMembers() {
+                const teamMembersContainer = document.getElementById('teamMembers');
+                teamMembersContainer.innerHTML = '';
+
+                teamMembers.forEach(member => {
+                    const memberElement = document.createElement('div');
+                    memberElement.className = 'member-card';
+                    memberElement.innerHTML = `
+                    <div class="member-avatar">
+                        <span class="material-symbols-rounded">${member.avatar}</span>
+                    </div>
+                    <h3 class="member-name">${member.name}</h3>
+                    <div class="member-id">${member.studentId}</div>
+                    <div class="member-role">${member.role}</div>
+                    <p class="member-desc">${member.description}</p>
+                    <div class="member-links">
+                        <a href="mailto:${member.email}" class="link-btn" title="Email">
+                            <span class="material-symbols-rounded">mail</span>
+                        </a>
+                        <a href="https://github.com/${member.github}" target="_blank" class="link-btn" title="GitHub">
+                            <span class="material-symbols-rounded">code</span>
+                        </a>
+                        <button class="link-btn" onclick="showMemberDetails(${member.id})" title="詳細資訊" style="border:none; background:none; cursor:pointer;">
+                            <span class="material-symbols-rounded">info</span>
+                        </button>
+                    </div>
+                `;
+                    teamMembersContainer.appendChild(memberElement);
+                });
+            }
+
+            // ==========================================
+            // 顯示篩選選項頁面
+            // ==========================================
+            function showFilterOptions() {
+                const buttonContainer = document.querySelector('.button-container');
+                const resultContainer = document.getElementById('resultContainer');
+                const resultsList = document.getElementById('resultsList');
+                
+                // 顯示抽選按鈕，隱藏結果
+                buttonContainer.style.display = 'block';
+                resultContainer.style.display = 'none';
+                resultsList.style.display = 'none';
+                
+                // 滾動到頂部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // ==========================================
+            // 隨機抽選函數 (直接顯示單一結果)
+            // ==========================================
+            function randomFood() {
+                const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
+                const selectedCategory = document.getElementById('foodCategory').value;
+                
+                // 獲取選中的標籤
+                const selectedTags = [];
+                document.querySelectorAll('input[name="foodTags"]:checked').forEach(checkbox => {
+                    selectedTags.push(checkbox.value);
+                });
+
+                // 1. 篩選資料
+                currentFilteredFoods = foods.filter(food => {
+                    const isTimeMatch = selectedTime === 'all' || food.time.includes(selectedTime);
+                    const isCategoryMatch = selectedCategory === 'all' || food.category === selectedCategory;
+                    
+                    // 標籤篩選邏輯
+                    let isTagMatch = true;
+                    if (selectedTags.length > 0) {
+                        // 檢查食物是否包含所有選中的標籤
+                        isTagMatch = selectedTags.every(tag => food.tags.includes(tag));
+                    }
+                    
+                    return isTimeMatch && isCategoryMatch && isTagMatch;
+                });
+
+                const buttonContainer = document.querySelector('.button-container');
+                const resultContainer = document.getElementById('resultContainer');
+
+                // 2. 判斷是否有結果
+                if (currentFilteredFoods.length === 0) {
+                    // 顯示篩選選項，顯示錯誤訊息
+                    buttonContainer.style.display = 'block';
+                    resultContainer.style.display = 'block';
+                    resultContainer.classList.add('show');
+
+                    document.getElementById('foodName').textContent = "無符合條件的店家";
+                    document.getElementById('foodStars').innerHTML = '';
+                    document.getElementById('foodRating').textContent = "請嘗試放寬篩選條件";
+                    document.getElementById('foodDescription').textContent = "-";
+                    document.getElementById('foodLocation').textContent = "-";
+                    document.getElementById('foodPrice').textContent = "-";
+                    document.getElementById('foodTagsContainer').innerHTML = '';
+                    return;
+                }
+
+                // 3. 隱藏抽選按鈕，顯示結果
+                buttonContainer.style.display = 'none';
+                resultContainer.style.display = 'block';
+
+                // 4. 隨機選擇一個結果
+                const randomIndex = Math.floor(Math.random() * currentFilteredFoods.length);
+                const selectedFood = currentFilteredFoods[randomIndex];
+                currentSelectedFood = selectedFood;
+                
+                // 5. 儲存到搜尋歷史
+                saveToHistory(selectedFood);
+                
+                // 6. 顯示詳細資訊
+                showDetail(selectedFood);
+                
+                // 7. 滾動到結果區域
+                setTimeout(() => {
+                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+
+            // ==========================================
+            // 再抽一次函數
+            // ==========================================
+            function rerollFood() {
+                if (currentFilteredFoods.length === 0) {
+                    randomFood();
+                    return;
+                }
+                
+                // 從當前篩選結果中隨機選擇一個
+                const randomIndex = Math.floor(Math.random() * currentFilteredFoods.length);
+                const selectedFood = currentFilteredFoods[randomIndex];
+                currentSelectedFood = selectedFood;
+                
+                // 儲存到搜尋歷史
+                saveToHistory(selectedFood);
+                
+                // 顯示詳細資訊
+                showDetail(selectedFood);
+            }
+
+            // ==========================================
+            // 顯示所有選項列表
+            // ==========================================
+            function showAllOptions() {
+                const resultContainer = document.getElementById('resultContainer');
+                const resultsList = document.getElementById('resultsList');
+                
+                // 隱藏單一結果，顯示列表
+                resultContainer.style.display = 'none';
+                resultsList.style.display = 'grid';
+                
+                // 清空舊內容
+                resultsList.innerHTML = '';
+
+                // 產生列表卡片
+                currentFilteredFoods.forEach((food, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'result-item';
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    card.onclick = () => {
+                        currentSelectedFood = food;
+                        saveToHistory(food);
+                        
+                        // 顯示單一結果
+                        resultContainer.style.display = 'block';
+                        resultsList.style.display = 'none';
+                        showDetail(food);
+                    };
+
+                    const title = document.createElement('h3');
+                    title.textContent = food.name;
+
+                    const tag = document.createElement('span');
+                    tag.className = 'mini-tag';
+                    tag.textContent = food.rating.split('，')[0];
+
+                    card.appendChild(title);
+                    card.appendChild(tag);
+                    resultsList.appendChild(card);
+                });
+
+                // 顯示列表
+                resultsList.classList.add('show');
+                
+                // 滾動到列表區域
+                setTimeout(() => {
+                    resultsList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+
+            // ==========================================
+            // 顯示詳細資訊函式
+            // ==========================================
+            function showDetail(food) {
+                // 填入資料
+                document.getElementById('foodName').textContent = food.name;
+                document.getElementById('foodRating').textContent = food.rating;
+                document.getElementById('foodDescription').textContent = food.description;
+                document.getElementById('foodLocation').textContent = food.location;
+                document.getElementById('foodPrice').textContent = food.price;
+
+                // 星星評價
+                const starsContainer = document.getElementById('foodStars');
+                starsContainer.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star';
+                    star.textContent = i < food.stars ? '★' : '☆';
+                    starsContainer.appendChild(star);
+                }
+                
+                // 顯示標籤
+                const tagsContainer = document.getElementById('foodTagsContainer');
+                tagsContainer.innerHTML = '';
+                if (food.tags && food.tags.length > 0) {
+                    const tagLabels = {
+                        'spicy': '🌶️ 辣味',
+                        'vegetarian': '🌱 素食',
+                        'quick': '⚡ 快速',
+                        'budget': '💰 平價',
+                        'popular': '🔥 熱門',
+                        'healthy': '🥗 健康',
+                        'traditional': '🏮 傳統'
+                    };
+                    
+                    food.tags.forEach(tag => {
+                        const tagElement = document.createElement('span');
+                        tagElement.className = 'food-tag';
+                        tagElement.textContent = tagLabels[tag] || tag;
+                        tagsContainer.appendChild(tagElement);
+                    });
+                }
+
+                // 添加動畫 class
+                const resultContainer = document.getElementById('resultContainer');
+                resultContainer.classList.remove('show');
+                void resultContainer.offsetWidth;
+                resultContainer.classList.add('show');
+            }
+
+            // ==========================================
+            // 搜尋歷史相關函數
+            // ==========================================
+            function saveToHistory(food) {
+                // 獲取當前時間
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('zh-TW', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+                
+                // 建立歷史記錄項目
+                const historyItem = {
+                    id: Date.now(),
+                    name: food.name,
+                    category: food.category,
+                    rating: food.rating,
+                    price: food.price,
+                    time: timeString,
+                    date: now.toLocaleDateString('zh-TW'),
+                    timestamp: now.getTime()
+                };
+                
+                // 從 localStorage 讀取歷史記錄
+                let history = JSON.parse(localStorage.getItem('foodHistory') || '[]');
+                
+                // 避免重複記錄 (相同食物在5分鐘內不重複記錄)
+                const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+                history = history.filter(item => 
+                    !(item.name === food.name && item.timestamp > fiveMinutesAgo)
+                );
+                
+                // 添加新記錄到開頭
+                history.unshift(historyItem);
+                
+                // 只保留最近20筆記錄
+                if (history.length > 20) {
+                    history = history.slice(0, 20);
+                }
+                
+                // 儲存回 localStorage
+                localStorage.setItem('foodHistory', JSON.stringify(history));
+                
+                // 更新顯示
+                loadSearchHistory();
+            }
+
+            function loadSearchHistory() {
+                const historyList = document.getElementById('historyList');
+                searchHistory = JSON.parse(localStorage.getItem('foodHistory') || '[]');
+                
+                // 清空列表
+                historyList.innerHTML = '';
+                
+                if (searchHistory.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="empty-history">
+                            還沒有搜尋記錄，快去尋找美食吧！
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // 顯示歷史記錄
+                searchHistory.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.onclick = () => {
+                        // 在食物資料中尋找對應的項目
+                        const food = foods.find(f => f.name === item.name);
+                        if (food) {
+                            currentSelectedFood = food;
+                            
+                            // 隱藏篩選按鈕，顯示結果
+                            document.querySelector('.button-container').style.display = 'none';
+                            const resultContainer = document.getElementById('resultContainer');
+                            resultContainer.style.display = 'block';
+                            showDetail(food);
+                            
+                            // 滾動到結果區域
+                            setTimeout(() => {
+                                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                        }
+                    };
+                    
+                    const categoryLabels = {
+                        'noodle': '麵食',
+                        'rice': '米飯',
+                        'western': '西式',
+                        'light': '輕食'
+                    };
+                    
+                    historyItem.innerHTML = `
+                        <div>
+                            <div class="history-food-name">${item.name}</div>
+                            <div class="history-info">
+                                <span class="history-category">${categoryLabels[item.category] || item.category}</span>
+                                <span class="history-time">${item.date} ${item.time}</span>
+                            </div>
+                        </div>
+                        <div class="history-price">${item.price}</div>
+                    `;
+                    
+                    historyList.appendChild(historyItem);
+                });
+            }
+
+            function clearSearchHistory() {
+                if (confirm('確定要清除所有搜尋歷史記錄嗎？')) {
+                    localStorage.removeItem('foodHistory');
+                    loadSearchHistory();
+                }
+            }
+
+            // ==========================================
+            // 組員相關功能
+            // ==========================================
+            function openTeamModal() {
+                document.getElementById('teamModalOverlay').classList.add('active');
+            }
+
+            function sendEmail(email) {
+                window.location.href = `mailto:${email}`;
+            }
+
+            function openGithub(username) {
+                alert(`將導向 ${username} 的 GitHub 主頁\n(此為示範功能，實際開發中可替換為真實連結)`);
+            }
+
+            function showMemberDetails(memberId) {
+                const member = teamMembers.find(m => m.id === memberId);
+                if (member) {
+                    alert(`詳細資訊:\n\n姓名: ${member.name}\n學號: ${member.studentId}\n職位: ${member.role}\n\n${member.description}`);
+                }
+            }
         </script>
 </body>
 
