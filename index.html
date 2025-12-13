@@ -12,23 +12,14 @@
            全局變數定義 (預設值 - 經典黑白)
            ======================================== */
         :root {
-            /* 這些變數現在會透過 JS 動態修改 */
             --bg-color: #000000;
-            /* 背景色 */
             --text-color: #ffffff;
-            /* 主要文字 */
             --text-sub: #bdbdbd;
-            /* 次要文字 */
             --accent-color: #ffffff;
-            /* 強調色 (邊框/按鈕) */
-
-            /* 玻璃擬態層級 */
             --surface: rgba(255, 255, 255, 0.08);
             --surface-light: rgba(255, 255, 255, 0.12);
             --border-light: rgba(255, 255, 255, 0.15);
             --border-medium: rgba(255, 255, 255, 0.25);
-
-            /* 選項背景 */
             --option-bg: rgba(0, 0, 0, 0.3);
             --option-bg-hover: rgba(0, 0, 0, 0.4);
         }
@@ -46,12 +37,11 @@
             min-height: 100vh;
             line-height: 1.6;
             transition: background-color 0.5s ease, color 0.5s ease;
-            /* 顏色切換過渡動畫 */
             overflow-x: hidden;
         }
 
         /* ========================================
-           設定面板 (Modal) - 新增部分
+           彈窗系統 (Modal) - 通用設定
            ======================================== */
         .modal-overlay {
             position: fixed;
@@ -75,8 +65,8 @@
             visibility: visible;
         }
 
-        .settings-modal,
-        .team-modal {
+        /* 設定視窗 (較小) */
+        .settings-modal {
             background-color: var(--bg-color);
             border: 1px solid var(--border-medium);
             border-radius: 16px;
@@ -86,6 +76,21 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             transform: scale(0.9);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* 團隊視窗 (較寬，用於卡片排列) */
+        .team-modal {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-medium);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 900px; /* 加寬寬度 */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-overlay.active .settings-modal,
@@ -106,6 +111,7 @@
             font-size: 1.4rem;
             font-weight: 300;
             letter-spacing: 1px;
+            color: var(--text-color);
         }
 
         .close-modal-btn {
@@ -154,121 +160,115 @@
         }
 
         /* ========================================
-           組員清單模態窗樣式
+           組員清單樣式 (更新為卡片 Grid 佈局)
            ======================================== */
-        .team-modal {
-            max-width: 500px;
+        .team-intro {
+            text-align: center;
+            color: var(--text-sub);
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
         .team-members {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
         }
 
-        .team-member {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: var(--option-bg);
-            /* 使用較深的背景色 */
-            border-radius: 10px;
+        .member-card {
+            background-color: var(--surface);
             border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .team-member:hover {
+        .member-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
             background-color: var(--surface-light);
-            border-color: var(--border-medium);
-            transform: translateY(-3px);
         }
 
         .member-avatar {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background-color: var(--surface-light);
+            border: 2px solid var(--border-medium);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .member-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .member-avatar .material-symbols-rounded {
-            font-size: 2rem;
+            margin-bottom: 15px;
             color: var(--text-color);
         }
 
-        .member-info {
-            flex: 1;
+        .member-avatar span {
+            font-size: 36px;
         }
 
         .member-name {
             font-size: 1.2rem;
-            font-weight: 400;
-            margin-bottom: 5px;
+            font-weight: 600;
             color: var(--text-color);
+            margin-bottom: 5px;
         }
 
         .member-id {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-family: monospace;
             color: var(--text-sub);
-            margin-bottom: 8px;
+            background: var(--surface-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
         }
 
         .member-role {
-            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+            width: 100%;
+        }
+
+        .member-desc {
+            font-size: 0.9rem;
             color: var(--text-sub);
-            background-color: var(--surface-light);
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-block;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
         }
 
-        .member-contact {
+        .member-links {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 15px;
+            margin-top: auto;
         }
 
-        .contact-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--surface);
-            border: 1px solid var(--border-light);
+        .link-btn {
+            color: var(--text-sub);
+            transition: color 0.2s;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            background: none;
+            border: none;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .contact-btn:hover {
-            background-color: var(--surface-light);
-            transform: scale(1.1);
-        }
-
-        .contact-btn .material-symbols-rounded {
-            font-size: 1rem;
-            color: var(--text-color);
-        }
-
-        .team-intro {
-            text-align: center;
-            margin-bottom: 25px;
-            color: var(--text-sub);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            padding: 0 10px;
+        .link-btn:hover {
+            color: var(--accent-color);
         }
 
         /* ========================================
@@ -491,7 +491,6 @@
             gap: 6px;
             border: 1px solid transparent;
             cursor: pointer;
-            /* 確保 cursor 為 pointer */
         }
 
         .nav-btn .material-symbols-rounded {
@@ -522,7 +521,6 @@
             height: 1px;
             background-color: var(--text-color);
             opacity: 0.8;
-            /* 讓線條稍微透明一點更美觀 */
         }
 
         /* ========================================
@@ -889,7 +887,6 @@
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
-            /* SVG 圖標顏色隨文字顏色改變需要用 JS 或 mask，這裡簡化使用 base64 白色，若切到淺色主題可能需調整 */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='grey' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
@@ -1188,22 +1185,14 @@
                 padding: 20px;
             }
 
-            .team-member {
-                padding: 12px;
+            /* 修改 RWD 卡片樣式 */
+            .member-card {
+                padding: 20px;
             }
 
             .member-avatar {
-                width: 50px;
-                height: 50px;
-                margin-right: 12px;
-            }
-
-            .member-avatar .material-symbols-rounded {
-                font-size: 1.5rem;
-            }
-
-            .member-name {
-                font-size: 1.1rem;
+                width: 60px;
+                height: 60px;
             }
         }
 
@@ -1227,26 +1216,11 @@
             h1 {
                 font-size: 1.8rem;
             }
-
-            .team-member {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .member-avatar {
-                margin-right: 0;
-                margin-bottom: 10px;
-            }
-
-            .member-contact {
-                justify-content: center;
-            }
         }
     </style>
 </head>
 
 <body>
-    <!-- 設定模態窗 -->
     <div class="modal-overlay" id="settingsModalOverlay">
         <div class="settings-modal">
             <div class="modal-header">
@@ -1275,7 +1249,6 @@
         </div>
     </div>
 
-    <!-- 組員清單模態窗 -->
     <div class="modal-overlay" id="teamModalOverlay">
         <div class="team-modal">
             <div class="modal-header">
@@ -1288,8 +1261,7 @@
             <p class="team-intro">AEUST RNG美食網站由一群熱愛美食與程式設計的高質量人類共同打造，致力於解決您的選擇困難症！</p>
 
             <div class="team-members" id="teamMembers">
-                <!-- 組員資料將由 JavaScript 動態生成 -->
-            </div>
+                </div>
         </div>
     </div>
 
@@ -1320,10 +1292,10 @@
 
     <nav class="navbar" id="navbar">
         <div class="nav-side nav-left">
-            <button class="nav-btn" id="teamBtn">
+            <a href="#" class="nav-btn" id="teamBtn">
                 <span class="material-symbols-rounded">groups</span>
                 <span>關於開發者團隊</span>
-            </button>
+            </a>
 
             <a href="about.html" class="nav-btn">
                 <span class="material-symbols-rounded">info</span>
@@ -1658,34 +1630,33 @@
                 });
             });
 
-            // 初始化組員清單
+            // 初始化組員清單 (這裡已經更新為生成卡片樣式)
             function initTeamMembers() {
                 const teamMembersContainer = document.getElementById('teamMembers');
                 teamMembersContainer.innerHTML = '';
 
                 teamMembers.forEach(member => {
                     const memberElement = document.createElement('div');
-                    memberElement.className = 'team-member';
+                    // 這裡改用 member-card 樣式
+                    memberElement.className = 'member-card';
                     memberElement.innerHTML = `
                     <div class="member-avatar">
                         <span class="material-symbols-rounded">${member.avatar}</span>
                     </div>
-                    <div class="member-info">
-                        <div class="member-name">${member.name}</div>
-                        <div class="member-id">學號: ${member.studentId}</div>
-                        <div class="member-role">${member.role}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-sub); margin-top: 5px;">${member.description}</div>
-                        <div class="member-contact">
-                            <button class="contact-btn" onclick="sendEmail('${member.email}')" title="發送郵件">
-                                <span class="material-symbols-rounded">mail</span>
-                            </button>
-                            <button class="contact-btn" onclick="openGithub('${member.github}')" title="GitHub 主頁">
-                                <span class="material-symbols-rounded">code</span>
-                            </button>
-                            <button class="contact-btn" onclick="showMemberDetails(${member.id})" title="詳細資訊">
-                                <span class="material-symbols-rounded">info</span>
-                            </button>
-                        </div>
+                    <h3 class="member-name">${member.name}</h3>
+                    <div class="member-id">${member.studentId}</div>
+                    <div class="member-role">${member.role}</div>
+                    <p class="member-desc">${member.description}</p>
+                    <div class="member-links">
+                        <a href="mailto:${member.email}" class="link-btn" title="Email">
+                            <span class="material-symbols-rounded">mail</span>
+                        </a>
+                        <a href="https://github.com/${member.github}" target="_blank" class="link-btn" title="GitHub">
+                            <span class="material-symbols-rounded">code</span>
+                        </a>
+                        <button class="link-btn" onclick="showMemberDetails(${member.id})" title="詳細資訊" style="border:none; background:none; cursor:pointer;">
+                            <span class="material-symbols-rounded">info</span>
+                        </button>
                     </div>
                 `;
                     teamMembersContainer.appendChild(memberElement);
