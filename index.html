@@ -2443,26 +2443,44 @@
             // 5. 更新AI建議
             updateAIRecommendation();
 
-            // 6. 模擬加載過程
+            // 6. 處理加載畫面 (新增：判斷是否為首次進入)
             const loadingScreen = document.getElementById('loadingScreen');
             const loadingComplete = document.getElementById('loadingComplete');
             const navbar = document.getElementById('navbar');
             const mainContainer = document.getElementById('mainContainer');
             const coverReturnContainer = document.getElementById('coverReturnContainer');
 
-            setTimeout(function () {
-                loadingComplete.classList.add('show');
-
+            // 檢查 sessionStorage 中是否有 'visited' 標記
+            if (sessionStorage.getItem('visited')) {
+                // 如果已經來過：直接隱藏加載畫面，不播放動畫
+                loadingScreen.style.display = 'none';
+                
+                // 直接顯示內容
+                navbar.classList.add('loaded');
+                mainContainer.classList.add('loaded');
+                coverReturnContainer.classList.add('loaded');
+                
+                // 確保初始顯示正確
+                showFilterOptions();
+            } else {
+                // 如果是第一次來：播放動畫
                 setTimeout(function () {
-                    loadingScreen.classList.add('hidden');
-                    navbar.classList.add('loaded');
-                    mainContainer.classList.add('loaded');
-                    coverReturnContainer.classList.add('loaded');
+                    loadingComplete.classList.add('show');
 
-                    // 初始顯示篩選頁面，隱藏結果
-                    showFilterOptions();
-                }, 800);
-            }, 1500);
+                    setTimeout(function () {
+                        loadingScreen.classList.add('hidden');
+                        navbar.classList.add('loaded');
+                        mainContainer.classList.add('loaded');
+                        coverReturnContainer.classList.add('loaded');
+
+                        // 初始顯示篩選頁面
+                        showFilterOptions();
+                        
+                        // 動畫結束後，設定標記表示已來過
+                        sessionStorage.setItem('visited', 'true');
+                    }, 800);
+                }, 1500);
+            }
         });
 
         // ==========================================
