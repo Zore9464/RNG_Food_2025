@@ -87,7 +87,7 @@
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* 團隊視窗 (較寬，用於卡片排列) */
+        /* 團隊視窗 */
         .team-modal {
             background-color: var(--bg-color);
             border: 1px solid var(--border-medium);
@@ -95,7 +95,21 @@
             padding: 30px;
             width: 90%;
             max-width: 900px;
-            /* 加寬寬度 */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* 儀錶板 Modal 樣式 */
+        .dashboard-modal {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-medium);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             transform: scale(0.9);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -104,7 +118,8 @@
         }
 
         .modal-overlay.active .settings-modal,
-        .modal-overlay.active .team-modal {
+        .modal-overlay.active .team-modal,
+        .modal-overlay.active .dashboard-modal {
             transform: scale(1);
         }
 
@@ -115,6 +130,24 @@
             margin-bottom: 25px;
             border-bottom: 1px solid var(--border-light);
             padding-bottom: 15px;
+        }
+
+        /* 儀錶板內容 Grid 佈局 - 選擇困難指數在上方 */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* 讓選擇困難指數面板橫跨兩欄 */
+        .dashboard-content .indecision-panel {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
         }
 
         .modal-title {
@@ -147,7 +180,6 @@
             font-size: 0.9rem;
         }
 
-        /* 風格化下拉選單 */
         .theme-select {
             width: 100%;
             padding: 12px;
@@ -169,9 +201,7 @@
             color: var(--text-color);
         }
 
-        /* ========================================
-           組員清單樣式 (更新為卡片 Grid 佈局)
-           ======================================== */
+        /* 組員清單樣式 */
         .team-intro {
             text-align: center;
             color: var(--text-sub);
@@ -281,9 +311,7 @@
             color: var(--accent-color);
         }
 
-        /* ========================================
-           加載畫面
-           ======================================== */
+        /* 加載畫面 */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -360,13 +388,8 @@
         }
 
         @keyframes rotateCircle {
-            0% {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-
-            100% {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .loading-text {
@@ -405,19 +428,9 @@
         }
 
         @keyframes progressMove {
-            0% {
-                left: -40%;
-                width: 40%;
-            }
-
-            50% {
-                width: 60%;
-            }
-
-            100% {
-                left: 100%;
-                width: 40%;
-            }
+            0% { left: -40%; width: 40%; }
+            50% { width: 60%; }
+            100% { left: 100%; width: 40%; }
         }
 
         .loading-message {
@@ -447,9 +460,7 @@
             opacity: 1;
         }
 
-        /* ========================================
-           極簡毛玻璃導覽列
-           ======================================== */
+        /* 導覽列 */
         .navbar {
             position: fixed;
             top: 0;
@@ -533,9 +544,7 @@
             opacity: 0.8;
         }
 
-        /* ========================================
-           返回Cover頁面的小框
-           ======================================== */
+        /* 返回Cover頁面的小框 */
         .cover-return-container {
             position: fixed;
             bottom: 30px;
@@ -684,12 +693,11 @@
         }
 
         /* ========================================
-           主要內容 & 元件
+           主要內容 & 元件 - 簡化為單欄佈局
            ======================================== */
         .container {
             margin-top: 100px;
-            max-width: 1400px;
-            /* 增加最大寬度 */
+            max-width: 1000px;
             margin-left: auto;
             margin-right: auto;
             padding: 0 30px 40px;
@@ -698,14 +706,15 @@
             transform: translateY(20px);
             transition: all 0.5s ease;
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            /* 三欄佈局 */
+            /* 改為單欄佈局 */
+            grid-template-columns: 1fr;
             grid-template-areas:
-                "header header header"
-                "stats-left center stats-right"
-                "buttons buttons buttons"
-                "filter history history"
-                "result result result";
+                "header"
+                "ai"
+                "buttons"
+                "filter"
+                "history"
+                "result";
             gap: 25px;
         }
 
@@ -715,37 +724,19 @@
             transition-delay: 0.4s;
         }
 
-        /* 主要內容區塊分配 */
         .page-header {
             grid-area: header;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
 
-        .stats-left-panel {
-            grid-area: stats-left;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .center-content {
-            grid-area: center;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .stats-right-panel {
-            grid-area: stats-right;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
+        .ai-section {
+            grid-area: ai;
         }
 
         .button-section {
             grid-area: buttons;
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .filter-section {
@@ -780,42 +771,11 @@
             position: absolute;
             background-color: var(--text-color);
         }
-
-        .line-vertical {
-            width: 1px;
-            height: 100%;
-            left: 20%;
-        }
-
-        .line-vertical:nth-child(2) {
-            left: 40%;
-        }
-
-        .line-vertical:nth-child(3) {
-            left: 60%;
-        }
-
-        .line-vertical:nth-child(4) {
-            left: 80%;
-        }
-
-        .line-horizontal {
-            width: 100%;
-            height: 1px;
-            top: 20%;
-        }
-
-        .line-horizontal:nth-child(6) {
-            top: 40%;
-        }
-
-        .line-horizontal:nth-child(7) {
-            top: 60%;
-        }
-
-        .line-horizontal:nth-child(8) {
-            top: 80%;
-        }
+        
+        .line-vertical { width: 1px; height: 100%; left: 33%; }
+        .line-vertical:nth-child(2) { left: 66%; }
+        .line-horizontal { width: 100%; height: 1px; top: 33%; }
+        .line-horizontal:nth-child(4) { top: 66%; }
 
         h1 {
             font-size: 3rem;
@@ -832,7 +792,6 @@
             letter-spacing: 1px;
         }
 
-        /* 主要按鈕區 - 改為網格佈局 */
         .button-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -906,6 +865,59 @@
             position: relative;
             overflow: hidden;
             height: fit-content;
+        }
+
+        /* 篩選器收合樣式 */
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 15px;
+            user-select: none;
+        }
+
+        .filter-header:hover {
+            color: var(--accent-color);
+        }
+
+        .filter-title-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .filter-toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        /* 當篩選器收合時，旋轉圖示 */
+        .filter-section.collapsed .filter-toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .filter-content {
+            max-height: 1000px;
+            opacity: 1;
+            overflow: hidden;
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* 收合狀態 */
+        .filter-section.collapsed .filter-content {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .filter-section.collapsed .filter-header {
+            margin-bottom: 0;
+            border-bottom: none;
         }
 
         /* 歷史記錄容器 */
@@ -1058,7 +1070,6 @@
             color: var(--text-color);
         }
 
-        /* 標籤系統樣式 */
         .tag-group {
             display: flex;
             flex-wrap: wrap;
@@ -1132,14 +1143,11 @@
             border: 1px solid rgba(74, 158, 255, 0.3);
         }
 
-        /* ========================================
-           儀錶板面板樣式
-           ======================================== */
+        /* 面板通用樣式 */
         .stats-panel,
         .achievements-panel,
         .indecision-panel,
-        .ai-panel,
-        .timer-panel {
+        .ai-panel {
             padding: 20px;
             background-color: var(--surface-light);
             border-radius: 16px;
@@ -1197,7 +1205,7 @@
             min-height: 1.5em;
         }
 
-        /* 決策統計數據 */
+        /* 統計數據網格 */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1256,12 +1264,7 @@
             min-height: 60px;
         }
 
-        /* 美食成就系統 */
-        .achievements-panel {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
+        /* 成就系統 */
         .achievements-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -1307,79 +1310,7 @@
             color: var(--text-sub);
         }
 
-        /* 決策時間限制模式 */
-        .timer-panel {
-            text-align: center;
-        }
-
-        .timer-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 15px 0;
-            font-family: monospace;
-            transition: color 0.3s ease;
-        }
-
-        .timer-display.normal {
-            color: var(--timer-normal);
-        }
-
-        .timer-display.warning {
-            color: var(--timer-warning);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-
-        .timer-progress {
-            height: 8px;
-            background-color: var(--surface);
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .timer-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--timer-normal), var(--timer-warning));
-            transition: width 1s linear;
-        }
-
-        .timer-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-medium);
-            background-color: var(--surface);
-            color: var(--text-color);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .timer-btn:hover {
-            background-color: var(--surface-light);
-            border-color: var(--text-color);
-            transform: translateY(-2px);
-        }
-
-        /* 結果容器 - 放在篩選和歷史記錄下方 */
+        /* 結果顯示區 */
         .result-section {
             opacity: 0;
             transform: translateY(20px);
@@ -1453,7 +1384,6 @@
             line-height: 1.5;
         }
 
-        /* 操作按鈕 */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -1489,7 +1419,6 @@
             border-color: var(--border-light);
         }
 
-        /* 搜尋歷史樣式 */
         .history-header {
             display: flex;
             justify-content: space-between;
@@ -1529,7 +1458,6 @@
             flex-grow: 1;
         }
 
-        /* 自訂滾動條樣式 */
         .history-list::-webkit-scrollbar {
             width: 6px;
         }
@@ -1621,7 +1549,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 結果列表容器 */
         .results-list {
             display: none;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1636,7 +1563,6 @@
             animation: fadeIn 0.5s ease;
         }
 
-        /* 列表單項卡片 */
         .result-item {
             background: var(--surface);
             border: 1px solid var(--border-light);
@@ -1671,7 +1597,6 @@
             border-radius: 20px;
         }
 
-        /* 詳細頁面的頭部與返回按鈕 */
         .result-header {
             display: flex;
             align-items: center;
@@ -1702,38 +1627,21 @@
             color: var(--text-color);
         }
 
-        /* 平滑捲動效果 */
         html {
             scroll-behavior: smooth;
         }
 
         /* 響應式 */
-        @media (max-width: 1200px) {
+        @media (max-width: 900px) {
             .container {
                 grid-template-columns: 1fr;
                 grid-template-areas:
                     "header"
-                    "stats-left"
-                    "center"
-                    "stats-right"
+                    "ai"
                     "buttons"
                     "filter"
                     "history"
                     "result";
-                max-width: 900px;
-                padding: 0 20px 40px;
-            }
-
-            .stats-left-panel,
-            .center-content,
-            .stats-right-panel {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-            }
-
-            .button-section {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -1765,12 +1673,6 @@
                 font-size: 2.2rem;
             }
 
-            .stats-left-panel,
-            .center-content,
-            .stats-right-panel {
-                grid-template-columns: 1fr;
-            }
-
             .filter-section,
             .history-container {
                 padding: 20px;
@@ -1800,7 +1702,6 @@
                 padding: 20px;
             }
 
-            /* 修改 RWD 卡片樣式 */
             .member-card {
                 padding: 20px;
             }
@@ -1918,6 +1819,45 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="dashboardModalOverlay">
+        <div class="dashboard-modal">
+            <div class="modal-header">
+                <span class="modal-title">個人美食儀錶板</span>
+                <button class="close-modal-btn" id="closeDashboardBtn">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+
+            <p class="team-intro">這裡記錄了您的所有美食決策軌跡與成就！</p>
+
+            <div class="dashboard-content">
+                <div class="indecision-panel" id="indecisionMeter" style="background: var(--surface); border: none;">
+                    <h3 class="history-title">你的選擇困難指數</h3>
+                    <div class="indecision-level" id="indecisionLevel">尚未評估</div>
+                    <div class="indecision-score" id="indecisionScore">0%</div>
+                    <div class="indecision-meter">
+                        <div class="indecision-meter-fill" id="indecisionMeterFill" style="width: 100%;"></div>
+                    </div>
+                    <p style="text-align: center; font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
+                        指數越高表示選擇越困難
+                    </p>
+                </div>
+
+                <div class="stats-panel" style="background: var(--surface); border: none;">
+                    <h3 class="history-title">決策統計數據</h3>
+                    <div class="stats-grid" id="statsGrid">
+                        </div>
+                </div>
+
+                <div class="achievements-panel" style="background: var(--surface); border: none;">
+                    <h3 class="history-title">美食成就</h3>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-animation">
             <div class="loading-circle"></div>
@@ -1935,10 +1875,6 @@
     <div class="background-lines">
         <div class="line line-vertical"></div>
         <div class="line line-vertical"></div>
-        <div class="line line-vertical"></div>
-        <div class="line line-vertical"></div>
-        <div class="line line-horizontal"></div>
-        <div class="line line-horizontal"></div>
         <div class="line line-horizontal"></div>
         <div class="line line-horizontal"></div>
     </div>
@@ -1964,20 +1900,22 @@
         <a href="./index.html" class="nav-logo">AEUST RNG</a>
 
         <div class="nav-side nav-right">
-            <div class="nav-side nav-right">
-                <a href="stores.html" class="nav-btn">
-                    <span class="material-symbols-rounded">store</span>
-                    <span>店家總覽</span>
-                </a>
-                <a href="./transport.html" class="nav-btn">
-                    <span class="material-symbols-rounded">commute</span>
-                    <span>交通資訊</span>
-                </a>
-                <button class="nav-btn" id="settingsBtn" style="background:none; border:none; padding: 8px 16px;">
-                    <span class="material-symbols-rounded">settings</span>
-                    <span>背景頁面設定</span>
-                </button>
-            </div>
+            <button class="nav-btn" id="dashboardBtn">
+                <span class="material-symbols-rounded">bar_chart</span>
+                <span>儀錶板</span>
+            </button>
+            <a href="stores.html" class="nav-btn">
+                <span class="material-symbols-rounded">store</span>
+                <span>店家總覽</span>
+            </a>
+            <a href="./transport.html" class="nav-btn">
+                <span class="material-symbols-rounded">commute</span>
+                <span>交通資訊</span>
+            </a>
+            <button class="nav-btn" id="settingsBtn" style="background:none; border:none; padding: 8px 16px;">
+                <span class="material-symbols-rounded">settings</span>
+                <span>背景頁面設定</span>
+            </button>
         </div>
     </nav>
 
@@ -1999,47 +1937,13 @@
         </div>
     </div>
 
-    <!-- 主要內容區域 - 使用網格佈局 -->
     <div class="container" id="mainContainer">
         <header class="page-header">
             <h1>今天吃什麼？</h1>
             <p class="subtitle">解決你的選擇困難症</p>
         </header>
 
-        <!-- 左側儀錶板 -->
-        <div class="stats-left-panel">
-            <div class="stats-panel">
-                <h3 class="history-title">決策統計數據</h3>
-                <div class="stats-grid" id="statsGrid">
-                    <!-- 統計數據將由JavaScript動態生成 -->
-                </div>
-            </div>
-
-            <div class="achievements-panel">
-                <h3 class="history-title">美食成就</h3>
-                <div class="achievements-grid" id="achievementsGrid">
-                    <!-- 成就將由JavaScript動態生成 -->
-                </div>
-            </div>
-        </div>
-
-        <!-- 中央內容區 -->
-        <div class="center-content">
-            <div class="indecision-panel" id="indecisionMeter">
-                <h3 class="history-title">你的選擇困難指數</h3>
-                <div class="indecision-level" id="indecisionLevel">尚未評估</div>
-                <div class="indecision-score" id="indecisionScore">0%</div>
-                <div class="indecision-meter">
-                    <div class="indecision-meter-fill" id="indecisionMeterFill" style="width: 100%;"></div>
-                </div>
-                <p style="text-align: center; font-size: 0.9rem; color: var(--text-sub); margin-top: 10px;">
-                    指數越高表示選擇越困難
-                </p>
-            </div>
-        </div>
-
-        <!-- 右側儀錶板 -->
-        <div class="stats-right-panel">
+        <div class="ai-section" style="grid-area: ai;">
             <div class="ai-panel" id="aiSuggestion">
                 <div class="ai-title">
                     <span class="material-symbols-rounded">psychology</span>
@@ -2049,24 +1953,8 @@
                     根據你的歷史記錄，AI會在這裡提供個性化建議！
                 </div>
             </div>
-
-            <div class="timer-panel" id="timerModeContainer">
-                <h3 class="history-title">決策時間限制模式</h3>
-                <p style="text-align: center; color: var(--text-sub); margin-bottom: 15px;">
-                    在時間壓力下強迫自己快速決定！
-                </p>
-                <div class="timer-display normal" id="timerDisplay">30</div>
-                <div class="timer-progress">
-                    <div class="timer-progress-bar" id="timerProgressBar" style="width: 100%;"></div>
-                </div>
-                <button class="timer-btn" id="startTimerBtn">
-                    <span class="material-symbols-rounded">timer</span>
-                    開始30秒挑戰
-                </button>
-            </div>
         </div>
 
-        <!-- 主要按鈕區 - 現在放在儀錶板下方，篩選選項上方 -->
         <div class="button-section">
             <button class="random-btn" id="randomFoodBtn">
                 <span class="material-symbols-rounded">casino</span>
@@ -2078,70 +1966,77 @@
             </button>
         </div>
 
-        <!-- 篩選選項區 -->
-        <div class="filter-section">
-            <div class="option-group">
-                <div class="option-title">
-                    <span class="material-symbols-rounded">schedule</span>
-                    <label>時段選擇</label>
+        <div class="filter-section collapsed" id="filterSection">
+            <div class="filter-header" id="filterToggleBtn">
+                <div class="filter-title-text">
+                    <span class="material-symbols-rounded">tune</span>
+                    <span>進階篩選選項</span>
                 </div>
-                <div class="radio-group">
-                    <label><input type="radio" name="mealTime" value="all" checked> <span>不限時段</span></label>
-                    <label><input type="radio" name="mealTime" value="breakfast"> <span>早餐</span></label>
-                    <label><input type="radio" name="mealTime" value="lunch"> <span>午餐</span></label>
-                    <label><input type="radio" name="mealTime" value="dinner"> <span>晚餐</span></label>
-                </div>
-            </div>
-            <div class="option-group">
-                <div class="option-title">
-                    <span class="material-symbols-rounded">category</span>
-                    <label>食物種類</label>
-                </div>
-                <select id="foodCategory">
-                    <option value="all">全部顯示</option>
-                    <option value="noodle">麵食愛好</option>
-                    <option value="rice">米飯主義</option>
-                    <option value="western">西式/異國</option>
-                    <option value="light">輕食/早點</option>
-                </select>
+                <span class="material-symbols-rounded filter-toggle-icon">expand_more</span>
             </div>
 
-            <!-- 標籤系統 -->
-            <div class="option-group">
-                <div class="option-title">
-                    <span class="material-symbols-rounded">sell</span>
-                    <label>特色標籤 (可多選)</label>
+            <div class="filter-content">
+                <div class="option-group">
+                    <div class="option-title">
+                        <span class="material-symbols-rounded">schedule</span>
+                        <label>時段選擇</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="mealTime" value="all" checked> <span>不限時段</span></label>
+                        <label><input type="radio" name="mealTime" value="breakfast"> <span>早餐</span></label>
+                        <label><input type="radio" name="mealTime" value="lunch"> <span>午餐</span></label>
+                        <label><input type="radio" name="mealTime" value="dinner"> <span>晚餐</span></label>
+                    </div>
                 </div>
-                <div class="tag-group" id="tagGroup">
-                    <label class="tag-label">
-                        <input type="checkbox" name="foodTags" value="spicy">
-                        <span>辣味</span>
-                    </label>
-                    <label class="tag-label">
-                        <input type="checkbox" name="foodTags" value="vegetarian">
-                        <span>素食</span>
-                    </label>
-                    <label class="tag-label">
-                        <input type="checkbox" name="foodTags" value="quick">
-                        <span>快速</span>
-                    </label>
-                    <label class="tag-label">
-                        <input type="checkbox" name="foodTags" value="budget">
-                        <span>平價</span>
-                    </label>
-                    <label class="tag-label">
-                        <input type="checkbox" name="foodTags" value="popular">
-                        <span>熱門</span>
-                    </label>
-                    <label class="tag-label">
-                        <input type="checkbox" name="foodTags" value="healthy">
-                        <span>健康</span>
-                    </label>
+                <div class="option-group">
+                    <div class="option-title">
+                        <span class="material-symbols-rounded">category</span>
+                        <label>食物種類</label>
+                    </div>
+                    <select id="foodCategory">
+                        <option value="all">全部顯示</option>
+                        <option value="noodle">麵食愛好</option>
+                        <option value="rice">米飯主義</option>
+                        <option value="western">西式/異國</option>
+                        <option value="light">輕食/早點</option>
+                    </select>
+                </div>
+
+                <div class="option-group">
+                    <div class="option-title">
+                        <span class="material-symbols-rounded">sell</span>
+                        <label>特色標籤 (可多選)</label>
+                    </div>
+                    <div class="tag-group" id="tagGroup">
+                        <label class="tag-label">
+                            <input type="checkbox" name="foodTags" value="spicy">
+                            <span>辣味</span>
+                        </label>
+                        <label class="tag-label">
+                            <input type="checkbox" name="foodTags" value="vegetarian">
+                            <span>素食</span>
+                        </label>
+                        <label class="tag-label">
+                            <input type="checkbox" name="foodTags" value="quick">
+                            <span>快速</span>
+                        </label>
+                        <label class="tag-label">
+                            <input type="checkbox" name="foodTags" value="budget">
+                            <span>平價</span>
+                        </label>
+                        <label class="tag-label">
+                            <input type="checkbox" name="foodTags" value="popular">
+                            <span>熱門</span>
+                        </label>
+                        <label class="tag-label">
+                            <input type="checkbox" name="foodTags" value="healthy">
+                            <span>健康</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 歷史記錄區 -->
         <div class="history-section">
             <div class="history-container">
                 <div class="history-header">
@@ -2151,12 +2046,10 @@
                     </button>
                 </div>
                 <div class="history-list" id="historyList">
-                    <!-- 歷史記錄將動態插入 -->
-                </div>
+                    </div>
             </div>
         </div>
 
-        <!-- 結果區域 - 現在放在篩選和歷史記錄下方 -->
         <div class="result-section" id="resultContainer">
             <div class="result-header">
                 <button class="back-btn" onclick="showFilterOptions()">
@@ -2167,7 +2060,6 @@
 
             <div class="rating" id="foodStars"></div>
 
-            <!-- 標籤顯示區域 -->
             <div class="food-tags" id="foodTagsContainer"></div>
 
             <div class="food-details">
@@ -2192,7 +2084,6 @@
                 </div>
             </div>
 
-            <!-- 操作按鈕 -->
             <div class="action-buttons">
                 <button class="action-btn" id="rerollBtn">
                     <span class="material-symbols-rounded">refresh</span>
@@ -2394,7 +2285,7 @@
             },
             {
                 name: "義大利麵",
-                rating: "醬汁濃鬱，麵條彈牙，配料豐富",
+                rating: "醬汁濃郁，麵條彈牙，配料豐富",
                 description: "義大利麵、番茄肉醬、起司、羅勒",
                 location: "台北市中山區南京東路",
                 price: "NT$ 180",
@@ -2518,8 +2409,7 @@
         let currentSelectedFood = null;
         let searchHistory = [];
         let decisionStartTime = null;
-        let timerInterval = null;
-        let currentTimerSeconds = 30;
+        // [移除] 計時器相關變數
         let totalDecisions = 0;
         let decisionStats = {
             totalDecisions: 0,
@@ -2624,6 +2514,42 @@
                 }
             });
 
+            // [新增] 儀錶板 Modal 邏輯
+            const dashboardBtn = document.getElementById('dashboardBtn');
+            const dashboardModalOverlay = document.getElementById('dashboardModalOverlay');
+            const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+
+            if (dashboardBtn) {
+                dashboardBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    dashboardModalOverlay.classList.add('active');
+                });
+            }
+
+            if (closeDashboardBtn) {
+                closeDashboardBtn.addEventListener('click', function () {
+                    dashboardModalOverlay.classList.remove('active');
+                });
+            }
+
+            if (dashboardModalOverlay) {
+                dashboardModalOverlay.addEventListener('click', function (e) {
+                    if (e.target === dashboardModalOverlay) {
+                        dashboardModalOverlay.classList.remove('active');
+                    }
+                });
+            }
+
+            // [新增] 篩選器收合邏輯
+            const filterToggleBtn = document.getElementById('filterToggleBtn');
+            const filterSection = document.getElementById('filterSection');
+
+            if (filterToggleBtn && filterSection) {
+                filterToggleBtn.addEventListener('click', function () {
+                    filterSection.classList.toggle('collapsed');
+                });
+            }
+
             // 隨機抽選按鈕
             document.getElementById('randomFoodBtn').addEventListener('click', function () {
                 decisionStartTime = Date.now();
@@ -2642,8 +2568,7 @@
             // 清除歷史記錄按鈕
             document.getElementById('clearHistoryBtn').addEventListener('click', clearSearchHistory);
 
-            // 開始計時器按鈕
-            document.getElementById('startTimerBtn').addEventListener('click', startTimerMode);
+            // [移除] 開始計時器按鈕事件監聽
 
             // 返回小框控制
             const coverReturnContainer = document.getElementById('coverReturnContainer');
@@ -3162,54 +3087,7 @@
             achievementsGrid.innerHTML = achievementsHTML;
         }
 
-        // ==========================================
-        // 7. 決策時間限制模式
-        // ==========================================
-        function startTimerMode() {
-            currentTimerSeconds = 30;
-            const timerDisplay = document.getElementById('timerDisplay');
-            const timerProgressBar = document.getElementById('timerProgressBar');
-            const startTimerBtn = document.getElementById('startTimerBtn');
-
-            // 更新顯示
-            timerDisplay.textContent = currentTimerSeconds;
-            timerDisplay.className = 'timer-display normal';
-            timerProgressBar.style.width = '100%';
-            startTimerBtn.disabled = true;
-            startTimerBtn.innerHTML = '<span class="material-symbols-rounded">timer</span> 倒數中...';
-
-            // 開始計時器
-            timerInterval = setInterval(() => {
-                currentTimerSeconds--;
-
-                // 更新顯示
-                timerDisplay.textContent = currentTimerSeconds;
-                timerProgressBar.style.width = `${(currentTimerSeconds / 30) * 100}%`;
-
-                // 最後10秒警告
-                if (currentTimerSeconds <= 10) {
-                    timerDisplay.className = 'timer-display warning';
-                }
-
-                // 時間到
-                if (currentTimerSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = '時間到！';
-
-                    // 自動隨機選擇
-                    setTimeout(() => {
-                        decisionStartTime = Date.now();
-                        randomFood();
-
-                        // 重置按鈕
-                        setTimeout(() => {
-                            startTimerBtn.disabled = false;
-                            startTimerBtn.innerHTML = '<span class="material-symbols-rounded">timer</span> 開始30秒挑戰';
-                        }, 1000);
-                    }, 1000);
-                }
-            }, 1000);
-        }
+        // [移除] startTimerMode 函數 (不再需要)
 
         // ==========================================
         // 隨機抽選函數 (直接顯示單一結果，移除輪盤動畫)
