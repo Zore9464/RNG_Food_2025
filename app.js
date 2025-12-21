@@ -3,12 +3,17 @@ const app = express();
 const path = require('path');
 const { teamMembers, foods } = require('./data');
 
+// 設定 EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// 設定靜態檔案
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.get('/cover', (req, res) => res.render('cover', { title: 'Welcome', page: 'cover' }));
+// === 路由 ===
+app.get('/cover', (req, res) => {
+    res.render('cover', { title: 'Welcome - AEUST RNG', page: 'cover' });
+});
 
 app.get('/', (req, res) => {
     res.render('index', { 
@@ -26,4 +31,6 @@ app.get('/transport', (req, res) => res.render('transport', { title: '交通資�
 app.get('/login', (req, res) => res.render('login', { title: '會員登入', page: 'login', teamMembers }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});

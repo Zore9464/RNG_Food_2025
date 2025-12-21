@@ -23,11 +23,7 @@
     --map-filter: grayscale(100%) invert(100%) contrast(90%);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -38,267 +34,88 @@ body {
     transition: background-color 0.5s ease, color 0.5s ease;
     overflow-x: hidden;
     padding-top: 80px;
-    /* 重要：避免導覽列蓋住內容 */
 }
 
 /* 導覽列通用樣式 */
 .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 70px;
+    position: fixed; top: 0; left: 0; width: 100%; height: 70px;
     background-color: var(--surface);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 20px; z-index: 1000;
 }
 
-.nav-side {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+/* 修正：加入 flex: 1 讓左右兩側平分空間，確保中間 Logo 置中 */
+.nav-side { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+    flex: 1; 
 }
 
-.nav-logo {
-    font-size: 1.8rem;
-    font-weight: 300;
-    color: var(--text-color);
-    text-decoration: none;
-    letter-spacing: 15px;
+/* 修正：強制左側內容靠左 */
+.nav-left { 
+    justify-content: flex-start; 
+}
+
+/* 修正：強制右側內容靠右 */
+.nav-right { 
+    justify-content: flex-end; 
+}
+
+/* 修正：確保 Logo 文字本身置中 */
+.nav-logo { 
+    font-size: 1.8rem; 
+    font-weight: 300; 
+    color: var(--text-color); 
+    text-decoration: none; 
+    letter-spacing: 15px; 
     position: relative;
+    text-align: center;
+    margin-right: -15px; 
+    white-space: nowrap; 
 }
 
-.nav-logo::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 180px;
-    height: 1px;
-    background-color: var(--text-color);
-    opacity: 0.8;
-}
+.nav-logo::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 180px; height: 1px; background-color: var(--text-color); opacity: 0.8; }
 
-.nav-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    color: var(--text-color);
-    text-decoration: none;
-    background: transparent;
-    border: none;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.nav-btn:hover {
-    background-color: var(--surface-light);
-}
-
-.nav-btn.active {
-    background-color: var(--accent-color);
-    color: var(--bg-color);
-}
+.nav-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; color: var(--text-color); text-decoration: none; background: transparent; border: none; font-size: 0.9rem; cursor: pointer; transition: all 0.3s ease; }
+.nav-btn:hover { background-color: var(--surface-light); }
+.nav-btn.active { background-color: var(--accent-color); color: var(--bg-color); }
 
 /* Modal 通用樣式 */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    z-index: 2000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    border-bottom: 1px solid var(--border-light);
-    padding-bottom: 15px;
-}
-
-.modal-title {
-    font-size: 1.4rem;
-    font-weight: 300;
-    letter-spacing: 1px;
-    color: var(--text-color);
-}
-
-.close-modal-btn {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.close-modal-btn:hover {
-    transform: rotate(90deg);
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid var(--border-light); padding-bottom: 15px; }
+.modal-title { font-size: 1.4rem; font-weight: 300; letter-spacing: 1px; color: var(--text-color); }
+.close-modal-btn { background: none; border: none; color: var(--text-color); cursor: pointer; transition: transform 0.2s; }
+.close-modal-btn:hover { transform: rotate(90deg); }
 
 /* 團隊成員卡片 */
-.team-intro {
-    text-align: center;
-    color: var(--text-sub);
-    margin-bottom: 30px;
-    font-size: 0.95rem;
-}
-
-.team-members {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-}
-
-.member-card {
-    background-color: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: 16px;
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.member-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--accent-color);
-    background-color: var(--surface-light);
-}
-
-.member-avatar {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background-color: var(--surface-light);
-    border: 2px solid var(--border-medium);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 15px;
-    color: var(--text-color);
-}
-
-.member-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 5px;
-}
-
-.member-role {
-    color: var(--accent-color);
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 10px;
-}
-
-.member-desc {
-    font-size: 0.9rem;
-    color: var(--text-sub);
-    margin-bottom: 15px;
-    flex-grow: 1;
-}
-
-.member-links {
-    display: flex;
-    gap: 15px;
-    margin-top: auto;
-}
-
-.link-btn {
-    color: var(--text-sub);
-    transition: color 0.2s;
-    text-decoration: none;
-}
-
-.link-btn:hover {
-    color: var(--accent-color);
-}
+.team-intro { text-align: center; color: var(--text-sub); margin-bottom: 30px; font-size: 0.95rem; }
+.team-members { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.member-card { background-color: var(--surface); border: 1px solid var(--border-light); border-radius: 16px; padding: 25px; display: flex; flex-direction: column; align-items: center; text-align: center; transition: all 0.3s ease; }
+.member-card:hover { transform: translateY(-5px); border-color: var(--accent-color); background-color: var(--surface-light); }
+.member-avatar { width: 70px; height: 70px; border-radius: 50%; background-color: var(--surface-light); border: 2px solid var(--border-medium); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; color: var(--text-color); }
+.member-name { font-size: 1.2rem; font-weight: 600; color: var(--text-color); margin-bottom: 5px; }
+.member-role { color: var(--accent-color); font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; }
+.member-desc { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 15px; flex-grow: 1; }
+.member-links { display: flex; gap: 15px; margin-top: auto; }
+.link-btn { color: var(--text-sub); transition: color 0.2s; text-decoration: none; }
+.link-btn:hover { color: var(--accent-color); }
 
 /* 背景裝飾 */
-.bg-lines {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    opacity: 0.05;
-    pointer-events: none;
-}
-
-.line {
-    position: absolute;
-    background-color: var(--text-color);
-}
-
-.v-line {
-    width: 1px;
-    height: 100%;
-    left: 20%;
-}
-
-.v-line:nth-child(2) {
-    left: 80%;
-}
+.bg-lines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.05; pointer-events: none; }
+.line { position: absolute; background-color: var(--text-color); }
+.v-line { width: 1px; height: 100%; left: 20%; }
+.v-line:nth-child(2) { left: 80%; }
 
 /* RWD */
 @media (max-width: 900px) {
-    .navbar {
-        height: auto;
-        flex-direction: column;
-        padding: 10px;
-    }
-
-    .nav-side {
-        width: 100%;
-        justify-content: center;
-        margin: 5px 0;
-        flex-wrap: wrap;
-    }
-
-    .nav-logo {
-        order: -1;
-        margin-bottom: 5px;
-    }
-
-    body {
-        padding-top: 140px;
-    }
-
-    .nav-btn span:last-child {
-        display: none;
-    }
-
-    .nav-btn {
-        padding: 8px;
-    }
+    .navbar { height: auto; flex-direction: column; padding: 10px; }
+    .nav-side { width: 100%; justify-content: center; margin: 5px 0; flex-wrap: wrap; }
+    .nav-logo { order: -1; margin-bottom: 5px; }
+    body { padding-top: 140px; }
+    .nav-btn span:last-child { display: none; }
+    .nav-btn { padding: 8px; }
 }

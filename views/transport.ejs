@@ -1,37 +1,25 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<%- include('partials/head', { title: '交通資訊' , customCss: `.info-card { background: var(--surface); border: 1px solid
-    var(--border-light); border-radius: 16px; padding: 30px; margin-bottom: 25px; backdrop-filter: blur(10px); } h2 {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light);
-    padding-bottom: 10px; } .map-frame { width: 100%; height: 350px; border-radius: 12px; border: 0; filter:
-    var(--map-filter); }` }) %>
-
-    <body>
-        <%- include('partials/modals') %>
-            <div class="bg-lines">
-                <div class="line v-line"></div>
-                <div class="line v-line"></div>
-            </div>
-            <%- include('partials/navbar', { page: 'transport' }) %>
-
-                <div class="container" style="max-width: 900px; margin: 100px auto; padding: 0 20px;">
-                    <header style="text-align: center; margin-bottom: 40px;">
-                        <h1 style="font-size: 2.2rem; margin-bottom: 10px;">交通資訊</h1>
-                        <p class="subtitle" style="color: var(--text-sub);">如何抵達 AEUST 周邊美食圈</p>
-                    </header>
-                    <div class="info-card">
-                        <h2><span class="material-symbols-rounded" style="color: var(--accent-color);">map</span>地理位置
-                        </h2>
-                        <iframe class="map-frame"
-                            src="https://maps.google.com/maps?q=AEUST&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
-                    </div>
-                    <div class="info-card">
-                        <h2><span class="material-symbols-rounded"
-                                style="color: var(--accent-color);">directions_bus</span>大眾運輸</h2>
-                        <p style="color: var(--text-color);">捷運：中和新蘆線【輔大站】1號出口。</p>
-                    </div>
-                </div>
-                <%- include('partials/scripts') %>
-    </body>
-
+<%- include('partials/head', { title: '交通資訊', customCss: `.info-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 16px; padding: 30px; margin-bottom: 25px; backdrop-filter: blur(10px); } h2 { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px; } .map-frame { width: 100%; height: 350px; border-radius: 12px; border: 0; filter: var(--map-filter); }` }) %>
+<body>
+    <%- include('partials/modals') %>
+    <div class="bg-lines"><div class="line v-line"></div><div class="line v-line"></div></div>
+    <%- include('partials/navbar', { page: 'transport' }) %>
+    
+    <div class="container" style="max-width: 900px; margin: 100px auto; padding: 0 20px;">
+        <header style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-size: 2.2rem; margin-bottom: 10px;">交通資訊</h1>
+            <p class="subtitle" style="color: var(--text-sub);">如何抵達 AEUST 周邊美食圈</p>
+        </header>
+        <div class="info-card">
+            <h2><span class="material-symbols-rounded" style="color: var(--accent-color);">map</span>地理位置</h2>
+            <iframe class="map-frame" src="https://maps.google.com/maps?q=AEUST&t=&z=15&ie=UTF8&iwloc=&output=embed"></iframe>
+        </div>
+        <div class="info-card">
+            <h2><span class="material-symbols-rounded" style="color: var(--accent-color);">directions_bus</span>大眾運輸</h2>
+            <p style="color: var(--text-color);">捷運：中和新蘆線【輔大站】1號出口。</p>
+        </div>
+    </div>
+    <%- include('partials/scripts') %>
+</body>
 </html>
