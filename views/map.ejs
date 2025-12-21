@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<%- include('partials/head', { title: '美食地圖', customCss: `#map { width: 100%; height: calc(100vh - 70px); margin-top: 70px; background: var(--bg-color); } .leaflet-tile-pane { filter: var(--map-filter); }` }) %>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+</head>
+<body>
+    <%- include('partials/modals') %>
+    <%- include('partials/navbar', { page: 'map' }) %>
+    <div id="map"></div>
+    <%- include('partials/scripts') %>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+    <script>
+        const map = L.map('map').setView([25.0478, 121.5170], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+        // 範例標記
+        L.marker([25.0488, 121.5180]).addTo(map).bindPopup('老王牛肉麵');
+    </script>
+</body>
+</html>

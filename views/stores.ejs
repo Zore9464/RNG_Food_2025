@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<%- include('partials/head', { title: '店家總覽', customCss: `.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; } .store-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 16px; padding: 25px; transition: transform 0.3s; } .store-card:hover { transform: translateY(-5px); border-color: var(--accent-color); }` }) %>
+<body>
+    <%- include('partials/modals') %>
+    <div class="bg-lines"><div class="line v-line"></div><div class="line v-line"></div></div>
+    <%- include('partials/navbar', { page: 'stores' }) %>
+    
+    <div class="container" style="max-width: 1000px; margin: 100px auto; padding: 0 20px;">
+        <header style="text-align: center; margin-bottom: 50px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 10px;">所有店家資訊</h1>
+            <div class="subtitle" style="color: var(--text-sub);">探索收錄在資料庫中的美味名單</div>
+        </header>
+        <div class="store-grid">
+            <% foods.forEach(food => { %>
+                <div class="store-card">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <h3 style="font-size:1.4rem; color:var(--text-color);"><%= food.location %></h3>
+                        <span style="color:var(--accent-color); border:1px solid var(--border-light); padding:4px 10px; border-radius:20px;"><%= food.price %></span>
+                    </div>
+                    <div style="color:var(--text-color); margin-bottom:15px;">
+                        <% for(let i=0; i<5; i++) { %><%= i < food.stars ? '★' : '☆' %><% } %>
+                    </div>
+                    <p style="font-weight:500; margin-bottom:5px;"><%= food.name %></p>
+                    <p style="color:var(--text-sub); font-size:0.95rem;"><%= food.description %></p>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+    <%- include('partials/scripts') %>
+</body>
+</html>

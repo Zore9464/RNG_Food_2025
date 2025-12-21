@@ -1,0 +1,47 @@
+<div class="modal-overlay" id="settingsModalOverlay">
+    <div class="settings-modal" style="background-color: var(--bg-color); border: 1px solid var(--border-medium); border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; transform: scale(0.9); transition: all 0.3s;">
+        <div class="modal-header">
+            <span class="modal-title">網站設定</span>
+            <button class="close-modal-btn" id="closeSettingsBtn"><span class="material-symbols-rounded">close</span></button>
+        </div>
+        <div class="setting-item" style="margin-bottom: 20px;">
+            <label style="display:block; margin-bottom:10px; color:var(--text-sub);">色彩主題風格</label>
+            <select id="themeSelector" style="width: 100%; padding: 12px; background-color: var(--surface); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-color);">
+                <option value="default">經典黑白</option>
+                <option value="light">極簡亮白</option>
+                <option value="midnight">午夜深藍</option>
+                <option value="forest">森林墨綠</option>
+                <option value="latte">暖色拿鐵</option>
+                <option value="lavender">薰衣草紫</option>
+                <option value="sakura">櫻花淺粉</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="teamModalOverlay">
+    <div class="team-modal" style="background-color: var(--bg-color); border: 1px solid var(--border-medium); border-radius: 20px; padding: 30px; width: 90%; max-width: 900px;">
+        <div class="modal-header">
+            <span class="modal-title">開發團隊</span>
+            <button class="close-modal-btn" id="closeTeamBtn"><span class="material-symbols-rounded">close</span></button>
+        </div>
+        <p class="team-intro">AEUST RNG美食網站由一群熱愛美食與程式設計的高質量人類共同打造！</p>
+        <div class="team-members">
+            <% if (typeof teamMembers !== 'undefined') { %>
+                <% teamMembers.forEach(member => { %>
+                    <div class="member-card">
+                        <div class="member-avatar"><span class="material-symbols-rounded"><%= member.avatar %></span></div>
+                        <h3 class="member-name"><%= member.name %></h3>
+                        <div style="font-size: 0.85rem; font-family: monospace; color: var(--text-sub); background: var(--surface-light); padding: 2px 8px; border-radius: 4px; margin-bottom: 10px;"><%= member.studentId %></div>
+                        <div class="member-role"><%= member.role %></div>
+                        <p class="member-desc"><%= member.description %></p>
+                        <div class="member-links">
+                            <a href="mailto:<%= member.email %>" class="link-btn"><span class="material-symbols-rounded">mail</span></a>
+                            <a href="https://github.com/<%= member.github %>" target="_blank" class="link-btn"><span class="material-symbols-rounded">code</span></a>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+    </div>
+</div>

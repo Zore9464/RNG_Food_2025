@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<%- include('partials/head', { title: '會員登入', customCss: `.login-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; margin: 100px auto; text-align: center; } .input-field { width: 100%; padding: 14px 16px; background: var(--option-bg); border: 1px solid var(--border-light); border-radius: 12px; color: var(--text-color); margin-bottom: 20px; } .login-btn { width: 100%; padding: 14px; background: var(--text-color); color: var(--bg-color); border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }` }) %>
+<body>
+    <%- include('partials/modals') %>
+    <div class="bg-lines"><div class="line v-line"></div><div class="line v-line"></div></div>
+    <%- include('partials/navbar', { page: 'login' }) %>
+    
+    <div class="container" style="display:flex; justify-content:center; align-items:center; min-height:80vh;">
+        <div class="login-card">
+            <div style="width: 80px; height: 80px; background: var(--surface-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--border-medium);">
+                <span class="material-symbols-rounded" style="font-size: 40px;">person</span>
+            </div>
+            <h2 style="font-size: 1.8rem; font-weight: 300; margin-bottom: 5px;">會員登入</h2>
+            <p style="color: var(--text-sub); margin-bottom: 30px;">歡迎回到 AEUST RNG</p>
+            <form onsubmit="event.preventDefault(); alert('測試登入成功！'); window.location.href='/';">
+                <input type="text" class="input-field" placeholder="學號" required>
+                <input type="password" class="input-field" placeholder="密碼" required>
+                <button type="submit" class="login-btn">登入</button>
+            </form>
+        </div>
+    </div>
+    <%- include('partials/scripts') %>
+</body>
+</html>

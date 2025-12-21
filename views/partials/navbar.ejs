@@ -1,0 +1,36 @@
+<nav class="navbar" id="navbar">
+    <div class="nav-side nav-left">
+        <button class="nav-btn" id="teamBtn">
+            <span class="material-symbols-rounded">groups</span>
+            <span>關於開發者團隊</span>
+        </button>
+        <a href="/about" class="nav-btn <%= page === 'about' ? 'active' : '' %>">
+            <span class="material-symbols-rounded">info</span>
+            <span>關於網站</span>
+        </a>
+        <a href="/map" class="nav-btn <%= page === 'map' ? 'active' : '' %>">
+            <span class="material-symbols-rounded">map</span>
+            <span>美食地圖搜尋</span>
+        </a>
+    </div>
+    <a href="/" class="nav-logo">AEUST RNG</a>
+    <div class="nav-side nav-right">
+        <% if (page==='index' ) { %>
+            <button class="nav-btn" id="dashboardBtn">
+                <span class="material-symbols-rounded">bar_chart</span><span>儀錶板</span>
+            </button>
+            <% } %>
+                <a href="/stores" class="nav-btn <%= page === 'stores' ? 'active' : '' %>">
+                    <span class="material-symbols-rounded">store</span><span>店家總覽</span>
+                </a>
+                <a href="/transport" class="nav-btn <%= page === 'transport' ? 'active' : '' %>">
+                    <span class="material-symbols-rounded">commute</span><span>交通資訊</span>
+                </a>
+                <a href="/login" class="nav-btn <%= page === 'login' ? 'active' : '' %>">
+                    <span class="material-symbols-rounded">login</span><span>會員登入</span>
+                </a>
+                <button class="nav-btn" id="settingsBtn">
+                    <span class="material-symbols-rounded">settings</span><span>背景設定</span>
+                </button>
+    </div>
+</nav>

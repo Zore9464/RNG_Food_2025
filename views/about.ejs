@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<%- include('partials/head', { title: '關於網站' , customCss: `.section-card { background: var(--surface); border: 1px solid
+    var(--border-light); border-radius: 16px; padding: 40px; margin-bottom: 30px; backdrop-filter: blur(10px); }` }) %>
+
+    <body>
+        <%- include('partials/modals') %>
+            <div class="bg-lines">
+                <div class="line v-line"></div>
+                <div class="line v-line"></div>
+            </div>
+            <%- include('partials/navbar', { page: 'about' }) %>
+
+                <div class="container" style="max-width: 800px; margin: 100px auto; padding: 0 20px;">
+                    <header style="text-align: center; margin-bottom: 60px;">
+                        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">關於 AEUST RNG</h1>
+                        <div class="subtitle" style="color: var(--text-sub);">解決人類歷史上最困難的決定</div>
+                    </header>
+                    <article class="section-card">
+                        <h2
+                            style="font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <span class="material-symbols-rounded" style="color: var(--accent-color);">lightbulb</span>
+                            設計初衷
+                        </h2>
+                        <p style="color: var(--text-sub); margin-bottom: 20px;">「今天午餐吃什麼？」這大概是上班族和學生每天最常問、也最難回答的問題。</p>
+                    </article>
+                    <article class="section-card">
+                        <h2
+                            style="font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                            <span class="material-symbols-rounded" style="color: var(--accent-color);">code</span> 開發技術
+                        </h2>
+                        <p style="color: var(--text-sub);">本網站採用純粹的 HTML5、CSS3 與 JavaScript 構建 (現已升級為 Node.js +
+                            EJS)，確保輕量化與極致的載入速度。</p>
+                    </article>
+                </div>
+                <%- include('partials/scripts') %>
+    </body>
+
+</html>

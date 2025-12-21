@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<%- include('partials/head', { title: 'AEUST RNG', customCss: `
+    .dashboard-modal { background-color: var(--bg-color); border: 1px solid var(--border-medium); border-radius: 20px; padding: 30px; width: 90%; max-width: 800px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); transform: scale(0.9); transition: all 0.3s; max-height: 90vh; overflow-y: auto; }
+    .dashboard-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .dashboard-content .indecision-panel { grid-column: 1 / -1; }
+    .container { margin-top: 100px; max-width: 1000px; margin-left: auto; margin-right: auto; padding: 0 30px 40px; display: grid; grid-template-columns: 1fr; grid-template-areas: "header" "ai" "buttons" "filter" "history" "result"; gap: 25px; opacity: 0; transition: opacity 0.5s; }
+    .container.loaded { opacity: 1; }
+    .filter-section { padding: 25px; background: var(--surface-light); border-radius: 16px; border: 1px solid var(--border-light); overflow: hidden; height: fit-content; transition: max-height 0.3s; }
+    .filter-section.collapsed .filter-content { max-height: 0; opacity: 0; margin: 0; padding: 0; }
+    .filter-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding-bottom: 15px; border-bottom: 1px solid var(--border-light); margin-bottom: 15px; }
+    .filter-content { max-height: 1000px; transition: all 0.5s; opacity: 1; }
+    .option-group { margin-bottom: 25px; padding: 15px; background: var(--option-bg); border-radius: 8px; border: 1px solid var(--border-light); }
+    .tag-label { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--tag-bg); border: 1px solid var(--border-light); border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 5px; }
+    .tag-label input { margin-right: 5px; }
+    .button-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0; }
+    .random-btn, .quick-decision-btn { width: 100%; padding: 20px; font-size: 1.1rem; border-radius: 12px; cursor: pointer; border: 1px solid var(--text-color); background: transparent; color: var(--text-color); display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .quick-decision-btn { background: linear-gradient(135deg, #667eea, #764ba2); border: none; color: white; }
+    .result-section { display: none; background: var(--surface-light); padding: 30px; border-radius: 16px; margin-top: 30px; }
+    .result-section.show { display: block; animation: fadeIn 0.5s; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+` }) %>
+<body>
+    <%- include('partials/modals') %>
+    
+    <div class="modal-overlay" id="dashboardModalOverlay">
+        <div class="dashboard-modal">
+            <div class="modal-header">
+                <span class="modal-title">個人美食儀錶板</span>
+                <button class="close-modal-btn" id="closeDashboardBtn"><span class="material-symbols-rounded">close</span></button>
+            </div>
+            <div class="dashboard-content">
+                <div class="indecision-panel" style="background: var(--surface); border: none; padding: 20px; text-align: center;">
+                    <h3>選擇困難指數</h3>
+                    <div id="indecisionScore" style="font-size: 2rem; font-weight: bold; margin: 10px 0;">0%</div>
+                    <div style="height: 20px; background: linear-gradient(90deg, #4CAF50, #FF9800, #ff4444); border-radius: 10px; position: relative; overflow: hidden;">
+                        <div id="indecisionMeterFill" style="height: 100%; background: var(--surface-light); position: absolute; right: 0; width: 100%; transition: width 1s;"></div>
+                    </div>
+                </div>
+                <div class="stats-panel" style="background: var(--surface); padding: 20px;">
+                    <h3>統計數據</h3>
+                    <div id="statsGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;"></div>
+                </div>
+                <div class="achievements-panel" style="background: var(--surface); padding: 20px;">
+                    <h3>成就</h3>
+                    <div id="achievementsGrid" style="display: grid; gap: 10px; margin-top: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-animation"><div class="loading-circle"></div><div class="loading-text">AEUST RNG</div></div>
+    </div>
+
+    <%- include('partials/navbar', { page: 'index' }) %>
+
+    <div class="container" id="mainContainer">
+        <header class="page-header" style="text-align: center;">
+            <h1 style="font-size: 3rem; margin-bottom: 10px;">今天吃什麼？</h1>
+            <p class="subtitle">解決你的選擇困難症</p>
+        </header>
+
+        <div class="ai-section" style="grid-area: ai; background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1)); padding: 20px; border-radius: 16px; border: 1px solid rgba(102,126,234,0.3);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 1.1rem;">
+                <span class="material-symbols-rounded">psychology</span> AI決策小幫手建議
+            </div>
+            <div id="aiContent" style="color: var(--text-sub);">根據你的歷史記錄，AI會在這裡提供個性化建議！</div>
+        </div>
+
+        <div class="button-section">
+            <button class="random-btn" id="randomFoodBtn"><span class="material-symbols-rounded">casino</span> 開始隨機抽選</button>
+            <button class="quick-decision-btn" id="quickDecisionBtn"><span class="material-symbols-rounded">bolt</span> 立即決定模式</button>
+        </div>
+
+        <div class="filter-section collapsed" id="filterSection">
+            <div class="filter-header" id="filterToggleBtn">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="material-symbols-rounded">tune</span> <span>進階篩選選項</span>
+                </div>
+                <span class="material-symbols-rounded filter-toggle-icon">expand_more</span>
+            </div>
+            <div class="filter-content">
+                <div class="option-group">
+                    <label>時段選擇</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="mealTime" value="all" checked> 不限時段</label>
+                        <label><input type="radio" name="mealTime" value="breakfast"> 早餐</label>
+                        <label><input type="radio" name="mealTime" value="lunch"> 午餐</label>
+                        <label><input type="radio" name="mealTime" value="dinner"> 晚餐</label>
+                    </div>
+                </div>
+                <div class="option-group">
+                    <label>食物種類</label>
+                    <select id="foodCategory">
+                        <option value="all">全部顯示</option>
+                        <option value="noodle">麵食愛好</option>
+                        <option value="rice">米飯主義</option>
+                        <option value="western">西式/異國</option>
+                        <option value="light">輕食/早點</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>特色標籤</label>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <label class="tag-label"><input type="checkbox" name="foodTags" value="spicy"> 辣味</label>
+                        <label class="tag-label"><input type="checkbox" name="foodTags" value="vegetarian"> 素食</label>
+                        <label class="tag-label"><input type="checkbox" name="foodTags" value="budget"> 平價</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-section" id="resultContainer">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button onclick="document.querySelector('.button-section').style.display='grid'; document.getElementById('resultContainer').classList.remove('show');" style="background:none; border:none; color:var(--text-sub); cursor:pointer;">← 返回</button>
+                <h2 id="foodName" style="font-size: 2.2rem; margin: 10px 0;"></h2>
+                <div id="foodStars" style="color: var(--text-color); font-size: 1.5rem; letter-spacing: 5px;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div style="background: var(--option-bg); padding: 15px; border-radius: 8px;">評價: <span id="foodRating"></span></div>
+                <div style="background: var(--option-bg); padding: 15px; border-radius: 8px;">內容: <span id="foodDescription"></span></div>
+                <div style="background: var(--option-bg); padding: 15px; border-radius: 8px;">地點: <span id="foodLocation"></span></div>
+                <div style="background: var(--option-bg); padding: 15px; border-radius: 8px;">價格: <span id="foodPrice"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/scripts') %>
+    <script>
+        const foods = <%- foodsData %>; // 從後端獲取數據
+        let decisionStats = JSON.parse(localStorage.getItem('decisionStats')) || { totalDecisions: 0, categories: {}, tags: {}, timeSlots: {}, avgDecisionTime: 0, totalDecisionTime: 0 };
+        
+        // Modal Logic for Dashboard
+        const dashboardBtn = document.getElementById('dashboardBtn');
+        const dashboardModal = document.getElementById('dashboardModalOverlay');
+        const closeDashboardBtn = document.getElementById('closeDashboardBtn');
+        if(dashboardBtn) dashboardBtn.addEventListener('click', (e) => { e.preventDefault(); dashboardModal.classList.add('active'); updateStatsDisplay(); });
+        if(closeDashboardBtn) closeDashboardBtn.addEventListener('click', () => dashboardModal.classList.remove('active'));
+
+        // Filter Logic
+        document.getElementById('filterToggleBtn').addEventListener('click', function() {
+            document.getElementById('filterSection').classList.toggle('collapsed');
+            this.querySelector('.filter-toggle-icon').style.transform = document.getElementById('filterSection').classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
+        });
+
+        // Random Logic
+        function randomFood() {
+            const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
+            const selectedCategory = document.getElementById('foodCategory').value;
+            const filtered = foods.filter(f => 
+                (selectedTime === 'all' || f.time.includes(selectedTime)) &&
+                (selectedCategory === 'all' || f.category === selectedCategory)
+            );
+            
+            if(filtered.length === 0) { alert('無符合條件的食物'); return; }
+            const food = filtered[Math.floor(Math.random() * filtered.length)];
+            
+            // Show result
+            document.querySelector('.button-section').style.display = 'none';
+            const res = document.getElementById('resultContainer');
+            res.classList.add('show');
+            document.getElementById('foodName').innerText = food.name;
+            document.getElementById('foodRating').innerText = food.rating;
+            document.getElementById('foodDescription').innerText = food.description;
+            document.getElementById('foodLocation').innerText = food.location;
+            document.getElementById('foodPrice').innerText = food.price;
+            document.getElementById('foodStars').innerHTML = '★'.repeat(food.stars) + '☆'.repeat(5-food.stars);
+            
+            // Update Stats
+            decisionStats.totalDecisions++;
+            localStorage.setItem('decisionStats', JSON.stringify(decisionStats));
+            
+            // Calc Indecision (Mock)
+            document.getElementById('indecisionScore').innerText = Math.min(100, decisionStats.totalDecisions * 2) + "%";
+            document.getElementById('indecisionMeterFill').style.width = (100 - Math.min(100, decisionStats.totalDecisions * 2)) + "%";
+        }
+
+        document.getElementById('randomFoodBtn').addEventListener('click', randomFood);
+        document.getElementById('quickDecisionBtn').addEventListener('click', randomFood);
+
+        function updateStatsDisplay() {
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-item" style="text-align:center; padding:10px; background:var(--surface); border-radius:8px;">
+                    <div style="font-size:1.5rem; font-weight:bold;">${decisionStats.totalDecisions}</div><div>總決策數</div>
+                </div>`;
+        }
+
+        // First Visit Animation
+        if(sessionStorage.getItem('visited')) {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContainer').classList.add('loaded');
+        } else {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainContainer').classList.add('loaded');
+                sessionStorage.setItem('visited', 'true');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
