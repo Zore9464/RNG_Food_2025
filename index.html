@@ -388,8 +388,13 @@
         }
 
         @keyframes rotateCircle {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
         }
 
         .loading-text {
@@ -428,9 +433,19 @@
         }
 
         @keyframes progressMove {
-            0% { left: -40%; width: 40%; }
-            50% { width: 60%; }
-            100% { left: 100%; width: 40%; }
+            0% {
+                left: -40%;
+                width: 40%;
+            }
+
+            50% {
+                width: 60%;
+            }
+
+            100% {
+                left: 100%;
+                width: 40%;
+            }
         }
 
         .loading-message {
@@ -771,11 +786,26 @@
             position: absolute;
             background-color: var(--text-color);
         }
-        
-        .line-vertical { width: 1px; height: 100%; left: 33%; }
-        .line-vertical:nth-child(2) { left: 66%; }
-        .line-horizontal { width: 100%; height: 1px; top: 33%; }
-        .line-horizontal:nth-child(4) { top: 66%; }
+
+        .line-vertical {
+            width: 1px;
+            height: 100%;
+            left: 33%;
+        }
+
+        .line-vertical:nth-child(2) {
+            left: 66%;
+        }
+
+        .line-horizontal {
+            width: 100%;
+            height: 1px;
+            top: 33%;
+        }
+
+        .line-horizontal:nth-child(4) {
+            top: 66%;
+        }
 
         h1 {
             font-size: 3rem;
@@ -914,7 +944,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         .filter-section.collapsed .filter-header {
             margin-bottom: 0;
             border-bottom: none;
@@ -1846,13 +1876,13 @@
                 <div class="stats-panel" style="background: var(--surface); border: none;">
                     <h3 class="history-title">決策統計數據</h3>
                     <div class="stats-grid" id="statsGrid">
-                        </div>
+                    </div>
                 </div>
 
                 <div class="achievements-panel" style="background: var(--surface); border: none;">
                     <h3 class="history-title">美食成就</h3>
                     <div class="achievements-grid" id="achievementsGrid">
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1908,9 +1938,9 @@
                 <span class="material-symbols-rounded">store</span>
                 <span>店家總覽</span>
             </a>
-            <a href="./transport.html" class="nav-btn">
-                <span class="material-symbols-rounded">commute</span>
-                <span>交通資訊</span>
+            <a href="./login.html" class="nav-btn">
+                <span class="material-symbols-rounded">login</span>
+                <span>會員登入</span>
             </a>
             <button class="nav-btn" id="settingsBtn" style="background:none; border:none; padding: 8px 16px;">
                 <span class="material-symbols-rounded">settings</span>
@@ -2046,7 +2076,7 @@
                     </button>
                 </div>
                 <div class="history-list" id="historyList">
-                    </div>
+                </div>
             </div>
         </div>
 
@@ -2454,12 +2484,12 @@
             if (sessionStorage.getItem('visited')) {
                 // 如果已經來過：直接隱藏加載畫面，不播放動畫
                 loadingScreen.style.display = 'none';
-                
+
                 // 直接顯示內容
                 navbar.classList.add('loaded');
                 mainContainer.classList.add('loaded');
                 coverReturnContainer.classList.add('loaded');
-                
+
                 // 確保初始顯示正確
                 showFilterOptions();
             } else {
@@ -2475,7 +2505,7 @@
 
                         // 初始顯示篩選頁面
                         showFilterOptions();
-                        
+
                         // 動畫結束後，設定標記表示已來過
                         sessionStorage.setItem('visited', 'true');
                     }, 800);
@@ -2707,7 +2737,7 @@
             // 直接顯示結果，不再顯示輪盤動畫
             const buttonSection = document.querySelector('.button-section');
             const resultContainer = document.getElementById('resultContainer');
-            
+
             // 隱藏抽選按鈕，顯示結果
             buttonSection.style.display = 'none';
             resultContainer.style.display = 'block';

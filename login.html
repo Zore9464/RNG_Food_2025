@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>店家資訊 - RNG美食</title>
+    <title>會員登入 - AEUST RNG</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
-        /* === 全域變數與主題系統 === */
+        /* === 全域變數與主題系統 (統一標準) === */
         :root {
-            /* 預設值 */
             --bg-color: #000000;
             --text-color: #ffffff;
             --text-sub: #bdbdbd;
@@ -20,9 +19,8 @@
             --border-light: rgba(255, 255, 255, 0.15);
             --border-medium: rgba(255, 255, 255, 0.25);
             --option-bg: rgba(0, 0, 0, 0.3);
-            --card-hover: rgba(255, 255, 255, 0.05);
+            --option-bg-hover: rgba(0, 0, 0, 0.4);
             --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            --map-filter: grayscale(100%) invert(100%) contrast(90%);
         }
 
         * {
@@ -39,10 +37,12 @@
             transition: background-color 0.5s ease, color 0.5s ease;
             overflow-x: hidden;
             padding-top: 80px;
-            /* 預留導覽列空間 */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        /* === 頂部導覽列 === */
+        /* === 導覽列 (統一標準) === */
         .navbar {
             position: fixed;
             top: 0;
@@ -50,8 +50,8 @@
             width: 100%;
             height: 70px;
             background-color: var(--surface);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
@@ -95,7 +95,6 @@
             height: 1px;
             background-color: var(--text-color);
             opacity: 0.8;
-            /* 讓線條稍微透明一點更美觀 */
         }
 
         .nav-btn {
@@ -128,11 +127,13 @@
             font-size: 1.2rem;
         }
 
-        /* === 內容容器 === */
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
+        /* === 登入卡片樣式 === */
+        .login-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -148,128 +149,117 @@
             }
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: var(--text-sub);
-            font-size: 1rem;
-            font-weight: 300;
-        }
-
-        /* 店家卡片網格 */
-        .store-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        /* 單張卡片樣式 */
-        .store-card {
-            background-color: var(--surface-light);
-            border: 1px solid var(--border-light);
-            border-radius: 16px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .store-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--border-medium);
+        .login-card {
             background-color: var(--surface);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .store-name {
-            font-size: 1.4rem;
-            font-weight: 400;
-            letter-spacing: 1px;
-        }
-
-        .store-price {
-            font-size: 0.9rem;
-            color: var(--accent-color);
-            background: var(--option-bg);
-            padding: 4px 10px;
-            border-radius: 20px;
             border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            text-align: center;
         }
 
-        .stars {
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--surface-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border: 2px solid var(--border-medium);
+        }
+
+        .login-icon span {
+            font-size: 40px;
             color: var(--text-color);
-            margin-bottom: 15px;
-            letter-spacing: 2px;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .login-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
             font-size: 0.9rem;
         }
 
-        .store-desc {
-            color: var(--text-sub);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-            flex-grow: 1;
-            line-height: 1.6;
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: var(--option-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
         }
 
-        .card-footer {
-            border-top: 1px solid var(--border-light);
-            padding-top: 15px;
-            margin-top: auto;
+        .input-field:focus {
+            border-color: var(--accent-color);
+            background-color: var(--option-bg-hover);
+            box-shadow: 0 0 0 4px var(--surface-light);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .extra-links {
+            margin-top: 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-        }
-
-        .location {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--text-sub);
             font-size: 0.85rem;
         }
 
-        .location .material-symbols-rounded {
-            font-size: 1rem;
-        }
-
-        /* 標籤樣式 */
-        .tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-        }
-
-        .tag {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background-color: var(--option-bg);
+        .extra-links a {
             color: var(--text-sub);
-            border: 1px solid var(--border-light);
+            text-decoration: none;
+            transition: 0.2s;
         }
 
-        /* 裝飾線條 */
+        .extra-links a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        /* 背景裝飾 */
         .bg-lines {
             position: fixed;
             top: 0;
@@ -289,14 +279,14 @@
         .v-line {
             width: 1px;
             height: 100%;
-            left: 25%;
+            left: 20%;
         }
 
         .v-line:nth-child(2) {
-            left: 75%;
+            left: 80%;
         }
 
-        /* === 彈窗系統 (Modal) === */
+        /* === 彈窗系統 (Modal) - 統一標準 === */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -319,8 +309,9 @@
             visibility: visible;
         }
 
-        /* 設定彈窗 */
-        .settings-modal {
+        /* 1. 設定彈窗 & 登入相關彈窗 */
+        .settings-modal,
+        .modal-box {
             background-color: var(--bg-color);
             border: 1px solid var(--border-medium);
             border-radius: 16px;
@@ -332,11 +323,7 @@
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .modal-overlay.active .settings-modal {
-            transform: scale(1);
-        }
-
-        /* 團隊彈窗 */
+        /* 2. 團隊彈窗 (寬版) */
         .team-modal {
             background-color: var(--bg-color);
             border: 1px solid var(--border-medium);
@@ -351,6 +338,8 @@
             overflow-y: auto;
         }
 
+        .modal-overlay.active .settings-modal,
+        .modal-overlay.active .modal-box,
         .modal-overlay.active .team-modal {
             transform: scale(1);
         }
@@ -364,14 +353,17 @@
             padding-bottom: 15px;
         }
 
-        .modal-title {
+        .modal-title,
+        .modal-header h3 {
             font-size: 1.4rem;
             font-weight: 300;
             letter-spacing: 1px;
             color: var(--text-color);
+            margin: 0;
         }
 
-        .close-modal-btn {
+        .close-modal-btn,
+        .close-btn {
             background: none;
             border: none;
             color: var(--text-color);
@@ -379,8 +371,21 @@
             transition: transform 0.2s;
         }
 
-        .close-modal-btn:hover {
+        .close-modal-btn:hover,
+        .close-btn:hover {
             transform: rotate(90deg);
+        }
+
+        /* 設定下拉選單 (統一格式) */
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
         }
 
         .theme-select {
@@ -400,7 +405,7 @@
             color: var(--text-color);
         }
 
-        /* 團隊成員卡片 */
+        /* === 團隊成員卡片樣式 (統一格式) === */
         .team-intro {
             text-align: center;
             color: var(--text-sub);
@@ -424,6 +429,8 @@
             align-items: center;
             text-align: center;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .member-card:hover {
@@ -476,41 +483,25 @@
             color: var(--text-sub);
             transition: color 0.2s;
             text-decoration: none;
+            display: flex;
+            align-items: center;
         }
 
         .link-btn:hover {
             color: var(--accent-color);
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
             .navbar {
-                height: auto;
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            .nav-side {
-                width: 100%;
-                justify-content: center;
-                margin: 5px 0;
-                flex-wrap: wrap;
-            }
-
-            .nav-logo {
-                order: -1;
-                margin-bottom: 5px;
-            }
-
-            body {
-                padding-top: 140px;
+                padding: 0 10px;
             }
 
             .nav-btn span:last-child {
                 display: none;
             }
 
-            .nav-btn {
-                padding: 8px;
+            .login-card {
+                padding: 30px 20px;
             }
         }
     </style>
@@ -532,7 +523,7 @@
                 </button>
             </div>
             <div class="setting-item">
-                <label style="display:block; margin-bottom:10px; color:var(--text-sub);">色彩主題風格</label>
+                <label class="setting-label">色彩主題風格</label>
                 <select class="theme-select" id="themeSelector">
                     <option value="default">經典黑白 (Default)</option>
                     <option value="light">極簡亮白 (Light)</option>
@@ -560,7 +551,60 @@
         </div>
     </div>
 
-    <nav class="navbar" id="navbar">
+    <div class="modal-overlay" id="registerModalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>註冊新帳號</h3>
+                <button class="close-btn" onclick="closeModal('registerModalOverlay')"><span
+                        class="material-symbols-rounded">close</span></button>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label class="input-label">學號 (帳號)</label>
+                    <input type="text" id="regStudentId" class="input-field" placeholder="請輸入學號" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">姓名</label>
+                    <input type="text" id="regName" class="input-field" placeholder="請輸入真實姓名" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">密碼</label>
+                    <input type="password" id="regPassword" class="input-field" placeholder="設定密碼" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">確認密碼</label>
+                    <input type="password" id="regConfirmPassword" class="input-field" placeholder="再次輸入密碼" required>
+                </div>
+                <button type="submit" class="login-btn">立即註冊</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="forgotModalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>重設密碼</h3>
+                <button class="close-btn" onclick="closeModal('forgotModalOverlay')"><span
+                        class="material-symbols-rounded">close</span></button>
+            </div>
+            <p style="color: var(--text-sub); margin-bottom: 20px; font-size: 0.9rem;">
+                請輸入您的學號與註冊時的 Email，系統將發送重設連結給您。
+            </p>
+            <form onsubmit="handleForgotPassword(event)">
+                <div class="input-group">
+                    <label class="input-label">學號</label>
+                    <input type="text" id="forgotStudentId" class="input-field" placeholder="請輸入學號" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Email</label>
+                    <input type="email" id="forgotEmail" class="input-field" placeholder="請輸入 Email" required>
+                </div>
+                <button type="submit" class="login-btn">發送重設信</button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="navbar">
         <div class="nav-side nav-left">
             <button class="nav-btn" id="teamBtn">
                 <span class="material-symbols-rounded">groups</span>
@@ -579,11 +623,11 @@
         <a href="./index.html" class="nav-logo">AEUST RNG</a>
 
         <div class="nav-side nav-right">
-            <a href="stores.html" class="nav-btn active">
+            <a href="stores.html" class="nav-btn">
                 <span class="material-symbols-rounded">store</span>
                 <span>店家總覽</span>
             </a>
-            <a href="./login.html" class="nav-btn">
+            <a href="./login.html" class="nav-btn active">
                 <span class="material-symbols-rounded">login</span>
                 <span>會員登入</span>
             </a>
@@ -594,52 +638,50 @@
         </div>
     </nav>
 
-    <div class="container">
-        <header>
-            <h1>所有店家資訊</h1>
-            <div class="subtitle">探索收錄在資料庫中的美味名單</div>
-        </header>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-icon">
+                <span class="material-symbols-rounded">person</span>
+            </div>
+            <h2 class="login-title">會員登入</h2>
+            <p class="login-subtitle">歡迎回到 AEUST RNG</p>
 
-        <div class="store-grid" id="storeGrid"></div>
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label class="input-label">帳號 / 學號</label>
+                    <input type="text" class="input-field" placeholder="請輸入學號" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">密碼</label>
+                    <input type="password" class="input-field" placeholder="請輸入密碼" required>
+                </div>
+                <button type="submit" class="login-btn">登入</button>
+            </form>
 
-        <div style="text-align: center; margin-top: 60px; color: var(--text-sub); font-size: 0.9rem;">
-            &copy; 2025 RNG Project. 以上資料皆為真實.
+            <div class="extra-links">
+                <a href="javascript:void(0)" onclick="openModal('forgotModalOverlay')">忘記密碼?</a>
+                <a href="javascript:void(0)" onclick="openModal('registerModalOverlay')">註冊新帳號</a>
+            </div>
         </div>
     </div>
 
     <script>
-        // === 1. 資料庫 (店家 & 團隊) ===
-        const foods = [
-            { name: "燒餅油條配豆漿", rating: "傳統滋味，酥脆口感，豆香濃郁", description: "燒餅、油條、冰豆漿", location: "豆漿大王", price: "NT$ 45", stars: 4, category: "light", time: ["breakfast"] },
-            { name: "起司蛋餅", rating: "餅皮酥脆，起司牽絲，喚醒早晨", description: "手工蛋餅皮、切達起司、雞蛋", location: "巷口早餐店", price: "NT$ 40", stars: 5, category: "light", time: ["breakfast", "lunch"] },
-            { name: "牛肉麵", rating: "湯頭濃郁，牛肉軟嫩，麵條Q彈", description: "半筋半肉牛肉、手工麵條、青菜、蔥花", location: "台北市大安區忠孝東路四段", price: "NT$ 150", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
-            { name: "滷肉飯", rating: "滷汁香濃，米飯飽滿，肥瘦適中", description: "滷肉、米飯、滷蛋、黃瓜片", location: "台北市中正區羅斯福路一段", price: "NT$ 50", stars: 5, category: "rice", time: ["lunch", "dinner"] },
-            { name: "日式拉麵", rating: "湯頭醇厚，叉燒入口即化", description: "豚骨湯底、叉燒、溏心蛋、海苔、筍乾", location: "台北市信義區松壽路", price: "NT$ 220", stars: 4, category: "noodle", time: ["lunch", "dinner"] },
-            { name: "義大利麵", rating: "醬汁濃郁，麵條彈牙，配料豐富", description: "義大利麵、番茄肉醬、起司、羅勒", location: "台北市中山區南京東路", price: "NT$ 180", stars: 4, category: "western", time: ["lunch", "dinner"] },
-            { name: "健康沙拉", rating: "新鮮蔬菜，營養均衡，輕食首選", description: "生菜、番茄、雞胸肉、堅果、油醋醬", location: "台北市大安區仁愛路四段", price: "NT$ 120", stars: 3, category: "light", time: ["breakfast", "lunch"] },
-            { name: "港式燒臘", rating: "肉質鮮美，皮脆肉嫩，醬汁獨特", description: "燒鴨、叉燒、油雞、青菜、白飯", location: "台北市萬華區西門町", price: "NT$ 110", stars: 4, category: "rice", time: ["lunch", "dinner"] },
-            { name: "韓式拌飯", rating: "辣醬夠味，配料豐富，口感層次多", description: "米飯、牛肉、蔬菜、雞蛋、韓式辣醬", location: "台北市松山區市民大道", price: "NT$ 160", stars: 4, category: "rice", time: ["lunch", "dinner"] },
-            { name: "素食餐盒", rating: "清爽不油膩，營養均衡，素食者首選", description: "五穀飯、時蔬、豆腐、菇類、堅果", location: "台北市文山區興隆路", price: "NT$ 90", stars: 3, category: "light", time: ["lunch", "dinner"] }
-        ];
-
+        // === 資料庫 (組員) ===
         const teamMembers = [
             { id: 1, name: "林品承", studentId: "112111113", role: "前端開發、UI設計師", avatar: "person", email: "11211113@mail.aeust.edu.tw", github: "PINCHENG612", description: "負責UI/UX設計與前端互動功能等" },
             { id: 2, name: "林劭瑋", studentId: "112111125", role: "前端開發、UI設計師", avatar: "person", email: "aka0903912930@gmail.com", github: "Zore9464", description: "負責UI/UX設計與前端互動功能等" },
             { id: 3, name: "呂佩衫", studentId: "11211121", role: "後端開發、UI設計師", avatar: "person", email: "peishenlu@gmail.com", github: "peishenlu", description: "負責視覺設計與使用者體驗，負責資料庫設計與API開發" },
         ];
 
-        const categoryMap = { 'light': '輕食', 'noodle': '麵食', 'rice': '米飯', 'western': '西式', 'all': '全部' };
-        const timeMap = { 'breakfast': '早餐', 'lunch': '午餐', 'dinner': '晚餐' };
-
-        // === 2. 主題邏輯 ===
+        // === 主題資料庫 ===
         const themes = {
-            default: { '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd', '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)', '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)', '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)' },
-            light: { '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366', '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)', '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)', '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)' },
-            midnight: { '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8', '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)', '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)', '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)' },
-            forest: { '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7', '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)', '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)' },
-            latte: { '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4', '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)', '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)' },
-            lavender: { '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed', '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)', '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)' },
-            sakura: { '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777', '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)', '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)' }
+            default: { '--bg-color': '#000000', '--text-color': '#ffffff', '--text-sub': '#bdbdbd', '--accent-color': '#ffffff', '--surface': 'rgba(255, 255, 255, 0.08)', '--surface-light': 'rgba(255, 255, 255, 0.12)', '--border-light': 'rgba(255, 255, 255, 0.15)', '--border-medium': 'rgba(255, 255, 255, 0.25)', '--option-bg': 'rgba(0, 0, 0, 0.3)', '--option-bg-hover': 'rgba(0, 0, 0, 0.4)' },
+            light: { '--bg-color': '#f2f2f7', '--text-color': '#1c1c1e', '--text-sub': '#636366', '--accent-color': '#000000', '--surface': 'rgba(255, 255, 255, 0.8)', '--surface-light': 'rgba(255, 255, 255, 0.6)', '--border-light': 'rgba(0, 0, 0, 0.1)', '--border-medium': 'rgba(0, 0, 0, 0.2)', '--option-bg': 'rgba(255, 255, 255, 0.5)', '--option-bg-hover': 'rgba(255, 255, 255, 0.8)' },
+            midnight: { '--bg-color': '#0f172a', '--text-color': '#e2e8f0', '--text-sub': '#94a3b8', '--accent-color': '#38bdf8', '--surface': 'rgba(30, 41, 59, 0.7)', '--surface-light': 'rgba(51, 65, 85, 0.6)', '--border-light': 'rgba(148, 163, 184, 0.2)', '--border-medium': 'rgba(148, 163, 184, 0.4)', '--option-bg': 'rgba(15, 23, 42, 0.5)', '--option-bg-hover': 'rgba(30, 41, 59, 0.8)' },
+            forest: { '--bg-color': '#051910', '--text-color': '#e8f5e9', '--text-sub': '#a5d6a7', '--accent-color': '#66bb6a', '--surface': 'rgba(255, 255, 255, 0.05)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(165, 214, 167, 0.2)', '--border-medium': 'rgba(165, 214, 167, 0.3)', '--option-bg': 'rgba(0, 20, 10, 0.4)', '--option-bg-hover': 'rgba(0, 40, 20, 0.5)' },
+            latte: { '--bg-color': '#2c241b', '--text-color': '#ede0d4', '--text-sub': '#bcaaa4', '--accent-color': '#d7ccc8', '--surface': 'rgba(255, 255, 255, 0.06)', '--surface-light': 'rgba(255, 255, 255, 0.1)', '--border-light': 'rgba(215, 204, 200, 0.2)', '--border-medium': 'rgba(215, 204, 200, 0.3)', '--option-bg': 'rgba(62, 39, 35, 0.4)', '--option-bg-hover': 'rgba(78, 52, 46, 0.5)' },
+            lavender: { '--bg-color': '#f3e8ff', '--text-color': '#4c1d95', '--text-sub': '#7c3aed', '--accent-color': '#8b5cf6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(139, 92, 246, 0.2)', '--border-medium': 'rgba(139, 92, 246, 0.3)', '--option-bg': 'rgba(139, 92, 246, 0.1)', '--option-bg-hover': 'rgba(139, 92, 246, 0.2)' },
+            sakura: { '--bg-color': '#fff0f5', '--text-color': '#9d174d', '--text-sub': '#db2777', '--accent-color': '#f472b6', '--surface': 'rgba(255, 255, 255, 0.6)', '--surface-light': 'rgba(255, 255, 255, 0.8)', '--border-light': 'rgba(236, 72, 153, 0.2)', '--border-medium': 'rgba(236, 72, 153, 0.3)', '--option-bg': 'rgba(236, 72, 153, 0.1)', '--option-bg-hover': 'rgba(236, 72, 153, 0.2)' }
         };
 
         function applyTheme(themeName) {
@@ -651,7 +693,7 @@
             localStorage.setItem('rng_theme', themeName);
         }
 
-        // === 3. 渲染團隊 ===
+        // === 渲染團隊 ===
         function renderTeam() {
             const container = document.getElementById('teamMembers');
             if (!container) return;
@@ -670,45 +712,92 @@
             `).join('');
         }
 
-        // === 4. 初始化 ===
+        // === Modal 控制 ===
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        window.onclick = function (event) { if (event.target.classList.contains('modal-overlay')) event.target.classList.remove('active'); }
+
+        // === 登入邏輯 ===
+        async function handleLogin(e) {
+            e.preventDefault();
+            const studentId = document.querySelector('input[type="text"]').value.trim();
+            const password = document.querySelector('input[type="password"]').value.trim();
+            const loginBtn = document.querySelector('.login-btn');
+
+            if (!studentId || !password) { alert("請輸入學號與密碼！"); return; }
+
+            const originalBtnText = loginBtn.innerText;
+            loginBtn.innerText = "登入中...";
+            loginBtn.disabled = true;
+
+            try {
+                console.log("嘗試登入:", { studentId, password });
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                if (studentId === "112111113" && password === "123456") {
+                    alert("【測試模式】登入成功！");
+                    window.location.href = 'index.html';
+                } else {
+                    alert("【測試模式】帳號或密碼錯誤\n(測試: 112111113 / 123456)");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("系統錯誤");
+            } finally {
+                loginBtn.innerText = originalBtnText;
+                loginBtn.disabled = false;
+            }
+        }
+
+        // === 註冊與忘記密碼 ===
+        async function handleRegister(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "註冊中...";
+            btn.disabled = true;
+            await new Promise(r => setTimeout(r, 1000));
+            alert("【測試模式】註冊成功！");
+            closeModal('registerModalOverlay');
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "發送中...";
+            btn.disabled = true;
+            await new Promise(r => setTimeout(r, 1000));
+            alert("【測試模式】重設信已發送！");
+            closeModal('forgotModalOverlay');
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+
+        // === 初始化 ===
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('rng_theme') || 'default';
             document.getElementById('themeSelector').value = savedTheme;
             applyTheme(savedTheme);
             renderTeam();
 
-            // Modal 控制邏輯
+            // 綁定 Modal 按鈕
             const setupModal = (btnId, modalId, closeId) => {
                 const btn = document.getElementById(btnId);
                 const modal = document.getElementById(modalId);
                 const close = document.getElementById(closeId);
-                btn.addEventListener('click', () => modal.classList.add('active'));
-                close.addEventListener('click', () => modal.classList.remove('active'));
-                modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+                if (btn && modal && close) {
+                    btn.addEventListener('click', () => modal.classList.add('active'));
+                    close.addEventListener('click', () => modal.classList.remove('active'));
+                }
             };
 
             setupModal('settingsBtn', 'settingsModalOverlay', 'closeSettingsBtn');
             setupModal('teamBtn', 'teamModalOverlay', 'closeTeamBtn');
 
             document.getElementById('themeSelector').addEventListener('change', (e) => applyTheme(e.target.value));
-
-            // 渲染店家卡片
-            const storeGrid = document.getElementById('storeGrid');
-            foods.forEach(food => {
-                let starStr = ''; for (let i = 0; i < 5; i++) starStr += i < food.stars ? '★' : '☆';
-                let tagsHtml = `<span class="tag">${categoryMap[food.category]}</span>`;
-                food.time.forEach(t => tagsHtml += `<span class="tag">${timeMap[t]}</span>`);
-
-                const card = document.createElement('div');
-                card.className = 'store-card';
-                card.innerHTML = `
-                    <div class="card-header"><h3 class="store-name">${food.location}</h3><span class="store-price">${food.price}</span></div>
-                    <div class="stars">${starStr}</div><div class="tags">${tagsHtml}</div>
-                    <p style="margin-bottom: 5px; font-weight: 500;">${food.name}</p><p class="store-desc">${food.description}</p>
-                    <div class="card-footer"><div class="location"><span class="material-symbols-rounded">location_on</span><span>${food.location}</span></div><div class="location"><span class="material-symbols-rounded">rate_review</span></div></div>
-                `;
-                storeGrid.appendChild(card);
-            });
         });
     </script>
 </body>
