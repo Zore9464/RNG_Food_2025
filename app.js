@@ -3,19 +3,15 @@ const app = express();
 const path = require('path');
 const { teamMembers, foods } = require('./data');
 
-// 設定 EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// 設定靜態檔案
 app.use(express.static(path.join(__dirname, 'public')));
 
-// === 路由 ===
-app.get('/cover', (req, res) => {
+app.get('/', (req, res) => {
     res.render('cover', { title: 'Welcome - AEUST RNG', page: 'cover' });
 });
 
-app.get('/', (req, res) => {
+app.get('/index', (req, res) => {
     res.render('index', { 
         title: 'AEUST RNG', 
         page: 'index', 

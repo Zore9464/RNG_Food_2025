@@ -50,7 +50,10 @@
     </div>
 
     <div class="loading-screen" id="loadingScreen">
-        <div class="loading-animation"><div class="loading-circle"></div><div class="loading-text">AEUST RNG</div></div>
+        <div class="loading-animation">
+            <div class="loading-circle"></div>
+            <div class="loading-text" style="margin-left: 20px;">AEUST RNG</div>
+        </div>
     </div>
 
     <%- include('partials/navbar', { page: 'index' }) %>
@@ -128,23 +131,20 @@
 
     <%- include('partials/scripts') %>
     <script>
-        const foods = <%- foodsData %>; // 從後端獲取數據
+        const foods = <%- foodsData %>;
         let decisionStats = JSON.parse(localStorage.getItem('decisionStats')) || { totalDecisions: 0, categories: {}, tags: {}, timeSlots: {}, avgDecisionTime: 0, totalDecisionTime: 0 };
         
-        // Modal Logic for Dashboard
         const dashboardBtn = document.getElementById('dashboardBtn');
         const dashboardModal = document.getElementById('dashboardModalOverlay');
         const closeDashboardBtn = document.getElementById('closeDashboardBtn');
         if(dashboardBtn) dashboardBtn.addEventListener('click', (e) => { e.preventDefault(); dashboardModal.classList.add('active'); updateStatsDisplay(); });
         if(closeDashboardBtn) closeDashboardBtn.addEventListener('click', () => dashboardModal.classList.remove('active'));
 
-        // Filter Logic
         document.getElementById('filterToggleBtn').addEventListener('click', function() {
             document.getElementById('filterSection').classList.toggle('collapsed');
             this.querySelector('.filter-toggle-icon').style.transform = document.getElementById('filterSection').classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
         });
 
-        // Random Logic
         function randomFood() {
             const selectedTime = document.querySelector('input[name="mealTime"]:checked').value;
             const selectedCategory = document.getElementById('foodCategory').value;
@@ -156,7 +156,6 @@
             if(filtered.length === 0) { alert('無符合條件的食物'); return; }
             const food = filtered[Math.floor(Math.random() * filtered.length)];
             
-            // Show result
             document.querySelector('.button-section').style.display = 'none';
             const res = document.getElementById('resultContainer');
             res.classList.add('show');
@@ -167,11 +166,9 @@
             document.getElementById('foodPrice').innerText = food.price;
             document.getElementById('foodStars').innerHTML = '★'.repeat(food.stars) + '☆'.repeat(5-food.stars);
             
-            // Update Stats
             decisionStats.totalDecisions++;
             localStorage.setItem('decisionStats', JSON.stringify(decisionStats));
             
-            // Calc Indecision (Mock)
             document.getElementById('indecisionScore').innerText = Math.min(100, decisionStats.totalDecisions * 2) + "%";
             document.getElementById('indecisionMeterFill').style.width = (100 - Math.min(100, decisionStats.totalDecisions * 2)) + "%";
         }
@@ -186,7 +183,6 @@
                 </div>`;
         }
 
-        // First Visit Animation
         if(sessionStorage.getItem('visited')) {
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('mainContainer').classList.add('loaded');
