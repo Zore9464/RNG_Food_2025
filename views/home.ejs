@@ -111,7 +111,7 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div class="space-y-4">
-                                <h3 class="text-sm opacity-60">時段選擇</h3>
+                                <h3 class="text-5sm opacity-60">時段選擇</h3>
                                 <div class="flex flex-wrap gap-2" id="time-filters">
                                     <% ['all', 'breakfast' , 'lunch' , 'dinner' ].forEach(t=> { %>
                                         <button data-val="<%= t %>" onclick="setFilter('time', '<%= t %>')"
@@ -122,7 +122,7 @@
                                 </div>
                             </div>
                             <div class="space-y-4">
-                                <h3 class="text-sm opacity-60">食物種類</h3>
+                                <h3 class="text-5sm opacity-60">食物種類</h3>
                                 <select id="category-select" onchange="setFilter('category', this.value)"
                                     class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-white/30 transition-colors">
                                     <option value="all" class="bg-zinc-900">全部種類</option>
@@ -174,11 +174,11 @@
 
                     <div class="grid grid-cols-2 gap-4 text-left mb-8">
                         <div class="p-6 rounded-[2rem] bg-white/5 border border-white/10">
-                            <div class="text-[9px] uppercase tracking-[0.2em] opacity-40 mb-2 font-bold">地點</div>
+                            <div class="text-sm uppercase tracking-[0.2em] opacity-40 mb-2 font-bold">地點</div>
                             <div id="res-loc" class="text-lg font-light leading-snug"></div>
                         </div>
                         <div class="p-6 rounded-[2rem] bg-white/5 border border-white/10">
-                            <div class="text-[9px] uppercase tracking-[0.2em] opacity-40 mb-2 font-bold">價格</div>
+                            <div class="text-sm uppercase tracking-[0.2em] opacity-40 mb-2 font-bold">價格</div>
                             <div id="res-price" class="text-lg font-light leading-snug"></div>
                         </div>
                     </div>

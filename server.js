@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -7,7 +8,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// === 資料來源 ===
+// === 資料來源 (靜態資料) ===
 const THEMES = [
   { id: 'default', name: '經典黑白', bg: 'bg-black', text: 'text-white', accent: 'text-white', surface: 'bg-white/10', border: 'border-white/20' },
   { id: 'light', name: '極簡亮白', bg: 'bg-zinc-50', text: 'text-zinc-900', accent: 'text-zinc-900', surface: 'bg-white', border: 'border-zinc-300' },
@@ -86,9 +87,8 @@ app.get('/stores', (req, res) => res.render('stores', { title: '探索店家', f
 app.get('/about', (req, res) => res.render('about', { title: '團隊與理念', team: TEAM }));
 app.get('/login', (req, res) => res.render('login', { title: '登入' }));
 
-// 模擬 AI 建議 API (不需要 API Key)
+// 模擬 AI 建議 API (不需要 API Key，也不需要資料庫)
 app.post('/api/ai-suggestion', (req, res) => {
-    // 這裡我們只是一個簡單的隨機語錄庫
     const tips = [
         "今天感覺很適合來點重口味的，試試牛肉麵吧！",
         "天氣不錯，吃點清爽的沙拉如何？",

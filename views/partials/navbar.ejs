@@ -10,7 +10,7 @@
         
         <% links.forEach(link => { %>
             <a href="<%= link.to %>" 
-               class="text-sm uppercase tracking-[0.2em] font-bold flex items-center gap-2 hover:opacity-100 transition-opacity <%= path === link.to ? 'opacity-100 text-blue-400' : 'opacity-40' %>">
+               class="text-5sm uppercase tracking-[0.2em] font-bold flex items-center gap-2 hover:opacity-100 transition-opacity <%= path === link.to ? 'opacity-100 text-blue-400' : 'opacity-40' %>">
               <span class="material-symbols-rounded text-lg"><%= link.icon %></span>
               <%= link.label %>
             </a>
