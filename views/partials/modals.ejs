@@ -1,47 +1,53 @@
-<div class="modal-overlay" id="settingsModalOverlay">
-    <div class="settings-modal" style="background-color: var(--bg-color); border: 1px solid var(--border-medium); border-radius: 16px; padding: 30px; width: 90%; max-width: 400px; transform: scale(0.9); transition: all 0.3s;">
-        <div class="modal-header">
-            <span class="modal-title">網站設定</span>
-            <button class="close-modal-btn" id="closeSettingsBtn"><span class="material-symbols-rounded">close</span></button>
-        </div>
-        <div class="setting-item" style="margin-bottom: 20px;">
-            <label style="display:block; margin-bottom:10px; color:var(--text-sub);">色彩主題風格</label>
-            <select id="themeSelector" style="width: 100%; padding: 12px; background-color: var(--surface); border: 1px solid var(--border-light); border-radius: 8px; color: var(--text-color);">
-                <option value="default">經典黑白</option>
-                <option value="light">極簡亮白</option>
-                <option value="midnight">午夜深藍</option>
-                <option value="forest">森林墨綠</option>
-                <option value="latte">暖色拿鐵</option>
-                <option value="lavender">薰衣草紫</option>
-                <option value="sakura">櫻花淺粉</option>
-            </select>
+<div id="settings-modal" class="hidden fixed inset-0 z-[3000] items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass-dark w-full max-w-xl rounded-[3rem] p-10 border border-white/10 relative">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-2xl font-light tracking-widest uppercase">個性化設定</h2>
+                <button onclick="toggleModal('settings-modal')" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            <div class="space-y-6">
+                <label class="text-[10px] opacity-50 uppercase tracking-[0.3em] font-bold">主題切換</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <% themes.forEach(function(t) { %>
+                        <button 
+                            data-id="<%= t.id %>"
+                            onclick="selectTheme('<%= t.id %>')"
+                            class="theme-btn p-5 rounded-[1.5rem] border border-white/10 bg-white/5 hover:border-white/30 text-left transition-all">
+                            <div class="text-sm font-medium"><%= t.name %></div>
+                        </button>
+                    <% }); %>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal-overlay" id="teamModalOverlay">
-    <div class="team-modal" style="background-color: var(--bg-color); border: 1px solid var(--border-medium); border-radius: 20px; padding: 30px; width: 90%; max-width: 900px;">
-        <div class="modal-header">
-            <span class="modal-title">開發團隊</span>
-            <button class="close-modal-btn" id="closeTeamBtn"><span class="material-symbols-rounded">close</span></button>
-        </div>
-        <p class="team-intro">AEUST RNG美食網站由一群熱愛美食與程式設計的高質量人類共同打造！</p>
-        <div class="team-members">
-            <% if (typeof teamMembers !== 'undefined') { %>
-                <% teamMembers.forEach(member => { %>
-                    <div class="member-card">
-                        <div class="member-avatar"><span class="material-symbols-rounded"><%= member.avatar %></span></div>
-                        <h3 class="member-name"><%= member.name %></h3>
-                        <div style="font-size: 0.85rem; font-family: monospace; color: var(--text-sub); background: var(--surface-light); padding: 2px 8px; border-radius: 4px; margin-bottom: 10px;"><%= member.studentId %></div>
-                        <div class="member-role"><%= member.role %></div>
-                        <p class="member-desc"><%= member.description %></p>
-                        <div class="member-links">
-                            <a href="mailto:<%= member.email %>" class="link-btn"><span class="material-symbols-rounded">mail</span></a>
-                            <a href="https://github.com/<%= member.github %>" target="_blank" class="link-btn"><span class="material-symbols-rounded">code</span></a>
-                        </div>
+    <div id="dashboard-modal" class="hidden fixed inset-0 z-[3000] items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass-dark w-full max-w-xl rounded-[3rem] p-10 border border-white/10 relative">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-2xl font-light tracking-widest uppercase">個人數據統計</h2>
+                <button onclick="toggleModal('dashboard-modal')" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+            <div class="space-y-8">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center">
+                    <div class="text-[10px] uppercase opacity-40 tracking-widest mb-1">決策數</div>
+                    <div id="stat-decisions" class="text-3xl font-light">0</div>
+                  </div>
+                  <div class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center">
+                    <div class="text-[10px] uppercase opacity-40 tracking-widest mb-1">平均秒數</div>
+                    <div id="stat-avg" class="text-3xl font-light">0.0s</div>
+                  </div>
+                </div>
+                <div class="space-y-4">
+                  <h4 class="text-[10px] uppercase tracking-widest opacity-40 font-bold px-2">偏好類別</h4>
+                  <div id="stat-categories" class="space-y-2">
                     </div>
-                <% }); %>
-            <% } %>
+                </div>
+              </div>
         </div>
     </div>
-</div>
+    
+    <script src="/js/main.js"></script>

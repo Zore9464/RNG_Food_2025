@@ -1,29 +1,54 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<%- include('partials/head', { title: '關於網站', customCss: `.section-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 16px; padding: 40px; margin-bottom: 30px; backdrop-filter: blur(10px); }` }) %>
-<body>
+<%- include('partials/header') %>
+<body id="app-body" class="bg-black text-white m-0 p-0 overflow-x-hidden transition-colors duration-500 font-sans min-h-screen">
+    <%- include('partials/navbar') %>
+    <main class="pt-20">
+        <div class="max-w-5xl mx-auto px-6 py-12 space-y-24">
+          <section class="text-center space-y-6">
+            <h1 class="text-6xl md:text-8xl font-light tracking-tighter">ABOUT US.</h1>
+            <p class="max-w-2xl mx-auto text-lg md:text-xl opacity-50 font-light leading-relaxed">
+              AEUST RNG 致力於通過技術與設計的完美結合，解決「吃什麼」這項人類永恆的難題。我們提供極致簡約的介面與精準的隨機算法。
+            </p>
+          </section>
+
+          <section class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+              <div class="space-y-4">
+                <h2 class="text-3xl font-light tracking-widest uppercase">我們的理念</h2>
+                <div class="w-12 h-0.5 bg-blue-500"></div>
+              </div>
+              <div class="space-y-6 text-lg opacity-70 font-light">
+                <p>在亞東科技大學的校園生活中，美食的選擇往往讓人陷入糾結。我們認為這不應該是生活的負擔。</p>
+                <p>透過 AEUST RNG，我們將決策過程遊戲化。結合 AI 建議與地理位置，讓每一次用餐都變成一場未知的探索。</p>
+              </div>
+            </div>
+            <div class="aspect-square glass rounded-[3rem] flex items-center justify-center p-12">
+              <span class="material-symbols-rounded text-[120px] opacity-10 animate-pulse">explore</span>
+            </div>
+          </section>
+
+          <section class="space-y-16">
+            <div class="text-center space-y-4">
+              <h2 className="text-4xl font-light tracking-widest uppercase">開發團隊</h2>
+              <p className="opacity-40 text-sm tracking-widest">THE MINDS BEHIND THE PROJECT</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <% team.forEach(member => { %>
+                <div class="glass p-10 rounded-[2.5rem] border border-white/5 hover:border-white/20 transition-all group flex flex-col items-center text-center">
+                  <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-rounded text-4xl opacity-50">person</span>
+                  </div>
+                  <h3 class="text-2xl font-light mb-1"><%= member.name %></h3>
+                  <div class="text-sm text-blue-400 font-medium tracking-widest uppercase mb-4"><%= member.role %></div>
+                  <p class="text-sm opacity-50 font-light leading-relaxed mb-8"><%= member.description %></p>
+                </div>
+              <% }); %>
+            </div>
+          </section>
+        </div>
+    </main>
     <%- include('partials/modals') %>
-    <div class="bg-lines"><div class="line v-line"></div><div class="line v-line"></div></div>
-    <%- include('partials/navbar', { page: 'about' }) %>
-    
-    <div class="container" style="max-width: 800px; margin: 100px auto; padding: 0 20px;">
-        <header style="text-align: center; margin-bottom: 60px;">
-            <h1 style="font-size: 2.5rem; margin-bottom: 10px;">關於 AEUST RNG</h1>
-            <div class="subtitle" style="color: var(--text-sub);">解決人類歷史上最困難的決定</div>
-        </header>
-        <article class="section-card">
-            <h2 style="font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                <span class="material-symbols-rounded" style="color: var(--accent-color);">lightbulb</span> 設計初衷
-            </h2>
-            <p style="color: var(--text-sub); margin-bottom: 20px;">「今天午餐吃什麼？」這大概是上班族和學生每天最常問、也最難回答的問題。</p>
-        </article>
-        <article class="section-card">
-            <h2 style="font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                <span class="material-symbols-rounded" style="color: var(--accent-color);">code</span> 開發技術
-            </h2>
-            <p style="color: var(--text-sub);">本網站採用純粹的 HTML5、CSS3 與 JavaScript 構建 (現已升級為 Node.js + EJS)，確保輕量化與極致的載入速度。</p>
-        </article>
-    </div>
-    <%- include('partials/scripts') %>
 </body>
 </html>

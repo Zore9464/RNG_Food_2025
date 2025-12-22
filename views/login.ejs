@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<%- include('partials/head', { title: '會員登入', customCss: `.login-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: 24px; padding: 40px; width: 100%; max-width: 400px; margin: 100px auto; text-align: center; } .input-field { width: 100%; padding: 14px 16px; background: var(--option-bg); border: 1px solid var(--border-light); border-radius: 12px; color: var(--text-color); margin-bottom: 20px; } .login-btn { width: 100%; padding: 14px; background: var(--text-color); color: var(--bg-color); border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }` }) %>
-<body>
-    <%- include('partials/modals') %>
-    <div class="bg-lines"><div class="line v-line"></div><div class="line v-line"></div></div>
-    <%- include('partials/navbar', { page: 'login' }) %>
-    
-    <div class="container" style="display:flex; justify-content:center; align-items:center; min-height:80vh;">
-        <div class="login-card">
-            <div style="width: 80px; height: 80px; background: var(--surface-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid var(--border-medium);">
-                <span class="material-symbols-rounded" style="font-size: 40px;">person</span>
+<%- include('partials/header') %>
+<body id="app-body" class="bg-black text-white m-0 p-0 overflow-x-hidden transition-colors duration-500 font-sans min-h-screen">
+    <%- include('partials/navbar') %>
+    <main class="pt-20">
+        <div class="min-h-[80vh] flex items-center justify-center p-6">
+          <div class="glass p-12 md:p-16 rounded-[3.5rem] w-full max-w-lg space-y-10 border border-white/10 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] rounded-full"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 blur-[60px] rounded-full"></div>
+
+            <div class="text-center space-y-4 relative z-10">
+              <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
+                 <span class="material-symbols-rounded text-5xl opacity-40">fingerprint</span>
+              </div>
+              <h1 class="text-4xl font-light tracking-tight">MEMBER LOGIN</h1>
+              <p class="opacity-40 text-sm tracking-widest uppercase">登入以同步您的決策數據與喜好</p>
             </div>
-            <h2 style="font-size: 1.8rem; font-weight: 300; margin-bottom: 5px;">會員登入</h2>
-            <p style="color: var(--text-sub); margin-bottom: 30px;">歡迎回到 AEUST RNG</p>
-            <form onsubmit="event.preventDefault(); alert('測試登入成功！'); window.location.href='/index';">
-                <input type="text" class="input-field" placeholder="學號" required>
-                <input type="password" class="input-field" placeholder="密碼" required>
-                <button type="submit" class="login-btn">登入</button>
+
+            <form onsubmit="handleLogin(event)" class="space-y-8 relative z-10">
+              <div class="space-y-6">
+                <div class="space-y-2">
+                  <label class="text-[10px] uppercase tracking-[0.3em] opacity-30 px-4 font-bold">Account</label>
+                  <input required type="text" class="w-full bg-white/5 border border-white/10 p-5 rounded-[1.5rem] outline-none focus:border-white/40 focus:bg-white/10 transition-all text-white placeholder:text-white/20 text-lg font-light" placeholder="請輸入帳號">
+                </div>
+                <div class="space-y-2">
+                  <label class="text-[10px] uppercase tracking-[0.3em] opacity-30 px-4 font-bold">Password</label>
+                  <input required type="password" class="w-full bg-white/5 border border-white/10 p-5 rounded-[1.5rem] outline-none focus:border-white/40 focus:bg-white/10 transition-all text-white placeholder:text-white/20 text-lg font-light" placeholder="請輸入密碼">
+                </div>
+              </div>
+              <button id="login-btn" class="w-full py-5 rounded-[1.5rem] bg-white text-black font-bold tracking-widest uppercase hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                AUTHENTICATE
+                <span class="material-symbols-rounded text-lg">arrow_forward</span>
+              </button>
             </form>
+          </div>
         </div>
-    </div>
-    <%- include('partials/scripts') %>
+    </main>
+    <%- include('partials/modals') %>
 </body>
 </html>
