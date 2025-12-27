@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <script>const FOOD_DATA = <%- JSON.stringify(foods) %>;</script>
+    <script>window.FOOD_DATA = <%- JSON.stringify(foods) %>;</script>
     <script src="/js/main.js"></script>
     <%- include('partials/modals') %>
 </body>
