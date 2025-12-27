@@ -50,22 +50,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === 4. 核心功能：隨機抽選 (含詳細除錯) ===
 function startRNG(instant = false) {
-    // 1. 取得資料 (優先從 window 讀取)
+    // 1. 取得資料
     const foods = window.FOOD_DATA || [];
     
     console.log("=== 開始篩選 ===");
     console.log("目前篩選條件:", filterState);
-    console.log("資料總數:", foods.length);
 
     // 2. 執行篩選
     const validFoods = foods.filter(f => {
         // 時段篩選
-        // 邏輯：如果是 'all' 則通過，否則檢查 f.time 陣列是否包含目前的 time
-        // 防呆：如果 f.time 是 undefined，視為空陣列
         const fTime = Array.isArray(f.time) ? f.time : []; 
         const tMatch = filterState.time === 'all' || fTime.includes(filterState.time);
 
-        // 類別篩選
+        // ★ 關鍵修正：改用 styles 裡的 ID 來比對，而不是用舊的 category 字串
+        // filterState.category 現在是數字字串 (如 "11")，所以用 == 寬鬆比對
         const cMatch = filterState.category === 'all' || 
                        (f.styles && f.styles.some(s => s.id == filterState.category));
 
@@ -76,26 +74,43 @@ function startRNG(instant = false) {
 
     // 3. 檢查結果
     if(validFoods.length === 0) { 
-        alert(`沒有符合條件的店家！\n目前篩選條件：\n時段: ${filterState.time}\n分類: ${filterState.category}\n\n請嘗試切換為「全部」試試看。`); 
+        alert(`沒有符合條件的店家！\n目前篩選條件：\n時段: ${filterState.time}\n分類ID: ${filterState.category}\n\n請嘗試切換為「全部」試試看。`); 
         return; 
     }
 
     // 4. UI 互動與結果顯示
     const btn = document.getElementById('rng-btn');
     const txt = document.getElementById('rng-btn-text');
+    const controls = document.getElementById('controls-area');
+    const anim = document.getElementById('rerolling-anim');
     
     if(!instant) {
         if(btn) btn.disabled = true;
-        if(txt) txt.textContent = "抽選中...";
         
-        // 動畫延遲效果
+        // ★ 顯示轉動動畫 (如果 HTML 有這個元素)
+        if(controls && anim) {
+            controls.classList.add('hidden');
+            anim.classList.remove('hidden');
+            anim.classList.add('flex');
+        } else if(txt) {
+            txt.textContent = "抽選中...";
+        }
+        
+        // 動畫延遲效果 (1.5秒後顯示結果)
         setTimeout(() => {
             const picked = validFoods[Math.floor(Math.random() * validFoods.length)];
-            showResult(picked);
             
+            // 隱藏動畫，恢復按鈕
+            if(controls && anim) {
+                anim.classList.add('hidden');
+                anim.classList.remove('flex');
+                controls.classList.remove('hidden');
+            }
             if(btn) btn.disabled = false;
             if(txt) txt.textContent = "開始隨機抽選";
-        }, 800);
+
+            showResult(picked);
+        }, 1500);
     } else {
         // 快速模式
         const picked = validFoods[Math.floor(Math.random() * validFoods.length)];

@@ -113,7 +113,7 @@
                             <div class="space-y-4">
                                 <h3 class="text-5sm opacity-60">時段選擇</h3>
                                 <div class="flex flex-wrap gap-2" id="time-filters">
-                                    <% ['all', 'breakfast' , 'lunch' , 'dinner' ].forEach(t=> { %>
+                                    <% ['all', '早餐' , '午餐' , '晚餐' ].forEach(t=> { %>
                                         <button data-val="<%= t %>" onclick="setFilter('time', '<%= t %>')"
                                             class="filter-btn-time px-4 py-2 rounded-full text-sm transition-all border <%= t === 'all' ? 'bg-white text-black border-white' : 'border-white/10 hover:border-white/30' %>">
                                             <%= t==='all' ? '全部' : t %>
@@ -208,11 +208,12 @@
             </a>
 
             <script>
-                window.FOOD_DATA = <% - JSON.stringify(foods) %>;
+                window.FOOD_DATA = <%- JSON.stringify(foods) %>;
                 console.log("資料庫連線成功，共載入 " + window.FOOD_DATA.length + " 筆店家資料");
             </script>
 
             <script src="/js/main.js"></script>
+            <%- include('partials/modals') %>
     </body>
 
 </html>
