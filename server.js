@@ -28,67 +28,72 @@ async function getFoodsFromDB() {
     try {
         console.log("正在嘗試連線至資料庫...");
         
-        // 1. 查詢所有店家，並包含關聯的 Style
         const stores = await Store.findAll({
             include: [{
                 model: Style,
-                attributes: ['style_name'],
+                attributes: ['style_id', 'style_name'],
                 through: { attributes: [] }
             }]
         });
 
         console.log(`成功從資料庫撈取 ${stores.length} 筆店家資料`);
 
-        if (stores.length === 0) {
-            console.warn("警告：資料庫連線成功，但沒有任何店家資料。請確認是否已匯入 sql 檔。");
-            return [];
-        }
+        if (stores.length === 0) return [];
 
-        // 2. 轉換格式
         return stores.map(store => {
-            // 安全存取 Styles，避免關聯失敗導致崩潰
-            const styles = (store.Styles || []).map(s => s.style_name);
+            const stylesData = store.Styles || [];
+            
+            // ★ 關鍵修改：將 ID 與 Name 結合成物件陣列，方便前端直接使用
+            // 結果範例：[ { id: 1, name: '早餐' }, { id: 11, name: '麵食' } ]
+            const formattedStyles = stylesData.map(s => ({
+                id: s.style_id,
+                name: s.style_name
+            }));
+
+            // 為了相容舊邏輯，我們還是保留純文字的 styleNames 來做分類判斷
+            const styleNames = formattedStyles.map(s => s.name);
             
             let category = 'other';
             let time = [];
             let tags = ['popular'];
 
             // 時段判斷
-            if (styles.includes('早餐')) time.push('breakfast');
-            if (styles.includes('午餐')) time.push('lunch');
-            if (styles.includes('晚餐') || styles.includes('宵夜')) time.push('dinner');
+            if (styleNames.includes('早餐')) time.push('breakfast');
+            if (styleNames.includes('午餐')) time.push('lunch');
+            if (styleNames.includes('晚餐') || styleNames.includes('宵夜')) time.push('dinner');
             if (time.length === 0) time = ['lunch', 'dinner'];
 
             // 分類判斷
-            if (styles.some(s => ['麵食', '日式'].includes(s))) category = 'noodle';
-            else if (styles.some(s => ['飯食', '便當', '中式', '韓式', '丼飯'].includes(s))) category = 'rice';
-            else if (styles.some(s => ['異國料理', '餐酒館', '速食', '義式'].includes(s))) category = 'western';
-            else if (styles.some(s => ['早餐', '小吃', '飲品', '健康餐盒'].includes(s))) category = 'light';
+            if (styleNames.some(s => ['麵食', '日式'].includes(s))) category = 'noodle';
+            else if (styleNames.some(s => ['飯食', '便當', '中式', '韓式', '丼飯'].includes(s))) category = 'rice';
+            else if (styleNames.some(s => ['異國料理', '餐酒館', '速食', '義式'].includes(s))) category = 'western';
+            else if (styleNames.some(s => ['早餐', '小吃', '飲品', '健康餐盒'].includes(s))) category = 'light';
 
-            const description = styles.length > 0 
-                ? `提供${styles.slice(0, 3).join('、')}等美味選擇。` 
+            const description = styleNames.length > 0 
+                ? `提供${styleNames.slice(0, 3).join('、')}等美味選擇。` 
                 : "亞東科大周邊人氣美食。";
 
             return {
                 id: store.store_id.toString(),
                 name: store.Name,
-                rating: `評分 ${store.rating}，${styles[0] || '在地'}推薦`,
+                rating: `評分 ${store.rating}，${styleNames[0] || '在地'}推薦`,
                 description: description,
                 location: store.address,
                 price: "價格詳見菜單",
                 stars: Math.round(store.rating || 4),
                 category: category,
                 time: time,
-                tags: [...tags, ...styles],
+                tags: [...tags, ...styleNames],
+                
+                // ★ 新增：回傳完整的樣式物件陣列
+                styles: formattedStyles,
+                
                 lat: store.latitude ? parseFloat(store.latitude) : 0,
                 lng: store.longitude ? parseFloat(store.longitude) : 0
             };
         });
     } catch (error) {
-        console.error("========================================");
-        console.error("資料庫讀取錯誤！請檢查以下訊息：");
-        console.error(error.message);
-        console.error("========================================");
+        console.error("資料庫讀取錯誤：", error.message);
         return [];
     }
 }
@@ -103,14 +108,18 @@ app.use((req, res, next) => {
 // Routes
 app.get('/', (req, res) => res.render('index', { title: 'Welcome' }));
 
+// ★ 修改：在進入首頁時，順便撈取所有標籤 (styles) 傳給前端
 app.get('/home', async (req, res) => {
     const foods = await getFoodsFromDB();
-    res.render('home', { title: '首頁', foods: foods });
+    const allStyles = await Style.findAll(); // 撈取所有標籤
+    res.render('home', { title: '首頁', foods: foods, styles: allStyles });
 });
 
+// ★ 修改：在進入店家列表時，也撈取所有標籤
 app.get('/stores', async (req, res) => {
     const foods = await getFoodsFromDB();
-    res.render('stores', { title: '探索店家', foods: foods });
+    const allStyles = await Style.findAll(); // 撈取所有標籤
+    res.render('stores', { title: '探索店家', foods: foods, styles: allStyles });
 });
 
 app.get('/about', (req, res) => res.render('about', { title: '團隊與理念', team: TEAM }));

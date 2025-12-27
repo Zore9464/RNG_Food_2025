@@ -66,10 +66,8 @@ function startRNG(instant = false) {
         const tMatch = filterState.time === 'all' || fTime.includes(filterState.time);
 
         // 類別篩選
-        const cMatch = filterState.category === 'all' || f.category === filterState.category;
-
-        // 除錯：如果您發現某筆資料該出現卻沒出現，可以在這裡把 return log 出來
-        // if (!tMatch || !cMatch) console.log("過濾掉:", f.name, "原因:", !tMatch ? "時段不符" : "類別不符");
+        const cMatch = filterState.category === 'all' || 
+                       (f.styles && f.styles.some(s => s.id == filterState.category));
 
         return tMatch && cMatch;
     });
@@ -229,15 +227,17 @@ function filterStores() {
     const input = document.getElementById('store-search');
     if(!input) return;
     const term = input.value.toLowerCase();
-    const cat = input.dataset.cat || 'all';
+    const cat = input.dataset.cat || 'all'; // 這裡存的是 style_id
     
     const foods = window.FOOD_DATA || [];
     const filtered = foods.filter(f => {
         const matchesTerm = f.name.toLowerCase().includes(term) || f.location.includes(term);
-        const matchesCat = cat === 'all' || f.category === cat;
+        // 檢查 style_id
+        const matchesCat = cat === 'all' || (f.styles && f.styles.some(s => s.id == cat));
         return matchesTerm && matchesCat;
     });
 
+    // 更新 Sidebar (顯示真實標籤)
     const sidebar = document.getElementById('store-list-sidebar');
     if(sidebar) {
         sidebar.innerHTML = filtered.map(f => `
@@ -246,19 +246,23 @@ function filterStores() {
                     <h3 class="font-medium">${f.name}</h3>
                     <span class="text-xs font-mono opacity-60">${f.price}</span>
                 </div>
-                <div class="flex items-center gap-1 text-sm opacity-40 uppercase tracking-tighter">
-                    <span class="material-symbols-rounded text-sm">location_on</span>
-                    ${f.location}
+                <div class="flex flex-wrap gap-1 mt-2">
+                    ${f.styles.map(s => `<span class="text-[10px] px-1.5 py-0.5 bg-white/10 rounded text-blue-300">#${s.name}</span>`).join('')}
                 </div>
             </div>`).join('') || '<div class="text-center py-20 opacity-30 text-sm italic">尚無店家數據</div>';
     }
     
+    // 更新 Table (顯示真實標籤)
     const tbody = document.getElementById('store-table-body');
     if(tbody) {
         tbody.innerHTML = filtered.map(f => `
             <tr class="hover:bg-white/[0.02] transition-colors group">
                 <td class="px-8 py-6"><div class="font-medium group-hover:text-blue-400 transition-colors">${f.name}</div></td>
-                <td class="px-6 py-6"><span class="px-2 py-1 bg-white/5 rounded text-sm opacity-60 uppercase">${f.category}</span></td>
+                <td class="px-6 py-6">
+                    <div class="flex flex-wrap gap-1">
+                        ${f.styles.map(s => `<span class="px-2 py-1 bg-white/5 rounded text-sm opacity-60 hover:opacity-100 transition-opacity">#${s.name}</span>`).join('')}
+                    </div>
+                </td>
                 <td class="px-6 py-6 font-mono text-sm opacity-60">${f.price}</td>
                 <td class="px-6 py-6 flex text-yellow-500/60">${Array(f.stars).fill('★').join('')}</td>
                 <td class="px-8 py-6 text-right"><button onclick="setStoreView('map'); setTimeout(()=>panToStore('${f.id}'), 200)" class="p-2 rounded-full hover:bg-white/10 transition-colors opacity-40 hover:opacity-100"><span class="material-symbols-rounded text-lg">explore</span></button></td>

@@ -124,12 +124,14 @@
                             <div class="space-y-4">
                                 <h3 class="text-5sm opacity-60">食物種類</h3>
                                 <select id="category-select" onchange="setFilter('category', this.value)"
-                                    class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-white/30 transition-colors">
+                                    class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-white/30 transition-colors cursor-pointer">
                                     <option value="all" class="bg-zinc-900">全部種類</option>
-                                    <option value="noodle" class="bg-zinc-900">麵食愛好</option>
-                                    <option value="rice" class="bg-zinc-900">米飯主義</option>
-                                    <option value="western" class="bg-zinc-900">西式/異國</option>
-                                    <option value="light" class="bg-zinc-900">輕食/早點</option>
+
+                                    <% styles.forEach(s=> { %>
+                                        <option value="<%= s.style_id %>" class="bg-zinc-900">
+                                            <%= s.style_name %>
+                                        </option>
+                                        <% }); %>
                                 </select>
                             </div>
                         </div>
@@ -206,7 +208,7 @@
             </a>
 
             <script>
-                window.FOOD_DATA = <%- JSON.stringify(foods) %>;
+                window.FOOD_DATA = <% - JSON.stringify(foods) %>;
                 console.log("資料庫連線成功，共載入 " + window.FOOD_DATA.length + " 筆店家資料");
             </script>
 
