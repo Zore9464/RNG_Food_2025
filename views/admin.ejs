@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<%- include('partials/header') %>
+<body class="bg-gray-900 text-white font-sans">
+    <nav class="p-6 flex justify-between items-center bg-black/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold tracking-widest">後台管理系統</h1>
+            <span class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full border border-blue-500/30">
+                Admin: <%= user %>
+            </span>
+        </div>
+        <a href="/logout" class="bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded text-sm font-bold transition">登出</a>
+    </nav>
+
+    <main class="p-10 container mx-auto">
+        <header class="mb-8 flex justify-between items-end">
+            <div>
+                <h2 class="text-3xl font-light mb-2">店家資料管理</h2>
+                <p class="text-white/40 text-sm">直接點擊表格內容即可編輯，修改後請點擊「儲存」。</p>
+            </div>
+            <button onclick="openAddModal()" 
+                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold tracking-wider shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+                <span class="material-symbols-rounded">add</span> 新增店家
+            </button>
+        </header>
+        
+        <div class="glass p-1 rounded-2xl border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white/5 border-b border-white/10 text-xs uppercase tracking-widest text-white/50">
+                            <th class="p-4">ID</th>
+                            <th class="p-4">店名 (Name)</th>
+                            <th class="p-4">評分 (Rating)</th>
+                            <th class="p-4">地址 (Address)</th>
+                            <th class="p-4 w-32">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <% stores.forEach(shop => { %>
+                        <tr class="hover:bg-white/5 transition group">
+                            <td class="p-4 font-mono opacity-50"><%= shop.store_id %></td>
+                            
+                            <td class="p-4 outline-none focus:bg-white/10 transition rounded" 
+                                contenteditable="true" id="name-<%= shop.store_id %>"><%= shop.Name %></td>
+                            
+                            <td class="p-4 outline-none focus:bg-white/10 transition rounded" 
+                                contenteditable="true" id="rating-<%= shop.store_id %>"><%= shop.rating %></td>
+
+                            <td class="p-4 outline-none focus:bg-white/10 transition rounded text-sm opacity-80" 
+                                contenteditable="true" id="address-<%= shop.store_id %>"><%= shop.address %></td>
+                            
+                            <td class="p-4 flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="updateShop('<%= shop.store_id %>')" 
+                                        class="bg-blue-600/80 hover:bg-blue-500 px-3 py-1 rounded text-xs font-bold transition">儲存</button>
+                                <button onclick="deleteShop('<%= shop.store_id %>')" 
+                                        class="bg-red-600/80 hover:bg-red-500 px-3 py-1 rounded text-xs font-bold transition">刪除</button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[100] opacity-0 transition-opacity duration-300">
+        <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="add-modal-content">
+            <h3 class="text-2xl font-bold mb-6 text-white">新增美食店家</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">店名 (Name)</label>
+                    <input type="text" id="new-name" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none transition" placeholder="例如：亞東蔥抓餅">
+                </div>
+                
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">評分 (Rating)</label>
+                    <input type="number" step="0.1" id="new-rating" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none transition" placeholder="例如：4.5">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">地址 (Address)</label>
+                    <input type="text" id="new-address" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none transition" placeholder="例如：新北市板橋區...">
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeAddModal()" class="flex-1 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition text-white/60 hover:text-white">取消</button>
+                <button onclick="createShop()" class="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-lg shadow-emerald-500/20 transition">確認新增</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === Modal 控制邏輯 ===
+        const modal = document.getElementById('add-modal');
+        const modalContent = document.getElementById('add-modal-content');
+
+        function openAddModal() {
+            modal.classList.remove('hidden');
+            // 小延遲讓 CSS transition 有淡入效果
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeAddModal() {
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                // 清空輸入框
+                document.getElementById('new-name').value = '';
+                document.getElementById('new-rating').value = '';
+                document.getElementById('new-address').value = '';
+            }, 300);
+        }
+
+        // === API 功能 ===
+
+        // 1. 新增店家
+        async function createShop() {
+            const name = document.getElementById('new-name').value;
+            const rating = document.getElementById('new-rating').value;
+            const address = document.getElementById('new-address').value;
+
+            if (!name) return alert('請輸入店名！');
+
+            try {
+                const res = await fetch('/admin/create-shop', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name, rating, address })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert('新增成功！');
+                    location.reload(); // 重新整理頁面
+                } else {
+                    alert('新增失敗：' + data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('系統錯誤');
+            }
+        }
+
+        // 2. 儲存修改功能
+        async function updateShop(id) {
+            const name = document.getElementById(`name-${id}`).innerText.trim();
+            const rating = document.getElementById(`rating-${id}`).innerText.trim();
+            const address = document.getElementById(`address-${id}`).innerText.trim();
+
+            try {
+                const res = await fetch('/admin/update-shop', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id, name, rating, address })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert('更新成功！');
+                } else {
+                    alert('更新失敗');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('系統錯誤');
+            }
+        }
+
+        // 3. 刪除功能
+        async function deleteShop(id) {
+            if(!confirm('⚠️ 確定要刪除這筆資料嗎？此動作無法復原。')) return;
+            
+            try {
+                const res = await fetch('/admin/delete-shop', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if(data.success) location.reload();
+                else alert('刪除失敗');
+            } catch (error) {
+                console.error(error);
+                alert('系統錯誤');
+            }
+        }
+    </script>
+</body>
+</html>
