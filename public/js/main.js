@@ -1,3 +1,5 @@
+// public/js/main.js
+
 // === 1. 確保 HTML 可以呼叫這些函式 ===
 window.startRNG = startRNG;
 window.setFilter = setFilter;
@@ -12,11 +14,15 @@ window.panToStore = panToStore;
 window.selectTheme = selectTheme;
 
 // === 2. 全域變數 ===
+// ★ 修正：這裡的列表必須跟 server.js 一致，前端才能正確切換顏色
 const THEMES = [
   { id: 'default', bg: 'bg-black', text: 'text-white' },
   { id: 'light', bg: 'bg-zinc-50', text: 'text-zinc-900' },
   { id: 'midnight', bg: 'bg-slate-950', text: 'text-slate-100' },
-  { id: 'forest', bg: 'bg-emerald-950', text: 'text-emerald-50' }
+  { id: 'forest', bg: 'bg-emerald-950', text: 'text-emerald-50' },
+  { id: 'ocean', bg: 'bg-cyan-950', text: 'text-cyan-50' },
+  { id: 'sunset', bg: 'bg-orange-950', text: 'text-orange-50' },
+  { id: 'lavender', bg: 'bg-purple-950', text: 'text-purple-50' }
 ];
 
 let filterState = { time: 'all', category: 'all' };
@@ -26,6 +32,7 @@ let mapMarkers = {};
 
 // === 3. 初始化 ===
 document.addEventListener('DOMContentLoaded', () => {
+    // ★ 優先讀取並套用使用者儲存的主題
     loadTheme();
     
     // 首頁初始化
@@ -48,37 +55,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// === 4. 核心功能：隨機抽選 (含詳細除錯) ===
+// === 4. 主題切換邏輯 (修正版) ===
+
+function loadTheme() {
+    // 從 localStorage 讀取上次的主題，預設為 default
+    const savedId = localStorage.getItem('rng_theme') || 'default';
+    // 套用主題，但因為 DOM 可能還沒完全 ready，確保選單也能同步
+    selectTheme(savedId);
+}
+
+function selectTheme(id) {
+    // 1. 在 THEMES 陣列中尋找對應的設定
+    const theme = THEMES.find(t => t.id === id) || THEMES[0];
+    
+    // 2. 存入 localStorage
+    localStorage.setItem('rng_theme', id);
+    
+    // 3. 套用 CSS
+    applyTheme(theme);
+
+    // 4. ★ 關鍵：同步更新下拉選單的顯示值 (解決「跟著選擇更動」的問題)
+    const select = document.getElementById('theme-select');
+    if (select) {
+        select.value = theme.id;
+    }
+}
+
+function applyTheme(theme) {
+    const body = document.getElementById('app-body');
+    if(!body) return;
+    
+    // 移除舊的顏色：遍歷所有主題，將它們的 bg 和 text 類別都移除
+    THEMES.forEach(t => body.classList.remove(t.bg, t.text));
+    
+    // 加入新的顏色
+    body.classList.add(theme.bg, theme.text);
+}
+
+
+// === 5. 核心功能：隨機抽選 ===
 function startRNG(instant = false) {
-    // 1. 取得資料
     const foods = window.FOOD_DATA || [];
     
-    console.log("=== 開始篩選 ===");
-    console.log("目前篩選條件:", filterState);
-
-    // 2. 執行篩選
     const validFoods = foods.filter(f => {
-        // 時段篩選
         const fTime = Array.isArray(f.time) ? f.time : []; 
         const tMatch = filterState.time === 'all' || fTime.includes(filterState.time);
-
-        // ★ 關鍵修正：改用 styles 裡的 ID 來比對，而不是用舊的 category 字串
-        // filterState.category 現在是數字字串 (如 "11")，所以用 == 寬鬆比對
         const cMatch = filterState.category === 'all' || 
                        (f.styles && f.styles.some(s => s.id == filterState.category));
 
         return tMatch && cMatch;
     });
 
-    console.log("符合條件的店家數:", validFoods.length);
-
-    // 3. 檢查結果
     if(validFoods.length === 0) { 
-        alert(`沒有符合條件的店家！\n目前篩選條件：\n時段: ${filterState.time}\n分類ID: ${filterState.category}\n\n請嘗試切換為「全部」試試看。`); 
+        alert(`沒有符合條件的店家！請嘗試切換條件試試看。`); 
         return; 
     }
 
-    // 4. UI 互動與結果顯示
     const btn = document.getElementById('rng-btn');
     const txt = document.getElementById('rng-btn-text');
     const controls = document.getElementById('controls-area');
@@ -87,7 +119,6 @@ function startRNG(instant = false) {
     if(!instant) {
         if(btn) btn.disabled = true;
         
-        // ★ 顯示轉動動畫 (如果 HTML 有這個元素)
         if(controls && anim) {
             controls.classList.add('hidden');
             anim.classList.remove('hidden');
@@ -96,11 +127,9 @@ function startRNG(instant = false) {
             txt.textContent = "抽選中...";
         }
         
-        // 動畫延遲效果 (1.5秒後顯示結果)
         setTimeout(() => {
             const picked = validFoods[Math.floor(Math.random() * validFoods.length)];
             
-            // 隱藏動畫，恢復按鈕
             if(controls && anim) {
                 anim.classList.add('hidden');
                 anim.classList.remove('flex');
@@ -112,14 +141,12 @@ function startRNG(instant = false) {
             showResult(picked);
         }, 1500);
     } else {
-        // 快速模式
         const picked = validFoods[Math.floor(Math.random() * validFoods.length)];
         showResult(picked);
     }
 }
 
 function showResult(food) {
-    console.log("抽選結果:", food.name);
     document.getElementById('res-name').textContent = food.name;
     document.getElementById('res-loc').textContent = food.location;
     document.getElementById('res-price').textContent = food.price;
@@ -131,7 +158,6 @@ function showResult(food) {
         ).join('');
     }
     
-    // 重置回饋按鈕
     const feedbackArea = document.getElementById('result-feedback-area');
     if(feedbackArea) {
         feedbackArea.innerHTML = `
@@ -154,10 +180,9 @@ function showResult(food) {
     saveHistory(food);
 }
 
-// === 5. 篩選與 UI 控制 ===
+// === 6. 篩選與 UI 控制 ===
 function setFilter(type, val) {
     filterState[type] = val;
-    console.log(`篩選條件更新: ${type} = ${val}`);
     
     if(type === 'time') {
         document.querySelectorAll('.filter-btn-time').forEach(btn => {
@@ -172,7 +197,7 @@ function initHomeLoader() {
     if(loader && !sessionStorage.getItem('visited')) {
         setTimeout(() => {
             loader.classList.add('opacity-0');
-            loader.style.pointerEvents = 'none'; // 讓滑鼠穿透
+            loader.style.pointerEvents = 'none';
             setTimeout(() => loader.style.display = 'none', 1000);
             sessionStorage.setItem('visited', 'true');
         }, 1500);
@@ -182,7 +207,7 @@ function initHomeLoader() {
     }
 }
 
-// === 6. 其他輔助函式 (歷史紀錄、地圖、主題) ===
+// === 7. 其他輔助函式 ===
 function renderHistory() {
     const list = document.getElementById('history-list');
     if(!list) return;
@@ -225,9 +250,7 @@ function saveHistory(food) {
     renderHistory();
 }
 
-// === 店家頁面與地圖 ===
 function setStoreCategory(id) {
-    // 將選擇的分類儲存到搜尋框的 data-cat 屬性中，方便 filterStores 讀取
     const searchInput = document.getElementById('store-search');
     if(searchInput) searchInput.dataset.cat = id;
     
@@ -242,17 +265,16 @@ function filterStores() {
     const input = document.getElementById('store-search');
     if(!input) return;
     const term = input.value.toLowerCase();
-    const cat = input.dataset.cat || 'all'; // 這裡存的是 style_id
+    const cat = input.dataset.cat || 'all';
     
     const foods = window.FOOD_DATA || [];
     const filtered = foods.filter(f => {
         const matchesTerm = f.name.toLowerCase().includes(term) || f.location.includes(term);
-        // 檢查 style_id
         const matchesCat = cat === 'all' || (f.styles && f.styles.some(s => s.id == cat));
         return matchesTerm && matchesCat;
     });
 
-    // 更新 Sidebar (顯示真實標籤)
+    // Sidebar Update
     const sidebar = document.getElementById('store-list-sidebar');
     if(sidebar) {
         sidebar.innerHTML = filtered.map(f => `
@@ -267,7 +289,7 @@ function filterStores() {
             </div>`).join('') || '<div class="text-center py-20 opacity-30 text-sm italic">尚無店家數據</div>';
     }
     
-    // 更新 Table (顯示真實標籤)
+    // Table Update
     const tbody = document.getElementById('store-table-body');
     if(tbody) {
         tbody.innerHTML = filtered.map(f => `
@@ -327,7 +349,6 @@ function setStoreView(mode) {
     }
 }
 
-// === 其他 ===
 function toggleModal(id) {
     const el = document.getElementById(id);
     if(!el) return;
@@ -335,6 +356,12 @@ function toggleModal(id) {
         el.classList.remove('hidden');
         el.classList.add('flex');
         if(id === 'dashboard-modal') updateDashboardUI();
+        // ★ 當打開設定視窗時，確保選單顯示正確的主題
+        if(id === 'settings-modal') {
+             const savedId = localStorage.getItem('rng_theme') || 'default';
+             const select = document.getElementById('theme-select');
+             if(select) select.value = savedId;
+        }
     } else {
         el.classList.add('hidden');
         el.classList.remove('flex');
@@ -345,35 +372,12 @@ function updateDashboardUI() {
     const saved = localStorage.getItem('decisionStats');
     const stats = saved ? JSON.parse(saved) : { totalDecisions: 0, categories: {} };
     document.getElementById('stat-decisions').textContent = stats.totalDecisions;
-    document.getElementById('stat-avg').textContent = '0s'; // 簡化處理
+    document.getElementById('stat-avg').textContent = '0.0s'; 
     
     document.getElementById('stat-categories').innerHTML = Object.entries(stats.categories).map(([k,v]) => `
         <div class="p-4 rounded-2xl bg-white/5 flex justify-between items-center mb-2">
             <span class="text-sm capitalize font-light">${k}</span><span class="text-xs opacity-40">${v} 次</span>
         </div>`).join('') || '<p class="text-center opacity-30 text-xs">無數據</p>';
-}
-
-function loadTheme() {
-    const savedId = localStorage.getItem('rng_theme') || 'default';
-    selectTheme(savedId);
-}
-
-function selectTheme(id) {
-    const theme = THEMES.find(t => t.id === id) || THEMES[0];
-    localStorage.setItem('rng_theme', id);
-    applyTheme(theme);
-}
-
-function applyTheme(theme) {
-    const body = document.getElementById('app-body');
-    if(!body) return;
-    THEMES.forEach(t => body.classList.remove(t.bg, t.text));
-    body.classList.add(theme.bg, theme.text);
-    
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        const isSel = btn.dataset.id === theme.id;
-        btn.className = `theme-btn p-5 rounded-[1.5rem] border transition-all text-left ${isSel ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 bg-white/5 hover:border-white/30'}`;
-    });
 }
 
 async function fetchAiTip() {

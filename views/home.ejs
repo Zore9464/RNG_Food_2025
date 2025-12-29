@@ -111,15 +111,20 @@
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                             <div class="space-y-4">
-                                <h3 class="text-5sm opacity-60">時段選擇</h3>
-                                <div class="flex flex-wrap gap-2" id="time-filters">
-                                    <% ['all', '早餐' , '午餐' , '晚餐' ].forEach(t=> { %>
-                                        <button data-val="<%= t %>" onclick="setFilter('time', '<%= t %>')"
-                                            class="filter-btn-time px-4 py-2 rounded-full text-sm transition-all border <%= t === 'all' ? 'bg-white text-black border-white' : 'border-white/10 hover:border-white/30' %>">
-                                            <%= t==='all' ? '全部' : t %>
-                                        </button>
-                                        <% }); %>
-                                </div>
+    <h3 class="text-5sm opacity-60">食物種類</h3>
+    
+    <select id="category-select" onchange="setFilter('category', this.value)"
+        class="w-full bg-white/5 border border-white/10 p-3 rounded-xl outline-none focus:border-white/30 transition-colors cursor-pointer">
+        
+        <option value="all" class="text-black bg-white">全部種類</option>
+
+        <% styles.forEach(s=> { %>
+            <option value="<%= s.style_id %>" class="text-black bg-white">
+                <%= s.style_name %>
+            </option>
+        <% }); %>
+    </select>
+</div>
                             </div>
                             <div class="space-y-4">
                                 <h3 class="text-5sm opacity-60">食物種類</h3>
@@ -207,10 +212,20 @@
                     class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 ease-in-out whitespace-nowrap text-sm font-bold tracking-widest group-hover:ml-2">回首頁</span>
             </a>
 
-            <script>
-                window.FOOD_DATA = <%- JSON.stringify(foods) %>;
-                console.log("資料庫連線成功，共載入 " + window.FOOD_DATA.length + " 筆店家資料");
-            </script>
+            <script id="server-data-foods" type="application/json">
+    <%- JSON.stringify(typeof foods !== 'undefined' ? foods : []) %>
+</script>
+
+<script>
+    try {
+        const rawData = document.getElementById('server-data-foods').textContent;
+        window.FOOD_DATA = JSON.parse(rawData);
+        console.log("資料庫連線成功，共載入 " + window.FOOD_DATA.length + " 筆店家資料");
+    } catch (error) {
+        console.error("資料載入失敗，將使用空陣列:", error);
+        window.FOOD_DATA = [];
+    }
+</script>
 
             <script src="/js/main.js"></script>
             <%- include('partials/modals') %>

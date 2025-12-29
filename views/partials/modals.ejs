@@ -1,53 +1,61 @@
 <div id="settings-modal" class="hidden fixed inset-0 z-[3000] items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-dark w-full max-w-xl rounded-[3rem] p-10 border border-white/10 relative">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-light tracking-widest uppercase">個性化設定</h2>
-                <button onclick="toggleModal('settings-modal')" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
-            </div>
-            <div class="space-y-6">
-                <label class="text-sm opacity-50 uppercase tracking-[0.3em] font-bold">主題切換</label>
-                <div class="grid grid-cols-2 gap-4">
+    <div class="glass-dark w-full max-w-xl rounded-[3rem] p-10 border border-white/10 relative">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-2xl font-light tracking-widest uppercase">個性化設定</h2>
+            <button onclick="toggleModal('settings-modal')" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+        </div>
+        <div class="space-y-6">
+            <label class="text-sm opacity-50 uppercase tracking-[0.3em] font-bold">主題切換</label>
+            
+            <div class="relative group">
+                <select id="theme-select" onchange="selectTheme(this.value)"
+                    class="w-full bg-white/5 border border-white/10 p-4 rounded-[1.5rem] outline-none focus:border-white/30 transition-colors cursor-pointer appearance-none text-white font-medium tracking-wider">
+                    
                     <% themes.forEach(function(t) { %>
-                        <button 
-                            data-id="<%= t.id %>"
-                            onclick="selectTheme('<%= t.id %>')"
-                            class="theme-btn p-5 rounded-[1.5rem] border border-white/10 bg-white/5 hover:border-white/30 text-left transition-all">
-                            <div class="text-sm font-medium"><%= t.name %></div>
-                        </button>
+                        <option value="<%= t.id %>" class="text-black bg-white">
+                            <%= t.name %>
+                        </option>
                     <% }); %>
+                </select>
+                
+                <div class="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                    <span class="material-symbols-rounded">expand_more</span>
                 </div>
             </div>
+            
+            <p class="text-xs opacity-30 pt-2">選擇後將立即套用新主題配色。</p>
         </div>
     </div>
+</div>
 
-    <div id="dashboard-modal" class="hidden fixed inset-0 z-[3000] items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-dark w-full max-w-xl rounded-[3rem] p-10 border border-white/10 relative">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-light tracking-widest uppercase">個人數據統計</h2>
-                <button onclick="toggleModal('dashboard-modal')" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full">
-                    <span class="material-symbols-rounded">close</span>
-                </button>
-            </div>
-            <div class="space-y-8">
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center">
+<div id="dashboard-modal" class="hidden fixed inset-0 z-[3000] items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <div class="glass-dark w-full max-w-xl rounded-[3rem] p-10 border border-white/10 relative">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-2xl font-light tracking-widest uppercase">個人數據統計</h2>
+            <button onclick="toggleModal('dashboard-modal')" class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-full">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+        </div>
+        <div class="space-y-8">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center">
                     <div class="text-[10px] uppercase opacity-40 tracking-widest mb-1">決策數</div>
                     <div id="stat-decisions" class="text-3xl font-light">0</div>
-                  </div>
-                  <div class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center">
+                </div>
+                <div class="p-6 rounded-3xl bg-white/5 border border-white/10 text-center">
                     <div class="text-[10px] uppercase opacity-40 tracking-widest mb-1">平均秒數</div>
                     <div id="stat-avg" class="text-3xl font-light">0.0s</div>
-                  </div>
                 </div>
-                <div class="space-y-4">
-                  <h4 class="text-[10px] uppercase tracking-widest opacity-40 font-bold px-2">偏好類別</h4>
-                  <div id="stat-categories" class="space-y-2">
-                    </div>
+            </div>
+            <div class="space-y-4">
+                <h4 class="text-[10px] uppercase tracking-widest opacity-40 font-bold px-2">偏好類別</h4>
+                <div id="stat-categories" class="space-y-2">
                 </div>
-              </div>
+            </div>
         </div>
     </div>
-    
-    <script src="/js/main.js"></script>
+</div>
+
+<script src="/js/main.js"></script>

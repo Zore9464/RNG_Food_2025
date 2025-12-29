@@ -18,12 +18,18 @@ app.use(session({
     cookie: { maxAge: 3600000 } // 登入有效期 1 小時
 }));
 
-// === 靜態設定資料 ===
+// server.js
+
+// === 靜態設定資料 (已擴充) ===
 const THEMES = [
     { id: 'default', name: '經典黑白', bg: 'bg-black', text: 'text-white', accent: 'text-white', surface: 'bg-white/10', border: 'border-white/20' },
     { id: 'light', name: '極簡亮白', bg: 'bg-zinc-50', text: 'text-zinc-900', accent: 'text-zinc-900', surface: 'bg-white', border: 'border-zinc-300' },
     { id: 'midnight', name: '午夜深藍', bg: 'bg-slate-950', text: 'text-slate-100', accent: 'text-blue-400', surface: 'bg-slate-900/80', border: 'border-slate-800' },
-    { id: 'forest', name: '森林墨綠', bg: 'bg-emerald-950', text: 'text-emerald-50', accent: 'text-emerald-400', surface: 'bg-emerald-900/60', border: 'border-emerald-800' }
+    { id: 'forest', name: '森林墨綠', bg: 'bg-emerald-950', text: 'text-emerald-50', accent: 'text-emerald-400', surface: 'bg-emerald-900/60', border: 'border-emerald-800' },
+    // ★ 新增的三個主題
+    { id: 'ocean', name: '海洋蔚藍', bg: 'bg-cyan-950', text: 'text-cyan-50', accent: 'text-cyan-400', surface: 'bg-cyan-900/60', border: 'border-cyan-800' },
+    { id: 'sunset', name: '日落暖橘', bg: 'bg-orange-950', text: 'text-orange-50', accent: 'text-orange-400', surface: 'bg-orange-900/60', border: 'border-orange-800' },
+    { id: 'lavender', name: '夢幻紫羅蘭', bg: 'bg-purple-950', text: 'text-purple-50', accent: 'text-purple-400', surface: 'bg-purple-900/60', border: 'border-purple-800' }
 ];
 
 const TEAM = [
@@ -153,64 +159,89 @@ app.get('/logout', (req, res) => {
     res.redirect('/login');
 });
 
-// ★ 後台儀表板 (Dashboard)
+// ★ 後台儀表板 (Dashboard) - 修改版
 app.get('/admin/dashboard', checkAuth, async (req, res) => {
     try {
-        // 抓取原始資料以便編輯 (不經過 getFoodsFromDB 的格式化，方便直接對應欄位)
-        const stores = await Store.findAll({ order: [['store_id', 'ASC']] });
-        res.render('admin', { title: '後台管理', stores, user: req.session.user });
+        // 1. 抓取所有店家，並包含 Style 資訊
+        const stores = await Store.findAll({ 
+            include: [{
+                model: Style,
+                as: 'Styles', // 確保你的 Model 關聯設定正確，若無 alias 可拿掉 as
+                through: { attributes: [] } // 不顯示中間表資訊
+            }],
+            order: [['store_id', 'ASC']] 
+        });
+
+        // 2. 抓取所有分類樣式 (供下拉選單用)
+        const styles = await Style.findAll();
+
+        res.render('admin', { 
+            title: '後台管理', 
+            stores: stores, 
+            styles: styles, // 傳遞分類清單給前端
+            user: req.session.user 
+        });
     } catch (error) {
-        res.status(500).send("資料庫錯誤");
+        console.error(error);
+        res.status(500).send("後台資料載入失敗");
     }
 });
 
-// ★ API: 更新店家資料
+// ★ API: 更新店家資料 - 修改版 (加入經緯度與分類)
 app.post('/admin/update-shop', checkAuth, async (req, res) => {
-    const { id, name, rating, address } = req.body;
+    const { id, name, rating, address, lat, lng, styleId } = req.body;
     try {
+        // 1. 更新基本資料與經緯度
         await Store.update(
-            { Name: name, rating: rating, address: address },
+            { 
+                Name: name, 
+                rating: rating, 
+                address: address,
+                latitude: lat || 0,
+                longitude: lng || 0
+            },
             { where: { store_id: id } }
         );
+
+        // 2. 更新分類關聯 (重新設定分類)
+        if (styleId) {
+            const store = await Store.findByPk(id);
+            // setStyles 會覆蓋舊的關聯，若要多選可用 addStyles
+            await store.setStyles([styleId]); 
+        }
+
         res.json({ success: true });
     } catch (error) {
-        console.error(error);
+        console.error("Update Error:", error);
         res.json({ success: false, message: '更新失敗' });
     }
 });
 
-// ★ API: 刪除店家
-app.post('/admin/delete-shop', checkAuth, async (req, res) => {
-    const { id } = req.body;
-    try {
-        await Store.destroy({ where: { store_id: id } });
-        res.json({ success: true });
-    } catch (error) {
-        console.error(error);
-        res.json({ success: false, message: '刪除失敗' });
-    }
-});
-
-// ★ 新增：建立新店家的 API
+// ★ API: 建立新店家 - 修改版 (加入經緯度與分類)
 app.post('/admin/create-shop', checkAuth, async (req, res) => {
-    const { name, rating, address } = req.body;
+    const { name, rating, address, lat, lng, styleId } = req.body;
     
-    // 簡易驗證
     if (!name) return res.json({ success: false, message: '店名為必填' });
 
     try {
-        await Store.create({
+        // 1. 建立店家
+        const newStore = await Store.create({
             Name: name,
-            rating: rating || 4.0, // 若未填寫則預設 4.0
+            rating: rating || 4.0,
             address: address || '暫無地址',
-            // 如果你的資料庫有 lat/lng 欄位且設為 not null，請加上預設值
-            latitude: 0, 
-            longitude: 0
+            latitude: lat || 0,
+            longitude: lng || 0
         });
+
+        // 2. 建立分類關聯
+        if (styleId) {
+            await newStore.addStyle(styleId);
+        }
+
         res.json({ success: true });
     } catch (error) {
         console.error("Create Error:", error);
-        res.json({ success: false, message: '新增店家失敗，請檢查資料庫格式' });
+        res.json({ success: false, message: '新增店家失敗' });
     }
 });
 
