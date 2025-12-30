@@ -145,7 +145,7 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     const admin = ADMINS.find(a => a.user === username && a.pass === password);
-    
+
     if (admin) {
         req.session.user = admin.user;
         return res.json({ success: true });
@@ -163,23 +163,23 @@ app.get('/logout', (req, res) => {
 app.get('/admin/dashboard', checkAuth, async (req, res) => {
     try {
         // 1. 抓取所有店家，並包含 Style 資訊
-        const stores = await Store.findAll({ 
+        const stores = await Store.findAll({
             include: [{
                 model: Style,
                 as: 'Styles', // 確保你的 Model 關聯設定正確，若無 alias 可拿掉 as
                 through: { attributes: [] } // 不顯示中間表資訊
             }],
-            order: [['store_id', 'ASC']] 
+            order: [['store_id', 'ASC']]
         });
 
         // 2. 抓取所有分類樣式 (供下拉選單用)
         const styles = await Style.findAll();
 
-        res.render('admin', { 
-            title: '後台管理', 
-            stores: stores, 
+        res.render('admin', {
+            title: '後台管理',
+            stores: stores,
             styles: styles, // 傳遞分類清單給前端
-            user: req.session.user 
+            user: req.session.user
         });
     } catch (error) {
         console.error(error);
@@ -187,15 +187,16 @@ app.get('/admin/dashboard', checkAuth, async (req, res) => {
     }
 });
 
-// ★ API: 更新店家資料 - 修改版 (加入經緯度與分類)
+// ★ API: 更新店家資料 (支援多重分類)
 app.post('/admin/update-shop', checkAuth, async (req, res) => {
-    const { id, name, rating, address, lat, lng, styleId } = req.body;
+    // styleIds 預期是一個陣列，例如 [1, 3, 5]
+    const { id, name, rating, address, lat, lng, styleIds } = req.body;
     try {
-        // 1. 更新基本資料與經緯度
+        // 1. 更新基本資料
         await Store.update(
-            { 
-                Name: name, 
-                rating: rating, 
+            {
+                Name: name,
+                rating: rating,
                 address: address,
                 latitude: lat || 0,
                 longitude: lng || 0
@@ -203,11 +204,17 @@ app.post('/admin/update-shop', checkAuth, async (req, res) => {
             { where: { store_id: id } }
         );
 
-        // 2. 更新分類關聯 (重新設定分類)
-        if (styleId) {
+        // 2. 更新多重分類關聯
+        // 確保 styleIds 是陣列 (前端若只選一個可能會傳字串，需轉陣列)
+        if (styleIds) {
             const store = await Store.findByPk(id);
-            // setStyles 會覆蓋舊的關聯，若要多選可用 addStyles
-            await store.setStyles([styleId]); 
+            const ids = Array.isArray(styleIds) ? styleIds : [styleIds];
+            // setStyles 會自動移除舊的並加入新的，達成「同步」效果
+            await store.setStyles(ids);
+        } else {
+            // 如果沒選任何分類，則清空關聯
+            const store = await Store.findByPk(id);
+            await store.setStyles([]);
         }
 
         res.json({ success: true });
@@ -217,10 +224,10 @@ app.post('/admin/update-shop', checkAuth, async (req, res) => {
     }
 });
 
-// ★ API: 建立新店家 - 修改版 (加入經緯度與分類)
+// ★ API: 建立新店家 (支援多重分類)
 app.post('/admin/create-shop', checkAuth, async (req, res) => {
-    const { name, rating, address, lat, lng, styleId } = req.body;
-    
+    const { name, rating, address, lat, lng, styleIds } = req.body;
+
     if (!name) return res.json({ success: false, message: '店名為必填' });
 
     try {
@@ -233,9 +240,10 @@ app.post('/admin/create-shop', checkAuth, async (req, res) => {
             longitude: lng || 0
         });
 
-        // 2. 建立分類關聯
-        if (styleId) {
-            await newStore.addStyle(styleId);
+        // 2. 建立多重分類關聯
+        if (styleIds) {
+            const ids = Array.isArray(styleIds) ? styleIds : [styleIds];
+            await newStore.addStyles(ids);
         }
 
         res.json({ success: true });
