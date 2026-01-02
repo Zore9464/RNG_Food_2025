@@ -16,48 +16,48 @@ window.selectTheme = selectTheme;
 // === 2. 全域變數 & 主題設定 ===
 // ★ 修改：加入 surface (視窗背景) 與 border (邊框) 設定，讓視窗也能換膚
 const THEMES = [
-  { 
-      id: 'default', 
-      bg: 'bg-black', text: 'text-white', 
-      btn: 'bg-white text-black',
-      surface: 'bg-white/10', border: 'border-white/20' 
-  },
-  { 
-      id: 'light', 
-      bg: 'bg-zinc-50', text: 'text-zinc-900', 
-      btn: 'bg-zinc-900 text-white',
-      surface: 'bg-white', border: 'border-zinc-300' 
-  },
-  { 
-      id: 'midnight', 
-      bg: 'bg-slate-950', text: 'text-slate-100', 
-      btn: 'bg-blue-600 text-white',
-      surface: 'bg-slate-900/80', border: 'border-slate-800'
-  },
-  { 
-      id: 'forest', 
-      bg: 'bg-emerald-950', text: 'text-emerald-50', 
-      btn: 'bg-emerald-600 text-white',
-      surface: 'bg-emerald-900/60', border: 'border-emerald-800'
-  },
-  { 
-      id: 'ocean', 
-      bg: 'bg-cyan-950', text: 'text-cyan-50', 
-      btn: 'bg-cyan-600 text-white',
-      surface: 'bg-cyan-900/60', border: 'border-cyan-800'
-  },
-  { 
-      id: 'sunset', 
-      bg: 'bg-orange-950', text: 'text-orange-50', 
-      btn: 'bg-orange-600 text-white',
-      surface: 'bg-orange-900/60', border: 'border-orange-800'
-  },
-  { 
-      id: 'lavender', 
-      bg: 'bg-purple-950', text: 'text-purple-50', 
-      btn: 'bg-purple-600 text-white',
-      surface: 'bg-purple-900/60', border: 'border-purple-800'
-  }
+    {
+        id: 'default',
+        bg: 'bg-black', text: 'text-white',
+        btn: 'bg-white text-black',
+        surface: 'bg-white/10', border: 'border-white/20'
+    },
+    {
+        id: 'light',
+        bg: 'bg-zinc-50', text: 'text-zinc-900',
+        btn: 'bg-zinc-900 text-white',
+        surface: 'bg-white', border: 'border-zinc-300'
+    },
+    {
+        id: 'midnight',
+        bg: 'bg-slate-950', text: 'text-slate-100',
+        btn: 'bg-blue-600 text-white',
+        surface: 'bg-slate-900/80', border: 'border-slate-800'
+    },
+    {
+        id: 'forest',
+        bg: 'bg-emerald-950', text: 'text-emerald-50',
+        btn: 'bg-emerald-600 text-white',
+        surface: 'bg-emerald-900/60', border: 'border-emerald-800'
+    },
+    {
+        id: 'ocean',
+        bg: 'bg-cyan-950', text: 'text-cyan-50',
+        btn: 'bg-cyan-600 text-white',
+        surface: 'bg-cyan-900/60', border: 'border-cyan-800'
+    },
+    {
+        id: 'sunset',
+        bg: 'bg-orange-950', text: 'text-orange-50',
+        btn: 'bg-orange-600 text-white',
+        surface: 'bg-orange-900/60', border: 'border-orange-800'
+    },
+    {
+        id: 'lavender',
+        bg: 'bg-purple-950', text: 'text-purple-50',
+        btn: 'bg-purple-600 text-white',
+        surface: 'bg-purple-900/60', border: 'border-purple-800'
+    }
 ];
 
 let filterState = { time: 'all', category: 'all' };
@@ -68,20 +68,20 @@ let mapMarkers = {};
 // === 3. 初始化 ===
 document.addEventListener('DOMContentLoaded', () => {
     loadTheme();
-    
-    if(document.getElementById('rng-btn')) {
+
+    if (document.getElementById('rng-btn')) {
         renderHistory();
         fetchAiTip();
         initHomeLoader();
     }
-    
-    if(document.getElementById('map') || document.getElementById('view-table')) {
+
+    if (document.getElementById('map') || document.getElementById('view-table')) {
         initMap();
         setStoreCategory('all');
     }
 
     const welcomeScreen = document.getElementById('welcome-screen');
-    if(welcomeScreen) {
+    if (welcomeScreen) {
         setTimeout(() => welcomeScreen.classList.replace('opacity-0', 'opacity-100'), 100);
     }
 });
@@ -104,8 +104,8 @@ function selectTheme(id) {
 
 function applyTheme(theme) {
     const body = document.getElementById('app-body');
-    if(!body) return;
-    
+    if (!body) return;
+
     // 1. 處理 Body 背景與文字顏色
     THEMES.forEach(t => body.classList.remove(...t.bg.split(' '), ...t.text.split(' ')));
     body.classList.add(...theme.bg.split(' '), ...theme.text.split(' '));
@@ -113,8 +113,8 @@ function applyTheme(theme) {
     // 2. 處理登入按鈕顏色 (id="login-btn")
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
-        THEMES.forEach(t => { if(t.btn) loginBtn.classList.remove(...t.btn.split(' ')); });
-        if(theme.btn) loginBtn.classList.add(...theme.btn.split(' '));
+        THEMES.forEach(t => { if (t.btn) loginBtn.classList.remove(...t.btn.split(' ')); });
+        if (theme.btn) loginBtn.classList.add(...theme.btn.split(' '));
     }
 
     // 3. ★ 新增：處理彈跳視窗與卡片顏色 (class="theme-surface")
@@ -122,13 +122,13 @@ function applyTheme(theme) {
     document.querySelectorAll('.theme-surface').forEach(el => {
         // 移除舊樣式
         THEMES.forEach(t => {
-            if(t.surface) el.classList.remove(...t.surface.split(' '));
-            if(t.border) el.classList.remove(...t.border.split(' '));
+            if (t.surface) el.classList.remove(...t.surface.split(' '));
+            if (t.border) el.classList.remove(...t.border.split(' '));
         });
         // 加入新樣式
-        if(theme.surface) el.classList.add(...theme.surface.split(' '));
-        if(theme.border) el.classList.add(...theme.border.split(' '));
-        
+        if (theme.surface) el.classList.add(...theme.surface.split(' '));
+        if (theme.border) el.classList.add(...theme.border.split(' '));
+
         // 如果是亮色主題，確保視窗內的文字顏色也正確跟隨 Body
         // 因為 modal 內容通常會繼承 body 的文字顏色，但如果 surface 顏色特殊，可以這裡強制加 text class
         // 目前我們先依賴繼承 (因為 body 已經設了 text color)
@@ -139,40 +139,40 @@ function applyTheme(theme) {
 function startRNG(instant = false) {
     const foods = window.FOOD_DATA || [];
     const validFoods = foods.filter(f => {
-        const fTime = Array.isArray(f.time) ? f.time : []; 
+        const fTime = Array.isArray(f.time) ? f.time : [];
         const tMatch = filterState.time === 'all' || fTime.includes(filterState.time);
-        const cMatch = filterState.category === 'all' || 
-                       (f.styles && f.styles.some(s => s.id == filterState.category));
+        const cMatch = filterState.category === 'all' ||
+            (f.styles && f.styles.some(s => s.id == filterState.category));
         return tMatch && cMatch;
     });
 
-    if(validFoods.length === 0) { 
-        alert(`沒有符合條件的店家！請嘗試切換條件試試看。`); 
-        return; 
+    if (validFoods.length === 0) {
+        alert(`沒有符合條件的店家！請嘗試切換條件試試看。`);
+        return;
     }
 
     const btn = document.getElementById('rng-btn');
     const txt = document.getElementById('rng-btn-text');
     const controls = document.getElementById('controls-area');
     const anim = document.getElementById('rerolling-anim');
-    
-    if(!instant) {
-        if(btn) btn.disabled = true;
-        if(controls && anim) {
+
+    if (!instant) {
+        if (btn) btn.disabled = true;
+        if (controls && anim) {
             controls.classList.add('hidden');
             anim.classList.remove('hidden');
             anim.classList.add('flex');
-        } else if(txt) txt.textContent = "抽選中...";
-        
+        } else if (txt) txt.textContent = "抽選中...";
+
         setTimeout(() => {
             const picked = validFoods[Math.floor(Math.random() * validFoods.length)];
-            if(controls && anim) {
+            if (controls && anim) {
                 anim.classList.add('hidden');
                 anim.classList.remove('flex');
                 controls.classList.remove('hidden');
             }
-            if(btn) btn.disabled = false;
-            if(txt) txt.textContent = "開始隨機抽選";
+            if (btn) btn.disabled = false;
+            if (txt) txt.textContent = "開始隨機抽選";
             showResult(picked);
         }, 1500);
     } else {
@@ -182,15 +182,44 @@ function startRNG(instant = false) {
 }
 
 function showResult(food) {
+    // 1. 顯示文字分數
+    const ratingText = document.getElementById('res-rating-text');
+    if(ratingText) {
+        const scoreVal = food.score || 0;
+        ratingText.textContent = `綜合評分：${scoreVal} / 5.0`;
+    }
+
+    // 2. 填入店家資訊
     document.getElementById('res-name').textContent = food.name;
     document.getElementById('res-loc').textContent = food.location;
     document.getElementById('res-price').textContent = food.price;
+    
+    // 3. 顯示星星 (改用文字符號，保證能顯示！)
     const starContainer = document.getElementById('res-stars');
+    
     if(starContainer) {
-        starContainer.innerHTML = Array.from({length: 5}).map((_, i) => 
-            `<span class="material-symbols-rounded text-2xl">${i < food.stars ? 'star' : 'star_outline'}</span>`
-        ).join('');
+        const score = Number(food.score) || 0; 
+
+        starContainer.innerHTML = Array.from({length: 5}).map((_, i) => {
+            const diff = score - i;
+            let icon = '☆'; // 預設：空心星星 (文字)
+
+            if (diff >= 1) {
+                icon = '★'; // 滿分：實心星星 (文字)
+            } else if (diff >= 0.5) {
+                // 如果想要半星，文字符號比較難完美呈現，
+                // 為了排版整齊，這裡我們讓它顯示實心，或者您可以維持空心
+                // 這裡建議：超過 0.5 就給它一顆星，看起來比較大方
+                icon = '★'; 
+            }
+            
+            // 注意：這裡拿掉了 class="material-symbols-rounded"
+            // 改成 text-2xl 讓星星大一點
+            return `<span class="text-3xl">${icon}</span>`;
+        }).join('');
     }
+
+    // 4. 更新回饋區塊
     const feedbackArea = document.getElementById('result-feedback-area');
     if(feedbackArea) {
         feedbackArea.innerHTML = `
@@ -206,6 +235,7 @@ function showResult(food) {
                 </div>
             </div>`;
     }
+    
     toggleModal('result-modal');
     currentResult = food;
     saveStats(food);
@@ -214,7 +244,7 @@ function showResult(food) {
 
 function setFilter(type, val) {
     filterState[type] = val;
-    if(type === 'time') {
+    if (type === 'time') {
         document.querySelectorAll('.filter-btn-time').forEach(btn => {
             const active = btn.dataset.val === val;
             btn.className = `filter-btn-time px-4 py-2 rounded-full text-sm transition-all border ${active ? 'bg-white text-black border-white' : 'border-white/10 hover:border-white/30'}`;
@@ -224,14 +254,14 @@ function setFilter(type, val) {
 
 function initHomeLoader() {
     const loader = document.getElementById('home-loader');
-    if(loader && !sessionStorage.getItem('visited')) {
+    if (loader && !sessionStorage.getItem('visited')) {
         setTimeout(() => {
             loader.classList.add('opacity-0');
             loader.style.pointerEvents = 'none';
             setTimeout(() => loader.style.display = 'none', 1000);
             sessionStorage.setItem('visited', 'true');
         }, 1500);
-    } else if(loader) {
+    } else if (loader) {
         loader.style.display = 'none';
         loader.style.pointerEvents = 'none';
     }
@@ -239,9 +269,9 @@ function initHomeLoader() {
 
 function renderHistory() {
     const list = document.getElementById('history-list');
-    if(!list) return;
+    if (!list) return;
     const history = JSON.parse(localStorage.getItem('foodHistory')) || [];
-    if(history.length === 0) {
+    if (history.length === 0) {
         list.innerHTML = '<div class="col-span-full text-center py-20 glass rounded-[2rem] opacity-30 italic font-light">尚無任何搜尋記錄</div>';
     } else {
         list.innerHTML = history.slice(0, 4).map(h => `
@@ -273,14 +303,14 @@ function saveHistory(food) {
     const saved = localStorage.getItem('foodHistory');
     let history = saved ? JSON.parse(saved) : [];
     history.unshift(food);
-    if(history.length > 20) history.pop();
+    if (history.length > 20) history.pop();
     localStorage.setItem('foodHistory', JSON.stringify(history));
     renderHistory();
 }
 
 function setStoreCategory(id) {
     const searchInput = document.getElementById('store-search');
-    if(searchInput) searchInput.dataset.cat = id;
+    if (searchInput) searchInput.dataset.cat = id;
     document.querySelectorAll('.store-cat-btn').forEach(btn => {
         const active = btn.dataset.id === id;
         btn.className = `store-cat-btn px-3 py-1.5 rounded-lg text-3sm font-bold tracking-[0.1em] uppercase transition-all border ${active ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-white/5 border-white/5 opacity-50'}`;
@@ -290,7 +320,7 @@ function setStoreCategory(id) {
 
 function filterStores() {
     const input = document.getElementById('store-search');
-    if(!input) return;
+    if (!input) return;
     const term = input.value.toLowerCase();
     const cat = input.dataset.cat || 'all';
     const foods = window.FOOD_DATA || [];
@@ -301,7 +331,7 @@ function filterStores() {
     });
 
     const sidebar = document.getElementById('store-list-sidebar');
-    if(sidebar) {
+    if (sidebar) {
         sidebar.innerHTML = filtered.map(f => `
             <div onclick="panToStore('${f.id}')" class="p-5 rounded-2xl cursor-pointer border transition-all bg-white/5 border-white/5 hover:border-white/20 mb-3">
                 <div class="flex justify-between items-start mb-2">
@@ -313,9 +343,9 @@ function filterStores() {
                 </div>
             </div>`).join('') || '<div class="text-center py-20 opacity-30 text-sm italic">尚無店家數據</div>';
     }
-    
+
     const tbody = document.getElementById('store-table-body');
-    if(tbody) {
+    if (tbody) {
         tbody.innerHTML = filtered.map(f => `
             <tr class="hover:bg-white/[0.02] transition-colors group">
                 <td class="px-8 py-6"><div class="font-medium group-hover:text-blue-400 transition-colors">${f.name}</div></td>
@@ -332,12 +362,12 @@ function filterStores() {
 }
 
 function initMap() {
-    if(typeof L === 'undefined' || !document.getElementById('map')) return;
+    if (typeof L === 'undefined' || !document.getElementById('map')) return;
     mapInstance = L.map('map', { zoomControl: false }).setView([24.9959, 121.4527], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
     const foods = window.FOOD_DATA || [];
     foods.forEach(f => {
-        if(f.lat && f.lng) {
+        if (f.lat && f.lng) {
             const m = L.marker([f.lat, f.lng]).bindPopup(`<b>${f.name}</b><br>${f.location}`).addTo(mapInstance);
             mapMarkers[f.id] = m;
         }
@@ -346,9 +376,9 @@ function initMap() {
 
 function panToStore(id) {
     const f = (window.FOOD_DATA || []).find(x => x.id === id);
-    if(f && mapInstance) {
+    if (f && mapInstance) {
         mapInstance.flyTo([f.lat, f.lng], 18);
-        if(mapMarkers[id]) mapMarkers[id].openPopup();
+        if (mapMarkers[id]) mapMarkers[id].openPopup();
     }
 }
 
@@ -357,12 +387,12 @@ function setStoreView(mode) {
     const tableDiv = document.getElementById('view-table');
     const btnMap = document.getElementById('btn-view-map');
     const btnTable = document.getElementById('btn-view-table');
-    if(mode === 'map') {
+    if (mode === 'map') {
         mapDiv.classList.remove('hidden'); mapDiv.classList.add('flex');
         tableDiv.classList.add('hidden');
         btnMap.className = "flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold tracking-widest transition-all bg-white text-black";
         btnTable.className = "flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold tracking-widest transition-all opacity-40 hover:opacity-100";
-        if(mapInstance) setTimeout(() => mapInstance.invalidateSize(), 100);
+        if (mapInstance) setTimeout(() => mapInstance.invalidateSize(), 100);
     } else {
         mapDiv.classList.add('hidden'); mapDiv.classList.remove('flex');
         tableDiv.classList.remove('hidden');
@@ -373,15 +403,15 @@ function setStoreView(mode) {
 
 function toggleModal(id) {
     const el = document.getElementById(id);
-    if(!el) return;
-    if(el.classList.contains('hidden')) {
+    if (!el) return;
+    if (el.classList.contains('hidden')) {
         el.classList.remove('hidden');
         el.classList.add('flex');
-        if(id === 'dashboard-modal') updateDashboardUI();
-        if(id === 'settings-modal') {
-             const savedId = localStorage.getItem('rng_theme') || 'default';
-             const select = document.getElementById('theme-select');
-             if(select) select.value = savedId;
+        if (id === 'dashboard-modal') updateDashboardUI();
+        if (id === 'settings-modal') {
+            const savedId = localStorage.getItem('rng_theme') || 'default';
+            const select = document.getElementById('theme-select');
+            if (select) select.value = savedId;
         }
     } else {
         el.classList.add('hidden');
@@ -393,8 +423,8 @@ function updateDashboardUI() {
     const saved = localStorage.getItem('decisionStats');
     const stats = saved ? JSON.parse(saved) : { totalDecisions: 0, categories: {} };
     document.getElementById('stat-decisions').textContent = stats.totalDecisions;
-    document.getElementById('stat-avg').textContent = '0.0s'; 
-    document.getElementById('stat-categories').innerHTML = Object.entries(stats.categories).map(([k,v]) => `
+    document.getElementById('stat-avg').textContent = '0.0s';
+    document.getElementById('stat-categories').innerHTML = Object.entries(stats.categories).map(([k, v]) => `
         <div class="p-4 rounded-2xl bg-white/5 flex justify-between items-center mb-2">
             <span class="text-sm capitalize font-light">${k}</span><span class="text-xs opacity-40">${v} 次</span>
         </div>`).join('') || '<p class="text-center opacity-30 text-xs">無數據</p>';
@@ -402,12 +432,12 @@ function updateDashboardUI() {
 
 async function fetchAiTip() {
     const el = document.getElementById('ai-tip');
-    if(!el) return;
+    if (!el) return;
     try {
         const res = await fetch('/api/ai-suggestion', { method: 'POST' });
         const data = await res.json();
         el.textContent = data.text;
-    } catch(e) { el.textContent = "AI 正在休息中..."; }
+    } catch (e) { el.textContent = "AI 正在休息中..."; }
 }
 
 function handleLogin(e) {

@@ -83,10 +83,11 @@ async function getFoodsFromDB() {
                 id: store.store_id.toString(),
                 name: store.Name,
                 rating: `評分 ${store.rating}，${styleNames[0] || '在地'}推薦`,
+                score: store.rating,
                 description: description,
                 location: store.address,
                 price: "價格詳見菜單",
-                stars: Math.round(store.rating || 4),
+                stars: Math.round(store.rating || 4), // 這是四捨五入的整數
                 category: category,
                 time: time,
                 tags: [...tags, ...styleNames],
