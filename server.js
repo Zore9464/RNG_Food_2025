@@ -69,14 +69,17 @@ async function getFoodsFromDB() {
 
             if (styleNames.includes('早餐')) time.push('早餐');
             if (styleNames.includes('午餐')) time.push('午餐');
-            if (styleNames.includes('晚餐') || styleNames.includes('宵夜')) time.push('晚餐');
+           // ★ 修改處：將晚餐與宵夜分開判斷
+            if (styleNames.includes('晚餐')) time.push('晚餐');
+            if (styleNames.includes('宵夜')) time.push('宵夜'); // 獨立加入宵夜
+
             if (time.length === 0) time = ['午餐', '晚餐'];
 
             if (styleNames.some(s => ['麵食', '日式'].includes(s))) category = 'noodle';
             else if (styleNames.some(s => ['飯食', '便當', '中式', '韓式', '丼飯'].includes(s))) category = 'rice';
             else if (styleNames.some(s => ['異國料理', '餐酒館', '速食', '義式'].includes(s))) category = 'western';
             else if (styleNames.some(s => ['早餐', '小吃', '飲品', '健康餐盒'].includes(s))) category = 'light';
-
+            else if (styleNames.some(s => ['甜點', '蛋糕', '下午茶', '冰品', '咖啡', '豆花'].includes(s))) category = 'dessert';
             const description = styleNames.length > 0 ? `提供${styleNames.slice(0, 3).join('、')}等美味選擇。` : "亞東科大周邊人氣美食。";
 
             return {
