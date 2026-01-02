@@ -182,15 +182,44 @@ function startRNG(instant = false) {
 }
 
 function showResult(food) {
+    // 1. 顯示文字分數
+    const ratingText = document.getElementById('res-rating-text');
+    if(ratingText) {
+        const scoreVal = food.score || 0;
+        ratingText.textContent = `綜合評分：${scoreVal} / 5.0`;
+    }
+
+    // 2. 填入店家資訊
     document.getElementById('res-name').textContent = food.name;
     document.getElementById('res-loc').textContent = food.location;
     document.getElementById('res-price').textContent = food.price;
+    
+    // 3. 顯示星星 (改用文字符號，保證能顯示！)
     const starContainer = document.getElementById('res-stars');
+    
     if(starContainer) {
-        starContainer.innerHTML = Array.from({length: 5}).map((_, i) => 
-            `<span class="material-symbols-rounded text-2xl">${i < food.stars ? 'star' : 'star_outline'}</span>`
-        ).join('');
+        const score = Number(food.score) || 0; 
+
+        starContainer.innerHTML = Array.from({length: 5}).map((_, i) => {
+            const diff = score - i;
+            let icon = '☆'; // 預設：空心星星 (文字)
+
+            if (diff >= 1) {
+                icon = '★'; // 滿分：實心星星 (文字)
+            } else if (diff >= 0.5) {
+                // 如果想要半星，文字符號比較難完美呈現，
+                // 為了排版整齊，這裡我們讓它顯示實心，或者您可以維持空心
+                // 這裡建議：超過 0.5 就給它一顆星，看起來比較大方
+                icon = '★'; 
+            }
+            
+            // 注意：這裡拿掉了 class="material-symbols-rounded"
+            // 改成 text-3xl 讓星星大一點
+            return `<span class="text-3xl">${icon}</span>`;
+        }).join('');
     }
+
+    // 4. 更新回饋區塊
     const feedbackArea = document.getElementById('result-feedback-area');
     if(feedbackArea) {
         feedbackArea.innerHTML = `
@@ -206,6 +235,7 @@ function showResult(food) {
                 </div>
             </div>`;
     }
+    
     toggleModal('result-modal');
     currentResult = food;
     saveStats(food);

@@ -33,9 +33,9 @@ const THEMES = [
 ];
 
 const TEAM = [
-    { id: 1, name: "林品承", studentId: "112111113", role: "前端開發、UI設計師", description: "專注於極簡主義介面與流暢互動體驗。" },
-    { id: 2, name: "林劭瑋", studentId: "112111125", role: "前端開發、UI設計師", description: "擅長視覺平衡與色彩心理學應用。" },
-    { id: 3, name: "呂佩衫", studentId: "11211121", role: "後端開發、UI設計師", description: "致力於資料流優化與後端架構穩定性。" }
+     { id: 1, name: "林品承", studentId: "112111113", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
+    { id: 2, name: "林劭瑋", studentId: "112111125", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
+    { id: 3, name: "呂佩衫", studentId: "112111121", role: "後端/資料庫架設", description: "負責 MYSQL 資料庫的建立與後端網頁的連接" }
 ];
 
 // ★ 新增：管理者帳號設定 (三個帳號)
@@ -86,6 +86,7 @@ async function getFoodsFromDB() {
                 description: description,
                 location: store.address,
                 price: "價格詳見菜單",
+                score: store.rating,
                 stars: Math.round(store.rating || 4),
                 category: category,
                 time: time,

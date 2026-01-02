@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <%- include('partials/header') %>
-<body id="app-body" class="bg-black text-white m-0 p-0 overflow-x-hidden transition-colors duration-500 font-sans min-h-screen">
+
+  <body id="app-body"
+    class="bg-black text-white m-0 p-0 overflow-x-hidden transition-colors duration-500 font-sans min-h-screen">
     <%- include('partials/navbar') %>
-    <main class="pt-20">
+      <main class="pt-20">
         <div class="max-w-5xl mx-auto px-6 py-12 space-y-24">
           <section class="text-center space-y-6">
             <h1 class="text-6xl md:text-8xl font-light tracking-tighter">ABOUT US.</h1>
@@ -23,8 +25,12 @@
                 <p>透過 AEUST RNG，我們將決策過程遊戲化。結合 AI 建議與地理位置，讓每一次用餐都變成一場未知的探索。</p>
               </div>
             </div>
-            <div class="aspect-square glass rounded-[3rem] flex items-center justify-center p-12">
-              <span class="material-symbols-rounded text-[120px] opacity-10 animate-pulse">explore</span>
+             <div class="aspect-square glass rounded-[3rem] flex items-center justify-center p-4 md:p-8 overflow-hidden">
+              <img 
+                src="/img/AEUST.jpg" 
+                alt="亞東科技大學校園" 
+                class="w-full h-full object-cover rounded-[2.5rem] hover:scale-110 transition-transform duration-500" 
+              />
             </div>
           </section>
 
@@ -35,20 +41,29 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <% team.forEach(member => { %>
-                <div class="glass p-10 rounded-[2.5rem] border border-white/5 hover:border-white/20 transition-all group flex flex-col items-center text-center">
-                  <div class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <% team.forEach(member=> { %>
+                <div
+                  class="glass p-10 rounded-[2.5rem] border border-white/5 hover:border-white/20 transition-all group flex flex-col items-center text-center">
+                  <div
+                    class="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <span class="material-symbols-rounded text-4xl opacity-50">person</span>
                   </div>
-                  <h3 class="text-2xl font-light mb-1"><%= member.name %></h3>
-                  <div class="text-sm text-blue-400 font-medium tracking-widest uppercase mb-4"><%= member.role %></div>
-                  <p class="text-sm opacity-50 font-light leading-relaxed mb-8"><%= member.description %></p>
+                  <h3 class="text-2xl font-light mb-1">
+                    <%= member.name %>
+                  </h3>
+                  <div class="text-sm text-blue-400 font-medium tracking-widest uppercase mb-4">
+                    <%= member.role %>
+                  </div>
+                  <p class="text-sm opacity-50 font-light leading-relaxed mb-8">
+                    <%= member.description %>
+                  </p>
                 </div>
-              <% }); %>
+                <% }); %>
             </div>
           </section>
         </div>
-    </main>
-    <%- include('partials/modals') %>
-</body>
+      </main>
+      <%- include('partials/modals') %>
+  </body>
+
 </html>
