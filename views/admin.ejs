@@ -9,18 +9,21 @@
                 Admin: <%= user %>
             </span>
         </div>
-        <a href="/logout" class="bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded text-sm font-bold transition">登出</a>
+        <div class="flex gap-4">
+            <a href="/stores" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-sm font-bold transition">查看前台地圖</a>
+            <a href="/logout" class="bg-red-500/80 hover:bg-red-600 px-4 py-2 rounded text-sm font-bold transition">登出</a>
+        </div>
     </nav>
 
     <main class="p-10 container mx-auto">
         <header class="mb-8 flex justify-between items-end">
             <div>
-                <h2 class="text-3xl font-light mb-2">店家資料管理</h2>
-                <p class="text-white/40 text-sm">直接點擊表格內容即可編輯，修改後請點擊「儲存」。</p>
+                <h2 class="text-3xl font-light mb-2">店家資料庫</h2>
+                <p class="text-white/40 text-sm">直接點擊文字編輯，分類可多選 (捲動選擇)，修改後點擊「儲存」。</p>
             </div>
             <button onclick="openAddModal()" 
                     class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold tracking-wider shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
-                <span class="material-symbols-rounded">add</span> 新增店家
+                <span class="material-symbols-rounded">add_location</span> 新增店家
             </button>
         </header>
         
@@ -29,10 +32,12 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-white/5 border-b border-white/10 text-xs uppercase tracking-widest text-white/50">
-                            <th class="p-4">ID</th>
-                            <th class="p-4">店名 (Name)</th>
-                            <th class="p-4">評分 (Rating)</th>
-                            <th class="p-4">地址 (Address)</th>
+                            <th class="p-4 w-16">ID</th>
+                            <th class="p-4 w-48">店名</th>
+                            <th class="p-4 w-20">評分</th>
+                            <th class="p-4 w-48">分類 (多選)</th> <th class="p-4 w-64">地址</th>
+                            <th class="p-4 w-24">緯度</th>
+                            <th class="p-4 w-24">經度</th>
                             <th class="p-4 w-32">操作</th>
                         </tr>
                     </thead>
@@ -41,20 +46,33 @@
                         <tr class="hover:bg-white/5 transition group">
                             <td class="p-4 font-mono opacity-50"><%= shop.store_id %></td>
                             
-                            <td class="p-4 outline-none focus:bg-white/10 transition rounded" 
-                                contenteditable="true" id="name-<%= shop.store_id %>"><%= shop.Name %></td>
-                            
-                            <td class="p-4 outline-none focus:bg-white/10 transition rounded" 
-                                contenteditable="true" id="rating-<%= shop.store_id %>"><%= shop.rating %></td>
+                            <td class="p-4 outline-none focus:bg-white/10 rounded" contenteditable="true" id="name-<%= shop.store_id %>"><%= shop.Name %></td>
+                            <td class="p-4 outline-none focus:bg-white/10 rounded" contenteditable="true" id="rating-<%= shop.store_id %>"><%= shop.rating %></td>
 
-                            <td class="p-4 outline-none focus:bg-white/10 transition rounded text-sm opacity-80" 
-                                contenteditable="true" id="address-<%= shop.store_id %>"><%= shop.address %></td>
+                            <td class="p-4">
+                                <div id="styles-container-<%= shop.store_id %>" class="h-24 overflow-y-auto custom-scrollbar bg-black/30 border border-white/10 rounded p-2 space-y-1">
+                                    <% styles.forEach(s => { 
+                                        // 檢查這家店是否擁有這個分類
+                                        const isChecked = shop.Styles && shop.Styles.some(shopStyle => shopStyle.style_id === s.style_id);
+                                    %>
+                                        <label class="flex items-center gap-2 cursor-pointer hover:bg-white/5 p-1 rounded">
+                                            <input type="checkbox" 
+                                                   value="<%= s.style_id %>" 
+                                                   class="style-checkbox-<%= shop.store_id %> accent-blue-500"
+                                                   <%= isChecked ? 'checked' : '' %>>
+                                            <span class="text-xs text-white/80"><%= s.style_name %></span>
+                                        </label>
+                                    <% }) %>
+                                </div>
+                            </td>
+
+                            <td class="p-4 outline-none focus:bg-white/10 rounded text-sm opacity-80" contenteditable="true" id="address-<%= shop.store_id %>"><%= shop.address %></td>
+                            <td class="p-4 outline-none focus:bg-white/10 rounded font-mono text-xs text-blue-300" contenteditable="true" id="lat-<%= shop.store_id %>"><%= shop.latitude %></td>
+                            <td class="p-4 outline-none focus:bg-white/10 rounded font-mono text-xs text-blue-300" contenteditable="true" id="lng-<%= shop.store_id %>"><%= shop.longitude %></td>
                             
                             <td class="p-4 flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="updateShop('<%= shop.store_id %>')" 
-                                        class="bg-blue-600/80 hover:bg-blue-500 px-3 py-1 rounded text-xs font-bold transition">儲存</button>
-                                <button onclick="deleteShop('<%= shop.store_id %>')" 
-                                        class="bg-red-600/80 hover:bg-red-500 px-3 py-1 rounded text-xs font-bold transition">刪除</button>
+                                <button onclick="updateShop('<%= shop.store_id %>')" class="bg-blue-600/80 hover:bg-blue-500 px-3 py-1 rounded text-xs font-bold transition">儲存</button>
+                                <button onclick="deleteShop('<%= shop.store_id %>')" class="bg-red-600/80 hover:bg-red-500 px-3 py-1 rounded text-xs font-bold transition">刪除</button>
                             </td>
                         </tr>
                         <% }) %>
@@ -64,24 +82,52 @@
         </div>
     </main>
 
-    <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[100] opacity-0 transition-opacity duration-300">
-        <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="add-modal-content">
+    <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-[100] opacity-0 transition-opacity duration-300">
+        <div class="bg-zinc-900 border border-white/10 p-8 rounded-3xl w-full max-w-lg shadow-2xl transform scale-95 transition-transform duration-300" id="add-modal-content">
             <h3 class="text-2xl font-bold mb-6 text-white">新增美食店家</h3>
             
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">店名 (Name)</label>
-                    <input type="text" id="new-name" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none transition" placeholder="例如：亞東蔥抓餅">
-                </div>
-                
-                <div>
-                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">評分 (Rating)</label>
-                    <input type="number" step="0.1" id="new-rating" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none transition" placeholder="例如：4.5">
+            <div class="space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">店名 *</label>
+                        <input type="text" id="new-name" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none" placeholder="店家名稱">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">評分</label>
+                        <input type="number" step="0.1" id="new-rating" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none" value="4.0">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">地址 (Address)</label>
-                    <input type="text" id="new-address" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none transition" placeholder="例如：新北市板橋區...">
+                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">分類 (可多選)</label>
+                    <div class="w-full bg-white/5 border border-white/10 rounded-lg p-3 grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                        <% styles.forEach(s => { %>
+                            <label class="flex items-center gap-2 cursor-pointer hover:bg-white/5 p-1 rounded">
+                                <input type="checkbox" name="new-style-checkbox" value="<%= s.style_id %>" class="accent-emerald-500">
+                                <span class="text-sm text-white"><%= s.style_name %></span>
+                            </label>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">地址</label>
+                    <input type="text" id="new-address" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-emerald-500 outline-none" placeholder="完整地址">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div class="col-span-2 text-xs text-emerald-400 mb-1 flex items-center gap-1">
+                        <span class="material-symbols-rounded text-sm">map</span> 地圖座標設定
+                        <a href="https://www.google.com/maps" target="_blank" class="underline opacity-50 hover:opacity-100 ml-auto">去 Google Maps 找座標 ↗</a>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">緯度 (Lat)</label>
+                        <input type="number" step="0.000001" id="new-lat" class="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white font-mono focus:border-emerald-500 outline-none" placeholder="24.99...">
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-white/50 mb-1">經度 (Lng)</label>
+                        <input type="number" step="0.000001" id="new-lng" class="w-full bg-black/30 border border-white/10 rounded-lg p-2 text-white font-mono focus:border-emerald-500 outline-none" placeholder="121.45...">
+                    </div>
                 </div>
             </div>
 
@@ -93,40 +139,41 @@
     </div>
 
     <script>
-        // === Modal 控制邏輯 ===
         const modal = document.getElementById('add-modal');
         const modalContent = document.getElementById('add-modal-content');
 
         function openAddModal() {
             modal.classList.remove('hidden');
-            // 小延遲讓 CSS transition 有淡入效果
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
+            setTimeout(() => { modal.classList.remove('opacity-0'); modalContent.classList.remove('scale-95'); modalContent.classList.add('scale-100'); }, 10);
         }
 
         function closeAddModal() {
-            modal.classList.add('opacity-0');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            setTimeout(() => {
+            modal.classList.add('opacity-0'); modalContent.classList.remove('scale-100'); modalContent.classList.add('scale-95');
+            setTimeout(() => { 
                 modal.classList.add('hidden');
-                // 清空輸入框
+                // 重置所有輸入框與checkbox
                 document.getElementById('new-name').value = '';
-                document.getElementById('new-rating').value = '';
+                document.getElementById('new-rating').value = '4.0';
                 document.getElementById('new-address').value = '';
+                document.getElementById('new-lat').value = '';
+                document.getElementById('new-lng').value = '';
+                document.querySelectorAll('input[name="new-style-checkbox"]').forEach(cb => cb.checked = false);
             }, 300);
         }
 
-        // === API 功能 ===
+        // === API 功能 (支援多選) ===
 
         // 1. 新增店家
         async function createShop() {
             const name = document.getElementById('new-name').value;
             const rating = document.getElementById('new-rating').value;
             const address = document.getElementById('new-address').value;
+            const lat = document.getElementById('new-lat').value;
+            const lng = document.getElementById('new-lng').value;
+            
+            // ★ 收集多選 Checkbox 的值
+            const checkboxes = document.querySelectorAll('input[name="new-style-checkbox"]:checked');
+            const styleIds = Array.from(checkboxes).map(cb => cb.value);
 
             if (!name) return alert('請輸入店名！');
 
@@ -134,13 +181,13 @@
                 const res = await fetch('/admin/create-shop', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ name, rating, address })
+                    body: JSON.stringify({ name, rating, address, lat, lng, styleIds })
                 });
 
                 const data = await res.json();
                 if (data.success) {
                     alert('新增成功！');
-                    location.reload(); // 重新整理頁面
+                    location.reload();
                 } else {
                     alert('新增失敗：' + data.message);
                 }
@@ -150,34 +197,36 @@
             }
         }
 
-        // 2. 儲存修改功能
+        // 2. 更新店家
         async function updateShop(id) {
             const name = document.getElementById(`name-${id}`).innerText.trim();
             const rating = document.getElementById(`rating-${id}`).innerText.trim();
             const address = document.getElementById(`address-${id}`).innerText.trim();
+            const lat = document.getElementById(`lat-${id}`).innerText.trim();
+            const lng = document.getElementById(`lng-${id}`).innerText.trim();
+            
+            // ★ 收集該店家 Checkbox 的值
+            const checkboxes = document.querySelectorAll(`.style-checkbox-${id}:checked`);
+            const styleIds = Array.from(checkboxes).map(cb => cb.value);
 
             try {
                 const res = await fetch('/admin/update-shop', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ id, name, rating, address })
+                    body: JSON.stringify({ id, name, rating, address, lat, lng, styleIds })
                 });
                 const data = await res.json();
-                if(data.success) {
-                    alert('更新成功！');
-                } else {
-                    alert('更新失敗');
-                }
+                if(data.success) alert('更新成功！資料已同步。');
+                else alert('更新失敗');
             } catch (error) {
                 console.error(error);
                 alert('系統錯誤');
             }
         }
 
-        // 3. 刪除功能
+        // 3. 刪除店家
         async function deleteShop(id) {
             if(!confirm('⚠️ 確定要刪除這筆資料嗎？此動作無法復原。')) return;
-            
             try {
                 const res = await fetch('/admin/delete-shop', {
                     method: 'POST',
@@ -188,7 +237,6 @@
                 if(data.success) location.reload();
                 else alert('刪除失敗');
             } catch (error) {
-                console.error(error);
                 alert('系統錯誤');
             }
         }

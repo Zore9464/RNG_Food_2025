@@ -1,3 +1,5 @@
+// public/js/main.js
+
 // === 1. 確保 HTML 可以呼叫這些函式 ===
 window.startRNG = startRNG;
 window.setFilter = setFilter;
@@ -11,12 +13,51 @@ window.filterStores = filterStores;
 window.panToStore = panToStore;
 window.selectTheme = selectTheme;
 
-// === 2. 全域變數 ===
+// === 2. 全域變數 & 主題設定 ===
+// ★ 修改：加入 surface (視窗背景) 與 border (邊框) 設定，讓視窗也能換膚
 const THEMES = [
-  { id: 'default', bg: 'bg-black', text: 'text-white' },
-  { id: 'light', bg: 'bg-zinc-50', text: 'text-zinc-900' },
-  { id: 'midnight', bg: 'bg-slate-950', text: 'text-slate-100' },
-  { id: 'forest', bg: 'bg-emerald-950', text: 'text-emerald-50' }
+  { 
+      id: 'default', 
+      bg: 'bg-black', text: 'text-white', 
+      btn: 'bg-white text-black',
+      surface: 'bg-white/10', border: 'border-white/20' 
+  },
+  { 
+      id: 'light', 
+      bg: 'bg-zinc-50', text: 'text-zinc-900', 
+      btn: 'bg-zinc-900 text-white',
+      surface: 'bg-white', border: 'border-zinc-300' 
+  },
+  { 
+      id: 'midnight', 
+      bg: 'bg-slate-950', text: 'text-slate-100', 
+      btn: 'bg-blue-600 text-white',
+      surface: 'bg-slate-900/80', border: 'border-slate-800'
+  },
+  { 
+      id: 'forest', 
+      bg: 'bg-emerald-950', text: 'text-emerald-50', 
+      btn: 'bg-emerald-600 text-white',
+      surface: 'bg-emerald-900/60', border: 'border-emerald-800'
+  },
+  { 
+      id: 'ocean', 
+      bg: 'bg-cyan-950', text: 'text-cyan-50', 
+      btn: 'bg-cyan-600 text-white',
+      surface: 'bg-cyan-900/60', border: 'border-cyan-800'
+  },
+  { 
+      id: 'sunset', 
+      bg: 'bg-orange-950', text: 'text-orange-50', 
+      btn: 'bg-orange-600 text-white',
+      surface: 'bg-orange-900/60', border: 'border-orange-800'
+  },
+  { 
+      id: 'lavender', 
+      bg: 'bg-purple-950', text: 'text-purple-50', 
+      btn: 'bg-purple-600 text-white',
+      surface: 'bg-purple-900/60', border: 'border-purple-800'
+  }
 ];
 
 let filterState = { time: 'all', category: 'all' };
@@ -28,57 +69,88 @@ let mapMarkers = {};
 document.addEventListener('DOMContentLoaded', () => {
     loadTheme();
     
-    // 首頁初始化
     if(document.getElementById('rng-btn')) {
         renderHistory();
         fetchAiTip();
         initHomeLoader();
     }
     
-    // 店家頁初始化
     if(document.getElementById('map') || document.getElementById('view-table')) {
         initMap();
         setStoreCategory('all');
     }
 
-    // 歡迎頁動畫
     const welcomeScreen = document.getElementById('welcome-screen');
     if(welcomeScreen) {
         setTimeout(() => welcomeScreen.classList.replace('opacity-0', 'opacity-100'), 100);
     }
 });
 
-// === 4. 核心功能：隨機抽選 (含詳細除錯) ===
-function startRNG(instant = false) {
-    // 1. 取得資料
-    const foods = window.FOOD_DATA || [];
-    
-    console.log("=== 開始篩選 ===");
-    console.log("目前篩選條件:", filterState);
+// === 4. 主題切換邏輯 (完整版) ===
 
-    // 2. 執行篩選
+function loadTheme() {
+    const savedId = localStorage.getItem('rng_theme') || 'default';
+    selectTheme(savedId);
+}
+
+function selectTheme(id) {
+    const theme = THEMES.find(t => t.id === id) || THEMES[0];
+    localStorage.setItem('rng_theme', id);
+    applyTheme(theme);
+
+    const select = document.getElementById('theme-select');
+    if (select) select.value = theme.id;
+}
+
+function applyTheme(theme) {
+    const body = document.getElementById('app-body');
+    if(!body) return;
+    
+    // 1. 處理 Body 背景與文字顏色
+    THEMES.forEach(t => body.classList.remove(...t.bg.split(' '), ...t.text.split(' ')));
+    body.classList.add(...theme.bg.split(' '), ...theme.text.split(' '));
+
+    // 2. 處理登入按鈕顏色 (id="login-btn")
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        THEMES.forEach(t => { if(t.btn) loginBtn.classList.remove(...t.btn.split(' ')); });
+        if(theme.btn) loginBtn.classList.add(...theme.btn.split(' '));
+    }
+
+    // 3. ★ 新增：處理彈跳視窗與卡片顏色 (class="theme-surface")
+    // 這會改變 modal 的背景色與邊框
+    document.querySelectorAll('.theme-surface').forEach(el => {
+        // 移除舊樣式
+        THEMES.forEach(t => {
+            if(t.surface) el.classList.remove(...t.surface.split(' '));
+            if(t.border) el.classList.remove(...t.border.split(' '));
+        });
+        // 加入新樣式
+        if(theme.surface) el.classList.add(...theme.surface.split(' '));
+        if(theme.border) el.classList.add(...theme.border.split(' '));
+        
+        // 如果是亮色主題，確保視窗內的文字顏色也正確跟隨 Body
+        // 因為 modal 內容通常會繼承 body 的文字顏色，但如果 surface 顏色特殊，可以這裡強制加 text class
+        // 目前我們先依賴繼承 (因為 body 已經設了 text color)
+    });
+}
+
+// === 5. 隨機抽選與其他功能 (保持不變) ===
+function startRNG(instant = false) {
+    const foods = window.FOOD_DATA || [];
     const validFoods = foods.filter(f => {
-        // 時段篩選
         const fTime = Array.isArray(f.time) ? f.time : []; 
         const tMatch = filterState.time === 'all' || fTime.includes(filterState.time);
-
-        // ★ 關鍵修正：改用 styles 裡的 ID 來比對，而不是用舊的 category 字串
-        // filterState.category 現在是數字字串 (如 "11")，所以用 == 寬鬆比對
         const cMatch = filterState.category === 'all' || 
                        (f.styles && f.styles.some(s => s.id == filterState.category));
-
         return tMatch && cMatch;
     });
 
-    console.log("符合條件的店家數:", validFoods.length);
-
-    // 3. 檢查結果
     if(validFoods.length === 0) { 
-        alert(`沒有符合條件的店家！\n目前篩選條件：\n時段: ${filterState.time}\n分類ID: ${filterState.category}\n\n請嘗試切換為「全部」試試看。`); 
+        alert(`沒有符合條件的店家！請嘗試切換條件試試看。`); 
         return; 
     }
 
-    // 4. UI 互動與結果顯示
     const btn = document.getElementById('rng-btn');
     const txt = document.getElementById('rng-btn-text');
     const controls = document.getElementById('controls-area');
@@ -86,21 +158,14 @@ function startRNG(instant = false) {
     
     if(!instant) {
         if(btn) btn.disabled = true;
-        
-        // ★ 顯示轉動動畫 (如果 HTML 有這個元素)
         if(controls && anim) {
             controls.classList.add('hidden');
             anim.classList.remove('hidden');
             anim.classList.add('flex');
-        } else if(txt) {
-            txt.textContent = "抽選中...";
-        }
+        } else if(txt) txt.textContent = "抽選中...";
         
-        // 動畫延遲效果 (1.5秒後顯示結果)
         setTimeout(() => {
             const picked = validFoods[Math.floor(Math.random() * validFoods.length)];
-            
-            // 隱藏動畫，恢復按鈕
             if(controls && anim) {
                 anim.classList.add('hidden');
                 anim.classList.remove('flex');
@@ -108,30 +173,24 @@ function startRNG(instant = false) {
             }
             if(btn) btn.disabled = false;
             if(txt) txt.textContent = "開始隨機抽選";
-
             showResult(picked);
         }, 1500);
     } else {
-        // 快速模式
         const picked = validFoods[Math.floor(Math.random() * validFoods.length)];
         showResult(picked);
     }
 }
 
 function showResult(food) {
-    console.log("抽選結果:", food.name);
     document.getElementById('res-name').textContent = food.name;
     document.getElementById('res-loc').textContent = food.location;
     document.getElementById('res-price').textContent = food.price;
-    
     const starContainer = document.getElementById('res-stars');
     if(starContainer) {
         starContainer.innerHTML = Array.from({length: 5}).map((_, i) => 
             `<span class="material-symbols-rounded text-2xl">${i < food.stars ? 'star' : 'star_outline'}</span>`
         ).join('');
     }
-    
-    // 重置回饋按鈕
     const feedbackArea = document.getElementById('result-feedback-area');
     if(feedbackArea) {
         feedbackArea.innerHTML = `
@@ -147,18 +206,14 @@ function showResult(food) {
                 </div>
             </div>`;
     }
-    
     toggleModal('result-modal');
     currentResult = food;
     saveStats(food);
     saveHistory(food);
 }
 
-// === 5. 篩選與 UI 控制 ===
 function setFilter(type, val) {
     filterState[type] = val;
-    console.log(`篩選條件更新: ${type} = ${val}`);
-    
     if(type === 'time') {
         document.querySelectorAll('.filter-btn-time').forEach(btn => {
             const active = btn.dataset.val === val;
@@ -172,7 +227,7 @@ function initHomeLoader() {
     if(loader && !sessionStorage.getItem('visited')) {
         setTimeout(() => {
             loader.classList.add('opacity-0');
-            loader.style.pointerEvents = 'none'; // 讓滑鼠穿透
+            loader.style.pointerEvents = 'none';
             setTimeout(() => loader.style.display = 'none', 1000);
             sessionStorage.setItem('visited', 'true');
         }, 1500);
@@ -182,12 +237,10 @@ function initHomeLoader() {
     }
 }
 
-// === 6. 其他輔助函式 (歷史紀錄、地圖、主題) ===
 function renderHistory() {
     const list = document.getElementById('history-list');
     if(!list) return;
     const history = JSON.parse(localStorage.getItem('foodHistory')) || [];
-    
     if(history.length === 0) {
         list.innerHTML = '<div class="col-span-full text-center py-20 glass rounded-[2rem] opacity-30 italic font-light">尚無任何搜尋記錄</div>';
     } else {
@@ -225,12 +278,9 @@ function saveHistory(food) {
     renderHistory();
 }
 
-// === 店家頁面與地圖 ===
 function setStoreCategory(id) {
-    // 將選擇的分類儲存到搜尋框的 data-cat 屬性中，方便 filterStores 讀取
     const searchInput = document.getElementById('store-search');
     if(searchInput) searchInput.dataset.cat = id;
-    
     document.querySelectorAll('.store-cat-btn').forEach(btn => {
         const active = btn.dataset.id === id;
         btn.className = `store-cat-btn px-3 py-1.5 rounded-lg text-3sm font-bold tracking-[0.1em] uppercase transition-all border ${active ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-white/5 border-white/5 opacity-50'}`;
@@ -242,17 +292,14 @@ function filterStores() {
     const input = document.getElementById('store-search');
     if(!input) return;
     const term = input.value.toLowerCase();
-    const cat = input.dataset.cat || 'all'; // 這裡存的是 style_id
-    
+    const cat = input.dataset.cat || 'all';
     const foods = window.FOOD_DATA || [];
     const filtered = foods.filter(f => {
         const matchesTerm = f.name.toLowerCase().includes(term) || f.location.includes(term);
-        // 檢查 style_id
         const matchesCat = cat === 'all' || (f.styles && f.styles.some(s => s.id == cat));
         return matchesTerm && matchesCat;
     });
 
-    // 更新 Sidebar (顯示真實標籤)
     const sidebar = document.getElementById('store-list-sidebar');
     if(sidebar) {
         sidebar.innerHTML = filtered.map(f => `
@@ -267,7 +314,6 @@ function filterStores() {
             </div>`).join('') || '<div class="text-center py-20 opacity-30 text-sm italic">尚無店家數據</div>';
     }
     
-    // 更新 Table (顯示真實標籤)
     const tbody = document.getElementById('store-table-body');
     if(tbody) {
         tbody.innerHTML = filtered.map(f => `
@@ -289,7 +335,6 @@ function initMap() {
     if(typeof L === 'undefined' || !document.getElementById('map')) return;
     mapInstance = L.map('map', { zoomControl: false }).setView([24.9959, 121.4527], 16);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance);
-    
     const foods = window.FOOD_DATA || [];
     foods.forEach(f => {
         if(f.lat && f.lng) {
@@ -312,7 +357,6 @@ function setStoreView(mode) {
     const tableDiv = document.getElementById('view-table');
     const btnMap = document.getElementById('btn-view-map');
     const btnTable = document.getElementById('btn-view-table');
-
     if(mode === 'map') {
         mapDiv.classList.remove('hidden'); mapDiv.classList.add('flex');
         tableDiv.classList.add('hidden');
@@ -327,7 +371,6 @@ function setStoreView(mode) {
     }
 }
 
-// === 其他 ===
 function toggleModal(id) {
     const el = document.getElementById(id);
     if(!el) return;
@@ -335,6 +378,11 @@ function toggleModal(id) {
         el.classList.remove('hidden');
         el.classList.add('flex');
         if(id === 'dashboard-modal') updateDashboardUI();
+        if(id === 'settings-modal') {
+             const savedId = localStorage.getItem('rng_theme') || 'default';
+             const select = document.getElementById('theme-select');
+             if(select) select.value = savedId;
+        }
     } else {
         el.classList.add('hidden');
         el.classList.remove('flex');
@@ -345,35 +393,11 @@ function updateDashboardUI() {
     const saved = localStorage.getItem('decisionStats');
     const stats = saved ? JSON.parse(saved) : { totalDecisions: 0, categories: {} };
     document.getElementById('stat-decisions').textContent = stats.totalDecisions;
-    document.getElementById('stat-avg').textContent = '0s'; // 簡化處理
-    
+    document.getElementById('stat-avg').textContent = '0.0s'; 
     document.getElementById('stat-categories').innerHTML = Object.entries(stats.categories).map(([k,v]) => `
         <div class="p-4 rounded-2xl bg-white/5 flex justify-between items-center mb-2">
             <span class="text-sm capitalize font-light">${k}</span><span class="text-xs opacity-40">${v} 次</span>
         </div>`).join('') || '<p class="text-center opacity-30 text-xs">無數據</p>';
-}
-
-function loadTheme() {
-    const savedId = localStorage.getItem('rng_theme') || 'default';
-    selectTheme(savedId);
-}
-
-function selectTheme(id) {
-    const theme = THEMES.find(t => t.id === id) || THEMES[0];
-    localStorage.setItem('rng_theme', id);
-    applyTheme(theme);
-}
-
-function applyTheme(theme) {
-    const body = document.getElementById('app-body');
-    if(!body) return;
-    THEMES.forEach(t => body.classList.remove(t.bg, t.text));
-    body.classList.add(theme.bg, theme.text);
-    
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        const isSel = btn.dataset.id === theme.id;
-        btn.className = `theme-btn p-5 rounded-[1.5rem] border transition-all text-left ${isSel ? 'border-blue-500 bg-blue-500/10' : 'border-white/10 bg-white/5 hover:border-white/30'}`;
-    });
 }
 
 async function fetchAiTip() {
