@@ -12,6 +12,7 @@ window.setStoreCategory = setStoreCategory;
 window.filterStores = filterStores;
 window.panToStore = panToStore;
 window.selectTheme = selectTheme;
+window.resetStats = resetStats; // ★ 新增這一行
 
 // === 2. 全域變數 ===
 // ★ 修改：與 server.js 同步，將 sky 替換為 grey
@@ -430,6 +431,20 @@ function updateDashboardUI() {
         <div class="p-4 rounded-2xl bg-white/5 flex justify-between items-center mb-2">
             <span class="text-sm capitalize font-light">${k}</span><span class="text-xs opacity-40">${v} 次</span>
         </div>`).join('') || '<p class="text-center opacity-30 text-xs">無數據</p>';
+}
+// ★ 新增：重置統計數據功能
+function resetStats() {
+    // 1. 跳出確認視窗
+    if(!confirm('⚠️ 確定要清空所有統計數據嗎？\n此動作無法復原。')) return;
+
+    // 2. 清除 localStorage 中的數據
+    localStorage.removeItem('decisionStats');
+
+    // 3. 立即更新介面 (會變回 0)
+    updateDashboardUI();
+
+    // 4. 提示成功
+    alert('統計數據已重置歸零！');
 }
 
 async function fetchAiTip() {
