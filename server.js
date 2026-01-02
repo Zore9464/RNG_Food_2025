@@ -33,9 +33,9 @@ const THEMES = [
 ];
 
 const TEAM = [
-    { id: 1, name: "林品承", studentId: "112111113", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接。" },
-    { id: 2, name: "林劭瑋", studentId: "112111125", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接。" },
-    { id: 3, name: "呂佩衫", studentId: "112111121", role: "後端/資料庫架設", description: "負責 MYSQL 資料庫的建立與後端網頁的連接。" }
+    { id: 1, name: "林品承", studentId: "112111113", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
+    { id: 2, name: "林劭瑋", studentId: "112111125", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
+    { id: 3, name: "呂佩衫", studentId: "112111121", role: "後端/資料庫架設", description: "負責 MYSQL 資料庫的建立與後端網頁的連接" }
 ];
 
 // ★ 新增：管理者帳號設定 (三個帳號)
