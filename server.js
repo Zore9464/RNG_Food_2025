@@ -33,7 +33,7 @@ const THEMES = [
 ];
 
 const TEAM = [
-     { id: 1, name: "林品承", studentId: "112111113", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
+    { id: 1, name: "林品承", studentId: "112111113", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
     { id: 2, name: "林劭瑋", studentId: "112111125", role: "前/後端開發、UI設計", description: "負責前端與後端的網頁程式碼設計，以及後端與資料庫的連接" },
     { id: 3, name: "呂佩衫", studentId: "112111121", role: "後端/資料庫架設", description: "負責 MYSQL 資料庫的建立與後端網頁的連接" }
 ];
@@ -132,7 +132,7 @@ app.get('/stores', async (req, res) => {
     res.render('stores', { title: '探索店家', foods: foods, styles: categoryStyles });
 });
 
-app.get('/about', (req, res) => res.render('about', { title: '團隊與理念', team: TEAM }));
+app.get('/about', (req, res) => res.render('about', { title: '關於我們', team: TEAM }));
 
 // === 登入與後台管理路由 ===
 
