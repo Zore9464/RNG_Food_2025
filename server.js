@@ -20,16 +20,61 @@ app.use(session({
 
 // server.js
 
-// === 靜態設定資料 (已擴充) ===
+// === 靜態設定資料 ===
 const THEMES = [
-    { id: 'default', name: '經典黑白', bg: 'bg-black', text: 'text-white', accent: 'text-white', surface: 'bg-white/10', border: 'border-white/20' },
-    { id: 'light', name: '極簡亮白', bg: 'bg-zinc-50', text: 'text-zinc-900', accent: 'text-zinc-900', surface: 'bg-white', border: 'border-zinc-300' },
-    { id: 'midnight', name: '午夜深藍', bg: 'bg-slate-950', text: 'text-slate-100', accent: 'text-blue-400', surface: 'bg-slate-900/80', border: 'border-slate-800' },
-    { id: 'forest', name: '森林墨綠', bg: 'bg-emerald-950', text: 'text-emerald-50', accent: 'text-emerald-400', surface: 'bg-emerald-900/60', border: 'border-emerald-800' },
-    // ★ 新增的三個主題
-    { id: 'ocean', name: '海洋蔚藍', bg: 'bg-cyan-950', text: 'text-cyan-50', accent: 'text-cyan-400', surface: 'bg-cyan-900/60', border: 'border-cyan-800' },
-    { id: 'sunset', name: '日落暖橘', bg: 'bg-orange-950', text: 'text-orange-50', accent: 'text-orange-400', surface: 'bg-orange-900/60', border: 'border-orange-800' },
-    { id: 'lavender', name: '夢幻紫羅蘭', bg: 'bg-purple-950', text: 'text-purple-50', accent: 'text-purple-400', surface: 'bg-purple-900/60', border: 'border-purple-800' }
+    // 1. 基礎主題
+    { 
+        id: 'default', name: '經典黑白', 
+        bg: 'bg-black', text: 'text-white', 
+        btn: 'bg-white text-black', 
+        surface: 'bg-white/10', border: 'border-white/20' 
+    },
+    { 
+        id: 'light', name: '極簡亮白', 
+        bg: 'bg-zinc-50', text: 'text-zinc-900', 
+        btn: 'bg-zinc-900 text-white', 
+        surface: 'bg-white', border: 'border-zinc-300' 
+    },
+    
+    // 2. 深色主題
+    { 
+        id: 'midnight', name: '午夜深藍', 
+        bg: 'bg-slate-950', text: 'text-slate-100', 
+        btn: 'bg-blue-600 text-white', 
+        surface: 'bg-slate-900/80', border: 'border-slate-800' 
+    },
+    { 
+        id: 'forest', name: '森林墨綠', 
+        bg: 'bg-emerald-950', text: 'text-emerald-50', 
+        btn: 'bg-emerald-600 text-white', 
+        surface: 'bg-emerald-900/60', border: 'border-emerald-800' 
+    },
+
+    // 3. 淺色主題 (★ 修改：將藍色改為灰色，其他保持加深版)
+    { 
+        id: 'grey', name: '雅緻灰調', // ID 改為 grey
+        bg: 'bg-gray-200',  // 使用中灰色背景
+        text: 'text-gray-950', // 深灰文字
+        btn: 'bg-gray-600 text-white', // 深灰按鈕
+        surface: 'bg-white/70', 
+        border: 'border-gray-300' 
+    },
+    { 
+        id: 'cream', name: '焦糖暖橘', 
+        bg: 'bg-orange-200', 
+        text: 'text-orange-950', 
+        btn: 'bg-orange-600 text-white', 
+        surface: 'bg-white/70', 
+        border: 'border-orange-300' 
+    },
+    { 
+        id: 'lilac', name: '薰衣草紫', 
+        bg: 'bg-purple-200', 
+        text: 'text-purple-950', 
+        btn: 'bg-purple-600 text-white', 
+        surface: 'bg-white/70', 
+        border: 'border-purple-300' 
+    }
 ];
 
 const TEAM = [

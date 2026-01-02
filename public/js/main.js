@@ -13,8 +13,8 @@ window.filterStores = filterStores;
 window.panToStore = panToStore;
 window.selectTheme = selectTheme;
 
-// === 2. 全域變數 & 主題設定 ===
-// ★ 修改：加入 surface (視窗背景) 與 border (邊框) 設定，讓視窗也能換膚
+// === 2. 全域變數 ===
+// ★ 修改：與 server.js 同步，將 sky 替換為 grey
 const THEMES = [
   { 
       id: 'default', 
@@ -40,23 +40,25 @@ const THEMES = [
       btn: 'bg-emerald-600 text-white',
       surface: 'bg-emerald-900/60', border: 'border-emerald-800'
   },
+  // ★ 修改：灰色主題
   { 
-      id: 'ocean', 
-      bg: 'bg-cyan-950', text: 'text-cyan-50', 
-      btn: 'bg-cyan-600 text-white',
-      surface: 'bg-cyan-900/60', border: 'border-cyan-800'
+      id: 'grey', 
+      bg: 'bg-gray-200', text: 'text-gray-950', 
+      btn: 'bg-gray-600 text-white', 
+      surface: 'bg-white/70', border: 'border-gray-300'
+  },
+  // 其他淺色主題保持不變
+  { 
+      id: 'cream', 
+      bg: 'bg-orange-200', text: 'text-orange-950', 
+      btn: 'bg-orange-600 text-white', 
+      surface: 'bg-white/70', border: 'border-orange-300'
   },
   { 
-      id: 'sunset', 
-      bg: 'bg-orange-950', text: 'text-orange-50', 
-      btn: 'bg-orange-600 text-white',
-      surface: 'bg-orange-900/60', border: 'border-orange-800'
-  },
-  { 
-      id: 'lavender', 
-      bg: 'bg-purple-950', text: 'text-purple-50', 
-      btn: 'bg-purple-600 text-white',
-      surface: 'bg-purple-900/60', border: 'border-purple-800'
+      id: 'lilac', 
+      bg: 'bg-purple-200', text: 'text-purple-950', 
+      btn: 'bg-purple-600 text-white', 
+      surface: 'bg-white/70', border: 'border-purple-300'
   }
 ];
 
