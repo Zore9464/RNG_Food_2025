@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session'); // ★ 新增：引入 Session 管理
-const { Store, Style } = require('./models');
+const { sequelize, Store, Style } = require('./models');
 const app = express();
 const port = 3000;
 
@@ -318,6 +318,9 @@ app.post('/admin/delete-shop', checkAuth, async (req, res) => {
         // 3. 關聯清空後，才能安全刪除店家本體
         await store.destroy();
 
+        // 這行指令會告訴 MySQL：「請把下一個 ID 設為目前最大 ID + 1」
+        await sequelize.query("ALTER TABLE store AUTO_INCREMENT = 1");
+        
         res.json({ success: true });
 
     } catch (error) {
