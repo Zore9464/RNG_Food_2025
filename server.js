@@ -299,6 +299,37 @@ app.post('/admin/create-shop', checkAuth, async (req, res) => {
     }
 });
 
+// ★ API: 刪除店家
+app.post('/admin/delete-shop', checkAuth, async (req, res) => {
+    const { id } = req.body; // 取得前端傳來的店家 ID
+
+    try {
+        // 1. 先找出這家店
+        const store = await Store.findByPk(id);
+
+        if (!store) {
+            return res.json({ success: false, message: '找不到該店家資料' });
+        }
+
+        // 2. 關鍵步驟：先移除所有關聯 (解決外鍵約束 ERROR 1451 問題)
+        // 這會自動刪除 store_style_map 中該店家的所有紀錄
+        await store.setStyles([]); 
+
+        // 3. 關聯清空後，才能安全刪除店家本體
+        await store.destroy();
+
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error("Delete Error:", error);
+        // 如果是外鍵錯誤，通常會包含 'foreign key constraint fails'
+        if (error.message.includes('foreign key constraint fails')) {
+            return res.json({ success: false, message: '刪除失敗：請先確認是否已清除相關聯的分類設定' });
+        }
+        res.json({ success: false, message: '系統錯誤：刪除失敗' });
+    }
+});
+
 // 模擬 AI 建議 API
 app.post('/api/ai-suggestion', (req, res) => {
     const tips = [
