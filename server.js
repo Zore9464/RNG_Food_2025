@@ -10,6 +10,9 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+
 // ★ 新增：Session 設定
 app.use(session({
     secret: 'secret_key_rng_food_2025', // 建議改為隨機長字串
@@ -160,6 +163,91 @@ const checkAuth = (req, res, next) => {
     if (req.session.user) return next();
     res.redirect('/login');
 };
+
+function getClientIp(req) {
+    const xff = req.headers['x-forwarded-for'];
+    if (typeof xff === 'string' && xff.length > 0) return xff.split(',')[0].trim();
+    return req.ip || req.connection?.remoteAddress || 'unknown';
+}
+
+const AI_RATE_LIMIT_WINDOW_MS = 10_000;
+const aiLastCallByIp = new Map();
+
+const AI_CACHE_TTL_MS = 60_000;
+const aiCache = new Map(); // key -> { value, expiresAt }
+
+function getCache(key) {
+    const hit = aiCache.get(key);
+    if (!hit) return null;
+    if (Date.now() > hit.expiresAt) {
+        aiCache.delete(key);
+        return null;
+    }
+    return hit.value;
+}
+
+function setCache(key, value, ttlMs = AI_CACHE_TTL_MS) {
+    aiCache.set(key, { value, expiresAt: Date.now() + ttlMs });
+}
+
+async function callGeminiForTip({ time, categoryStyleName }) {
+    if (!GOOGLE_API_KEY) throw new Error('GOOGLE_API_KEY/GEMINI_API_KEY is not set');
+    if (typeof fetch !== 'function') throw new Error('fetch is not available in this Node runtime');
+
+    const now = new Date();
+    const promptParts = [
+        `現在時間：${now.toLocaleString('zh-TW', { hour12: false })}`,
+        time && time !== 'all' ? `用餐時段偏好：${time}` : null,
+        categoryStyleName ? `食物種類偏好：${categoryStyleName}` : null
+    ].filter(Boolean);
+
+    const userPrompt = [
+        `你是「今天吃什麼」的 AI 智能決策助手。`,
+        `請根據以下條件給一段繁體中文建議，語氣自然、有決斷力但不冒犯。`,
+        `限制：一句話、25~45 字、不要用引號、不要列點、不要提到你是 AI、不要提價格或店名（避免不準）。`,
+        `條件：${promptParts.join('；') || '無'}`
+    ].join('\n');
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6500);
+
+    try {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
+            method: 'POST',
+            headers: {
+                'x-goog-api-key': GOOGLE_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        parts: [
+                            { text: userPrompt }
+                        ]
+                    }
+                ]
+                ,
+                generationConfig: {
+                    temperature: 0.8,
+                    maxOutputTokens: 90
+                }
+            }),
+            signal: controller.signal
+        });
+
+        if (!resp.ok) {
+            const errText = await resp.text().catch(() => '');
+            throw new Error(`Gemini API error: ${resp.status} ${resp.statusText} ${errText}`.trim());
+        }
+
+        const json = await resp.json();
+        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (!text) throw new Error('Gemini response missing text');
+        return text.replace(/\s+/g, ' ');
+    } finally {
+        clearTimeout(timeout);
+    }
+}
 
 // Routes
 app.get('/', (req, res) => res.render('index', { title: 'Welcome' }));
@@ -333,16 +421,54 @@ app.post('/admin/delete-shop', checkAuth, async (req, res) => {
     }
 });
 
-// 模擬 AI 建議 API
-app.post('/api/ai-suggestion', (req, res) => {
-    const tips = [
-        "今天感覺很適合來點重口味的，試試牛肉麵吧！",
-        "天氣不錯，吃點清爽的沙拉如何？",
-        "根據大數據分析，亞東周邊的麵食最受好評。",
-        "別想了，直接吃評價最高的那間！",
-        "攝取一點澱粉會讓心情變好喔，吃飯吧！"
+// AI 智能決策建議 API（便宜模型 + 快取 + 回退）
+app.post('/api/ai-suggestion', async (req, res) => {
+    const fallbackTips = [
+        "今天就別猶豫了，挑一個你最常忽略的類型試試看。",
+        "想吃得滿足一點就選熱食，想清爽就選輕食，現在就決定。",
+        "先看你今天偏好鹹或清爽；選定方向後就直接下手別回頭。",
+        "如果你還在猶豫，代表你不排斥嘗試；今天就選一個沒吃過的。",
+        "用餐時間到了就別想太多，先把胃顧好，晚點再煩惱。"
     ];
-    setTimeout(() => res.json({ text: tips[Math.floor(Math.random() * tips.length)] }), 600);
+
+    const clientIp = getClientIp(req);
+    const last = aiLastCallByIp.get(clientIp) || 0;
+    if (Date.now() - last < AI_RATE_LIMIT_WINDOW_MS) {
+        const cached = getCache(`last:${clientIp}`);
+        if (cached) return res.json({ text: cached, cached: true });
+        return res.status(429).json({ text: fallbackTips[Math.floor(Math.random() * fallbackTips.length)], cached: false });
+    }
+    aiLastCallByIp.set(clientIp, Date.now());
+
+    const time = (req.body?.time || 'all').toString();
+    const category = (req.body?.category || 'all').toString();
+
+    let categoryStyleName = null;
+    if (category !== 'all' && /^\d+$/.test(category)) {
+        try {
+            const style = await Style.findByPk(Number(category));
+            if (style?.style_name) categoryStyleName = style.style_name;
+        } catch (_) {}
+    }
+
+    const cacheKey = `tip:${time}:${categoryStyleName || category}`;
+    const cached = getCache(cacheKey);
+    if (cached) {
+        setCache(`last:${clientIp}`, cached, AI_CACHE_TTL_MS);
+        return res.json({ text: cached, cached: true });
+    }
+
+    try {
+        const text = await callGeminiForTip({ time, categoryStyleName });
+        setCache(cacheKey, text);
+        setCache(`last:${clientIp}`, text, AI_CACHE_TTL_MS);
+        return res.json({ text, cached: false, model: GEMINI_MODEL });
+    } catch (err) {
+        console.error('[AI suggestion] fallback:', err?.message || err);
+        const text = fallbackTips[Math.floor(Math.random() * fallbackTips.length)];
+        setCache(`last:${clientIp}`, text, 15_000);
+        return res.json({ text, cached: true, fallback: true });
+    }
 });
 
 app.listen(port, () => {
