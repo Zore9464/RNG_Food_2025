@@ -3,15 +3,18 @@ const express = require('express');
 const session = require('express-session'); // ★ 新增：引入 Session 管理
 const { sequelize, Store, Style } = require('./models');
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT) || 3000;
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+// 初始化官方 Gemini 客戶端
+const genAI = GOOGLE_API_KEY ? new GoogleGenerativeAI(GOOGLE_API_KEY) : null;
 
 // ★ 新增：Session 設定
 app.use(session({
@@ -26,57 +29,57 @@ app.use(session({
 // === 靜態設定資料 ===
 const THEMES = [
     // 1. 基礎主題
-    { 
-        id: 'default', name: '經典黑白', 
-        bg: 'bg-black', text: 'text-white', 
-        btn: 'bg-white text-black', 
-        surface: 'bg-white/10', border: 'border-white/20' 
+    {
+        id: 'default', name: '經典黑白',
+        bg: 'bg-black', text: 'text-white',
+        btn: 'bg-white text-black',
+        surface: 'bg-white/10', border: 'border-white/20'
     },
-    { 
-        id: 'light', name: '極簡亮白', 
-        bg: 'bg-zinc-50', text: 'text-zinc-900', 
-        btn: 'bg-zinc-900 text-white', 
-        surface: 'bg-white', border: 'border-zinc-300' 
+    {
+        id: 'light', name: '極簡亮白',
+        bg: 'bg-zinc-50', text: 'text-zinc-900',
+        btn: 'bg-zinc-900 text-white',
+        surface: 'bg-white', border: 'border-zinc-300'
     },
-    
+
     // 2. 深色主題
-    { 
-        id: 'midnight', name: '午夜深藍', 
-        bg: 'bg-slate-950', text: 'text-slate-100', 
-        btn: 'bg-blue-600 text-white', 
-        surface: 'bg-slate-900/80', border: 'border-slate-800' 
+    {
+        id: 'midnight', name: '午夜深藍',
+        bg: 'bg-slate-950', text: 'text-slate-100',
+        btn: 'bg-blue-600 text-white',
+        surface: 'bg-slate-900/80', border: 'border-slate-800'
     },
-    { 
-        id: 'forest', name: '森林墨綠', 
-        bg: 'bg-emerald-950', text: 'text-emerald-50', 
-        btn: 'bg-emerald-600 text-white', 
-        surface: 'bg-emerald-900/60', border: 'border-emerald-800' 
+    {
+        id: 'forest', name: '森林墨綠',
+        bg: 'bg-emerald-950', text: 'text-emerald-50',
+        btn: 'bg-emerald-600 text-white',
+        surface: 'bg-emerald-900/60', border: 'border-emerald-800'
     },
 
     // 3. 淺色主題 (★ 修改：將藍色改為灰色，其他保持加深版)
-    { 
+    {
         id: 'grey', name: '雅緻灰調', // ID 改為 grey
         bg: 'bg-gray-200',  // 使用中灰色背景
         text: 'text-gray-950', // 深灰文字
         btn: 'bg-gray-600 text-white', // 深灰按鈕
-        surface: 'bg-white/70', 
-        border: 'border-gray-300' 
+        surface: 'bg-white/70',
+        border: 'border-gray-300'
     },
-    { 
-        id: 'cream', name: '焦糖暖橘', 
-        bg: 'bg-orange-200', 
-        text: 'text-orange-950', 
-        btn: 'bg-orange-600 text-white', 
-        surface: 'bg-white/70', 
-        border: 'border-orange-300' 
+    {
+        id: 'cream', name: '焦糖暖橘',
+        bg: 'bg-orange-200',
+        text: 'text-orange-950',
+        btn: 'bg-orange-600 text-white',
+        surface: 'bg-white/70',
+        border: 'border-orange-300'
     },
-    { 
-        id: 'lilac', name: '薰衣草紫', 
-        bg: 'bg-purple-200', 
-        text: 'text-purple-950', 
-        btn: 'bg-purple-600 text-white', 
-        surface: 'bg-white/70', 
-        border: 'border-purple-300' 
+    {
+        id: 'lilac', name: '薰衣草紫',
+        bg: 'bg-purple-200',
+        text: 'text-purple-950',
+        btn: 'bg-purple-600 text-white',
+        surface: 'bg-white/70',
+        border: 'border-purple-300'
     }
 ];
 
@@ -173,7 +176,8 @@ function getClientIp(req) {
 const AI_RATE_LIMIT_WINDOW_MS = 10_000;
 const aiLastCallByIp = new Map();
 
-const AI_CACHE_TTL_MS = 60_000;
+// 拉長快取，避免免費額度很快用完
+const AI_CACHE_TTL_MS = 10 * 60_000;
 const aiCache = new Map(); // key -> { value, expiresAt }
 
 function getCache(key) {
@@ -190,9 +194,9 @@ function setCache(key, value, ttlMs = AI_CACHE_TTL_MS) {
     aiCache.set(key, { value, expiresAt: Date.now() + ttlMs });
 }
 
+// --- callGeminiForTip 函數 ---
 async function callGeminiForTip({ time, categoryStyleName }) {
-    if (!GOOGLE_API_KEY) throw new Error('GOOGLE_API_KEY/GEMINI_API_KEY is not set');
-    if (typeof fetch !== 'function') throw new Error('fetch is not available in this Node runtime');
+    if (!genAI) throw new Error('GOOGLE_API_KEY/GEMINI_API_KEY is not set');
 
     const now = new Date();
     const promptParts = [
@@ -201,53 +205,47 @@ async function callGeminiForTip({ time, categoryStyleName }) {
         categoryStyleName ? `食物種類偏好：${categoryStyleName}` : null
     ].filter(Boolean);
 
-    const userPrompt = [
-        `你是「今天吃什麼」的 AI 智能決策助手。`,
-        `請根據以下條件給一段繁體中文建議，語氣自然、有決斷力但不冒犯。`,
-        `限制：一句話、25~45 字、不要用引號、不要列點、不要提到你是 AI、不要提價格或店名（避免不準）。`,
-        `條件：${promptParts.join('；') || '無'}`
-    ].join('\n');
+    const userPrompt = `
+請你扮演「今天吃什麼」的文字決策助手，語氣自然、有決斷力但不冒犯。
+任務：根據以下【條件】，輸出一段「完整的一句話」餐點類型建議（務必夠長、夠完整）。
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6500);
+【條件】
+${promptParts.join('\n') || '（無）'}
 
-    try {
-        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
-            method: 'POST',
-            headers: {
-                'x-goog-api-key': GOOGLE_API_KEY,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [
-                            { text: userPrompt }
-                        ]
-                    }
-                ]
-                ,
-                generationConfig: {
-                    temperature: 0.8,
-                    maxOutputTokens: 90
-                }
-            }),
-            signal: controller.signal
+【嚴格限制（一定要遵守）】
+1. 只輸出一段文字（不要列點、不要加標題、不要加前後說明）。
+2. 必須是完整句子，結尾一定要用全形句號「。」。
+3. 字數 25~45（以中文字符大約估算即可），不得少於 25 字，不要太短。
+4. 絕對不要提到「你是 AI」或「AI建議」。
+5. 不要提具體店名或價格，只給「食物類型/口味方向」。
+
+【格式範例（只看格式與長度，不要照抄內容）】
+今天就選一種熱騰騰又有飽足感的主食，吃完立刻回血繼續衝。
+
+現在請直接輸出建議（只要一句話）：
+`.trim();
+
+    async function generateOnce({ prompt, temperature }) {
+        const model = genAI.getGenerativeModel({
+            model: GEMINI_MODEL,
+            generationConfig: {
+                temperature,
+                maxOutputTokens: 180
+            }
         });
 
-        if (!resp.ok) {
-            const errText = await resp.text().catch(() => '');
-            throw new Error(`Gemini API error: ${resp.status} ${resp.statusText} ${errText}`.trim());
-        }
-
-        const json = await resp.json();
-        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (!text) throw new Error('Gemini response missing text');
-        return text.replace(/\s+/g, ' ');
-    } finally {
-        clearTimeout(timeout);
+        const result = await model.generateContent(prompt);
+        const text = result?.response?.text?.() || '';
+        return String(text).trim().replace(/\s+/g, ' ').trim();
     }
+
+    // 免費額度很少，避免重試造成一次建議打多次 API
+    const text = await generateOnce({ prompt: userPrompt, temperature: 0.8 });
+    if (!text) throw new Error('Gemini response missing text');
+    if (text.length < 15) throw new Error(`Gemini output too short: "${text}"`);
+    return text;
 }
+// ----------------------------------------
 
 // Routes
 app.get('/', (req, res) => res.render('index', { title: 'Welcome' }));
@@ -401,14 +399,14 @@ app.post('/admin/delete-shop', checkAuth, async (req, res) => {
 
         // 2. 關鍵步驟：先移除所有關聯 (解決外鍵約束 ERROR 1451 問題)
         // 這會自動刪除 store_style_map 中該店家的所有紀錄
-        await store.setStyles([]); 
+        await store.setStyles([]);
 
         // 3. 關聯清空後，才能安全刪除店家本體
         await store.destroy();
 
         // 這行指令會告訴 MySQL：「請把下一個 ID 設為目前最大 ID + 1」
         await sequelize.query("ALTER TABLE store AUTO_INCREMENT = 1");
-        
+
         res.json({ success: true });
 
     } catch (error) {
@@ -448,7 +446,7 @@ app.post('/api/ai-suggestion', async (req, res) => {
         try {
             const style = await Style.findByPk(Number(category));
             if (style?.style_name) categoryStyleName = style.style_name;
-        } catch (_) {}
+        } catch (_) { }
     }
 
     const cacheKey = `tip:${time}:${categoryStyleName || category}`;
@@ -464,10 +462,13 @@ app.post('/api/ai-suggestion', async (req, res) => {
         setCache(`last:${clientIp}`, text, AI_CACHE_TTL_MS);
         return res.json({ text, cached: false, model: GEMINI_MODEL });
     } catch (err) {
+        console.error("🚨 AI 崩潰啦，真實原因是：", err);
         console.error('[AI suggestion] fallback:', err?.message || err);
         const text = fallbackTips[Math.floor(Math.random() * fallbackTips.length)];
         setCache(`last:${clientIp}`, text, 15_000);
-        return res.json({ text, cached: true, fallback: true });
+        const msg = (err?.message || '').toString();
+        const quota = msg.includes('429') || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate');
+        return res.json({ text, cached: true, fallback: true, quota });
     }
 });
 
